@@ -1,2 +1,2 @@
-__version__ = "2019.9.3"
-__codename__ = "Australian Mist"
+__version__ = "2020.2.0"
+__codename__ = "Burmilla"
