@@ -26,8 +26,11 @@ _nodoc = {
     "unicode_literals",
 }
 
-_MATH_RE = r"(^|[^\\])(\$)((?:\\\$|[^$])*)\2"
-_DMATH_RE = r"(^|[^\\])(\$\$)(.*?)\2"
+_MATH_RE = r"(?P<pre>^|[^\\])(\$)(?P<body>(?:\\\$|[^$])*)\2"
+_MATH2_RE = r"(?P<pre>^|[^\\])\\\((?P<body>(?s).*?)\\\)"
+_DMATH_RE = r"(?P<pre>^|[^\\])(\$\$)(?P<body>.*?)\2"
+_DMATH2_RE = r"(?P<pre>^|[^\\])\\\[(?P<body>(?s).*?)\\\]"
+_DMATHENV_RE = r"\\begin\s*{(?P<env>(?:equation|eqnarray|align)\*?)}(?P<body>(?s).*?)\\end\s*{\1})"
 _ESCAPED_DOLLAR_RE = r"\\(\$)"
 
 
@@ -40,12 +43,14 @@ class RawHtmlInlineProcessor(HtmlInlineProcessor):
         HtmlInlineProcessor.__init__(self, *args, **kwargs)
 
     def handleMatch(self, m, data):
-        pre = m.group(1)
-        body = self.unescape(m.group(3))
-        rawhtml = "%(pre)s<%(tag)s>%(body)s</%(tag)s>" % {
+        pre = m.group("pre")
+        body = self.unescape(m.group("body"))
+        env = m.group("env")
+        rawhtml = "%(pre)s<%(tag)s%(env)s>%(body)s</%(tag)s>" % {
             "tag": self._hz_tag,
             "body": body,
-            "pre": pre,
+            "env": ' env="%s"' % env if env else '',
+            "pre": pre or "", # replace None with empty string
         }
         place_holder = self.md.htmlStash.store(rawhtml)
         return place_holder, m.start(0), m.end(0)
@@ -57,6 +62,15 @@ class MathExtension(Extension):
     def extendMarkdown(self, md):
         """ Modify inline patterns."""
         e = md.inlinePatterns.get_index_for_name("entity")
+        md.inlinePatterns.register(
+            RawHtmlInlineProcessor("displaymath", _DMATHENV_RE, md), "catsoop_dmath", e + 4
+        )
+        md.inlinePatterns.register(
+            RawHtmlInlineProcessor("displaymath", _DMATH2_RE, md), "catsoop_dmath", e + 4
+        )
+        md.inlinePatterns.register(
+            RawHtmlInlineProcessor("math", _MATH2_RE, md), "catsoop_math", e + 4
+        )
         md.inlinePatterns.register(
             RawHtmlInlineProcessor("displaymath", _DMATH_RE, md), "catsoop_dmath", e + 3
         )
