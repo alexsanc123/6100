@@ -133,7 +133,7 @@ def main():
     with open(os.path.join(os.path.dirname(__file__), "requirements.txt"), "r") as f:
         requirements = f.read().split("\n")
 
-    with open(os.path.join(os.path.dirname(__file__), "README"), "r") as f:
+    with open(os.path.join(os.path.dirname(__file__), "README.md"), "r") as f:
         readme = f.read()
 
     try:
@@ -154,7 +154,7 @@ def main():
             license="AGPLv3+",
             description="CAT-SOOP is a tool for automatic collection and assessment of online exercises.",
             long_description=readme,
-            long_description_content_type="text/plain",
+            long_description_content_type="text/markdown",
             include_package_data=True,
             entry_points={
                 "console_scripts": ["catsoop = catsoop.main:command_line_interface"]
