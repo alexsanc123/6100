@@ -28,17 +28,17 @@ otherwise.
 ### INSTALLING
 
 To install, run:
-```
+```nohighlight
 $ pip3 install catsoop
 ```
 
 Or, from a clone of the repository, run:
-```
+```nohighlight
 $ python3 setup.py install
 ```
 
 To generate a config.py file, run:
-```
+```nohighlight
 $ catsoop configure
 ```
 
@@ -47,12 +47,12 @@ copy for debugging purposes), see the instructions at
 <https://catsoop.org/website/docs/installing/server_configuration>
 
 To start the server, run:
-```
+```nohighlight
 $ catsoop start
 ```
 
 To run all the unit tests:
-```
+```nohighlight
 $ python3 setup.py test
 ```
 
