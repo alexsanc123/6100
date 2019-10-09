@@ -1,15 +1,17 @@
+```nohighlight
 \
 /    /\__/\
 \__=(  o_O )=
 (__________)
  |_ |_ |_ |_
+```
 
-  CAT-SOOP
+## CAT-SOOP
 
-* Web Site: https://catsoop.org
-* IRC: #catsoop on OFTC (irc.oftc.net)
-* Mailing List: catsoop-users@mit.edu
-  (subscribe at http://mailman.mit.edu/mailman/listinfo/catsoop-users)
+* Web Site: <https://catsoop.org>
+* IRC: `#catsoop` on OFTC (`irc.oftc.net`)
+* Mailing List: [catsoop-users@mit.edu](mailto:catsoop-users@mit.edu)
+  (subscribe at <http://mailman.mit.edu/mailman/listinfo/catsoop-users>)
 
 
 CAT-SOOP is a flexible, programmable learning management system originally
@@ -23,37 +25,47 @@ course material hosted on a CAT-SOOP instance, unless explicitly stated
 otherwise.
 
 
-INSTALLING
+### INSTALLING
 
 To install, run:
-  $ pip3 install catsoop
+```
+$ pip3 install catsoop
+```
 
 Or, from a clone of the repository, run:
-  $ python3 setup.py install
+```
+$ python3 setup.py install
+```
 
 To generate a config.py file, run:
-  $ catsoop configure
+```
+$ catsoop configure
+```
 
 If you are setting up a public-facing copy of CAT-SOOP (as opposed to a local
 copy for debugging purposes), see the instructions at
-https://catsoop.org/website/docs/installing/server_configuration
+<https://catsoop.org/website/docs/installing/server_configuration>
 
 To start the server, run:
-  $ catsoop start
+```
+$ catsoop start
+```
 
 To run all the unit tests:
-  $ python3 setup.py test
+```
+$ python3 setup.py test
+```
 
 
-HACKING
+### HACKING
 
-See https://catsoop.org/website/docs/contributing/hacking
+See <https://catsoop.org/website/docs/contributing/hacking>
 
 
-INCLUDED SOFTWARE
+### INCLUDED SOFTWARE
 
 CAT-SOOP incorporates pieces of third-party software.  Licensing information
-for the original programs is available in the LICENSE.included_software file.
+for the original programs is available in the `LICENSE.included_software` file.
 The CAT-SOOP distribution also includes several pieces of third-party software.
 Licensing information for these programs is included in this distribution, in
-the LICENSE.bundled_software file.
+the `LICENSE.bundled_software` file.
