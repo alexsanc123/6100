@@ -329,8 +329,10 @@ while True:
                 try:
                     row = cslog.unprep(f.read())
                 except Exception as err:
-                    LOGGER.error("[checker] failed to read queue log file %s, error=%s, traceback=%s" % 
-                                 (qfn, err, traceback.format_exc()))
+                    LOGGER.error(
+                        "[checker] failed to read queue log file %s, error=%s, traceback=%s"
+                        % (qfn, err, traceback.format_exc())
+                    )
                     continue
             _, magic = first.split("_")
             row["magic"] = magic

@@ -150,13 +150,24 @@ def main():
     atexit.register(_kill_children)
 
     while True:
-        for idx, (procinfo, proc) in enumerate(zip(procs, running)):	# restart running process if it has died
+        for idx, (procinfo, proc) in enumerate(
+            zip(procs, running)
+        ):  # restart running process if it has died
             if proc.poll() is not None:
                 (wd, cmd, slp, name) = procinfo
-                LOGGER.error('[start_catsoop] %s (pid=%s) was killed, restarting it' % (name, proc.pid))
-                running[idx] = subprocess.Popen(cmd, cwd=wd, preexec_fn=set_pdeathsig(signal.SIGTERM))
-                LOGGER.error("[start_catsoop] Starting %s (cmd=%s, wd=%s) as pid=%s" % (name, cmd, wd, running[idx].pid))
+                LOGGER.error(
+                    "[start_catsoop] %s (pid=%s) was killed, restarting it"
+                    % (name, proc.pid)
+                )
+                running[idx] = subprocess.Popen(
+                    cmd, cwd=wd, preexec_fn=set_pdeathsig(signal.SIGTERM)
+                )
+                LOGGER.error(
+                    "[start_catsoop] Starting %s (cmd=%s, wd=%s) as pid=%s"
+                    % (name, cmd, wd, running[idx].pid)
+                )
         time.sleep(1)
+
 
 def startup_catsoop(config_loc=None):
     print(cs_logo)
