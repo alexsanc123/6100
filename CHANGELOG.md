@@ -19,6 +19,14 @@ _Work toward next release. Currently under development._
 **DOCUMENTATION:**
 
 
+# Version 2019.9.4
+
+**FIXED:**
+
+* Fixed issue whereby having the logs on a different filesystem from /tmp
+    could cause the checker to crash.
+
+
 # Version 2019.9.3
 
 **FIXED:**
