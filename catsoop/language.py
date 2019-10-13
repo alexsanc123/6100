@@ -881,9 +881,9 @@ def handle_math_tags(tree):
             i.string = "\\begin{aligned}%s\\end{aligned}" % i.string
         # currently ignoring other values of i.attrs["env"], namely, equation
         del i.attrs["env"]
-        if i.name == "math": # (inline math)
+        if i.name == "math":  # (inline math)
             i.name = "span"
-        else: # i.name == "displaymath" (display math)
+        else:  # i.name == "displaymath" (display math)
             i.name = "div"
             i.attrs["style"] = "text-align:center;padding-bottom:10px;"
             i["class"].append("cs_displaymath")

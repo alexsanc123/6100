@@ -47,11 +47,11 @@ class RawHtmlInlineProcessor(HtmlInlineProcessor):
         pre = groups.get("pre", "")
         body = self.unescape(groups["body"])
         env = groups.get("env", "")
-        rawhtml = "%(pre)s<%(tag)s env=\"%(env)s\">%(body)s</%(tag)s>" % {
+        rawhtml = '%(pre)s<%(tag)s env="%(env)s">%(body)s</%(tag)s>' % {
             "tag": self._hz_tag,
             "body": body,
             "env": env,
-            "pre": pre or "", # replace None with empty string
+            "pre": pre or "",  # replace None with empty string
         }
         place_holder = self.md.htmlStash.store(rawhtml)
         return place_holder, m.start(0), m.end(0)
@@ -63,7 +63,9 @@ class MathExtension(Extension):
     def extendMarkdown(self, md):
         """ Modify inline patterns."""
         md.inlinePatterns.register(
-            RawHtmlInlineProcessor("displaymath", _DMATHENV_RE, md), "catsoop_denvmath", 201
+            RawHtmlInlineProcessor("displaymath", _DMATHENV_RE, md),
+            "catsoop_denvmath",
+            201,
         )
         md.inlinePatterns.register(
             RawHtmlInlineProcessor("displaymath", _DMATH2_RE, md), "catsoop_dmath2", 204
