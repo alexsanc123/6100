@@ -62,7 +62,6 @@ class MathExtension(Extension):
 
     def extendMarkdown(self, md):
         """ Modify inline patterns."""
-        e = md.inlinePatterns.get_index_for_name("backtick")
         md.inlinePatterns.register(
             RawHtmlInlineProcessor("displaymath", _DMATHENV_RE, md), "catsoop_denvmath", 201
         )
