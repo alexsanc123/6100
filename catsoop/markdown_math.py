@@ -26,11 +26,11 @@ _nodoc = {
     "unicode_literals",
 }
 
-_MATH_RE = r"(?P<pre>^|[^\\])(\$)(?P<body>(?:\\\$|[^$])*)\2"
-_MATH2_RE = r"(?P<pre>^|[^\\])\\\((?P<body>(?s).*?)\\\)"
-_DMATH_RE = r"(?P<pre>^|[^\\])(\$\$)(?P<body>.*?)\2"
-_DMATH2_RE = r"(?P<pre>^|[^\\])\\\[(?P<body>(?s).*?)\\\]"
-_DMATHENV_RE = r"\\begin\s*{(?P<env>(?:equation|eqnarray|align)\*?)}(?P<body>(?s).*?)\\end\s*{\1})"
+_MATH_RE = r"(?P<pre>^|[^\\])\$(?P<body>(?:\\\$|[^$])*)\$"
+_MATH2_RE = r"\\\((?P<body>(?s).*?)\\\)"
+_DMATH_RE = r"(?P<pre>^|[^\\])\$\$(?P<body>.*?)\$\$"
+_DMATH2_RE = r"\\\[(?P<body>(?s).*?)\\\]"
+_DMATHENV_RE = r"\\begin\s*{(?P<env>(?:equation|eqnarray|align)\*?)}(?P<body>(?s).*?)\\end\s*{(?P=env)}"
 _ESCAPED_DOLLAR_RE = r"\\(\$)"
 
 
@@ -43,13 +43,14 @@ class RawHtmlInlineProcessor(HtmlInlineProcessor):
         HtmlInlineProcessor.__init__(self, *args, **kwargs)
 
     def handleMatch(self, m, data):
-        pre = m.group("pre")
-        body = self.unescape(m.group("body"))
-        env = m.group("env")
-        rawhtml = "%(pre)s<%(tag)s%(env)s>%(body)s</%(tag)s>" % {
+        groups = m.groupdict()
+        pre = groups.get("pre", "")
+        body = self.unescape(groups["body"])
+        env = groups.get("env", "")
+        rawhtml = "%(pre)s<%(tag)s env=\"%(env)s\">%(body)s</%(tag)s>" % {
             "tag": self._hz_tag,
             "body": body,
-            "env": ' env="%s"' % env if env else '',
+            "env": env,
             "pre": pre or "", # replace None with empty string
         }
         place_holder = self.md.htmlStash.store(rawhtml)
