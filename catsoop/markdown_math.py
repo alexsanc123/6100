@@ -62,22 +62,22 @@ class MathExtension(Extension):
 
     def extendMarkdown(self, md):
         """ Modify inline patterns."""
-        e = md.inlinePatterns.get_index_for_name("entity")
+        e = md.inlinePatterns.get_index_for_name("backtick")
         md.inlinePatterns.register(
-            RawHtmlInlineProcessor("displaymath", _DMATHENV_RE, md), "catsoop_dmath", e + 4
+            RawHtmlInlineProcessor("displaymath", _DMATHENV_RE, md), "catsoop_denvmath", 201
         )
         md.inlinePatterns.register(
-            RawHtmlInlineProcessor("displaymath", _DMATH2_RE, md), "catsoop_dmath", e + 4
+            RawHtmlInlineProcessor("displaymath", _DMATH2_RE, md), "catsoop_dmath2", 204
         )
         md.inlinePatterns.register(
-            RawHtmlInlineProcessor("math", _MATH2_RE, md), "catsoop_math", e + 4
+            RawHtmlInlineProcessor("math", _MATH2_RE, md), "catsoop_math2", 203
         )
         md.inlinePatterns.register(
-            RawHtmlInlineProcessor("displaymath", _DMATH_RE, md), "catsoop_dmath", e + 3
+            RawHtmlInlineProcessor("displaymath", _DMATH_RE, md), "catsoop_dmath", 202
         )
         md.inlinePatterns.register(
-            RawHtmlInlineProcessor("math", _MATH_RE, md), "catsoop_math", e + 2
+            RawHtmlInlineProcessor("math", _MATH_RE, md), "catsoop_math", 201
         )
         md.inlinePatterns.register(
-            SimpleTextInlineProcessor(_ESCAPED_DOLLAR_RE), "catsoop_emath", e + 1
+            SimpleTextInlineProcessor(_ESCAPED_DOLLAR_RE), "catsoop_emath", 200
         )
