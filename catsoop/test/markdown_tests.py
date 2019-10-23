@@ -27,12 +27,14 @@ from ..test import CATSOOPTest
 # -----------------------------------------------------------------------------
 
 
-def math(x):
-    return "<math>%s</math>" % (x,)
+def math(x, env=""):
+    env = ' env="%s"' % env if env else ""
+    return "<math%s>%s</math>" % (env, x)
 
 
-def dmath(x):
-    return "<displaymath>%s</displaymath>" % (x,)
+def dmath(x, env=""):
+    env = ' env="%s"' % env if env else ""
+    return "<displaymath%s>%s</displaymath>" % (env, x)
 
 
 class TestMarkdownMath(CATSOOPTest):
@@ -73,8 +75,46 @@ class TestMarkdownMath(CATSOOPTest):
                 r"If %s is %s and %s is given by: %s"
                 % (dmath("A"), math(r"\frac{2}{3}"), math("x_5[n]"), dmath(_ft)),
             ),
+            (
+                "$$x = \\text{something like $2$}$$",
+                dmath(r"x = \text{something like $2$}"),
+            ),
+            (
+                "\\begin{align}\n  x & \\text{if $y$} \\\\\n  y & \\text{else}\n\end{align}",
+                dmath("\n  x & \\text{if $y$} \\\\\n  y & \\text{else}\n", "align"),
+            ),
+            (
+                "\\begin{align*}\n  x & \\text{if $y$} \\\\\n  y & \\text{else}\n\end{align*}",
+                dmath("\n  x & \\text{if $y$} \\\\\n  y & \\text{else}\n", "align*"),
+            ),
         ]
 
+        for i, o in pairs:
+            self.assertEqual(language._md_format_string(self.ctx, i, False), o)
+
+    def test_dollar_signs(self):
+        self.maxDiff = 10000
+
+        allmath = [r"$\$2 + \$3$", r"$x = \$200$"]
+        identities = [
+            r"$x + $300",
+            r"some people might type 200$ + 400$ instead.",
+            r"$ 2 $",
+            r"$x $",
+            r"$ x$",
+        ]
+        pairs = [
+            (r"\$x + y$ + $200", "$x + y$ + $200"),
+            (r"\$x + y\$", "$x + y$"),
+            (r"\$\$x + y\$\$", "$$x + y$$"),
+        ]
+
+        for i in allmath:
+            self.assertEqual(
+                language._md_format_string(self.ctx, i, False), math(i[1:-1])
+            )
+        for i in identities:
+            self.assertEqual(language._md_format_string(self.ctx, i, False), i)
         for i, o in pairs:
             self.assertEqual(language._md_format_string(self.ctx, i, False), o)
 
