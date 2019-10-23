@@ -44,7 +44,7 @@ class RawHtmlInlineProcessor(HtmlInlineProcessor):
         groups = m.groupdict()
         body = self.unescape(groups["body"])
         env = groups.get("env", "")
-        rawhtml = '<%(tag)s%(env)s>%(body)s</%(tag)s>' % {
+        rawhtml = "<%(tag)s%(env)s>%(body)s</%(tag)s>" % {
             "tag": self._hz_tag,
             "body": body,
             "env": ' env="%s"' % env if env else "",
