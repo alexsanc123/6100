@@ -27,9 +27,7 @@ _nodoc = {
 }
 
 _MATH_RE = r"(?:^|(?<!\\|\d))\$(?! )(?P<body>(?:\\\$|[^$])*)(?<!\s)\$(?!\d)"
-_MATH2_RE = r"\\\((?P<body>(?s).*?)\\\)"
 _DMATH_RE = r"\$\$(?P<body>.*?)\$\$"
-_DMATH2_RE = r"\\\[(?P<body>(?s).*?)\\\]"
 _DMATHENV_RE = r"\\begin\s*{(?P<env>(?:equation|eqnarray|align)\*?)}(?P<body>(?s).*?)\\end\s*{(?P=env)}"
 _ESCAPED_DOLLAR_RE = r"\\(\$)"
 
@@ -64,12 +62,6 @@ class MathExtension(Extension):
             RawHtmlInlineProcessor("displaymath", _DMATHENV_RE, md),
             "catsoop_denvmath",
             203,
-        )
-        md.inlinePatterns.register(
-            RawHtmlInlineProcessor("displaymath", _DMATH2_RE, md), "catsoop_dmath2", 202
-        )
-        md.inlinePatterns.register(
-            RawHtmlInlineProcessor("math", _MATH2_RE, md), "catsoop_math2", 201
         )
         md.inlinePatterns.register(
             RawHtmlInlineProcessor("displaymath", _DMATH_RE, md), "catsoop_dmath", 202
