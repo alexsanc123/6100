@@ -877,10 +877,13 @@ def handle_math_tags(tree):
     """
     for i in tree.find_all(re.compile("(?:display)?math")):
         i["class"] = i.get("class", [])
-        if i.attrs["env"] in ["align", "align*", "eqnarray", "eqnarray*"]:
-            i.string = "\\begin{aligned}%s\\end{aligned}" % i.string
-        # currently ignoring other values of i.attrs["env"], namely, equation
-        del i.attrs["env"]
+        try:
+            if i.attrs["env"] in ["align", "align*", "eqnarray", "eqnarray*"]:
+                i.string = "\\begin{aligned}%s\\end{aligned}" % i.string
+            # currently ignoring other values of i.attrs["env"], namely, equation
+            del i.attrs["env"]
+        except KeyError:
+            pass
         if i.name == "math":  # (inline math)
             i.name = "span"
         else:  # i.name == "displaymath" (display math)
