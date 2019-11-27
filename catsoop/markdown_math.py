@@ -64,11 +64,11 @@ class MathExtension(Extension):
             203,
         )
         md.inlinePatterns.register(
-            RawHtmlInlineProcessor("displaymath", _DMATH_RE, md), "catsoop_dmath", 202
+            RawHtmlInlineProcessor("displaymath", _DMATH_RE, md), "catsoop_dmath", 183
         )
         md.inlinePatterns.register(
-            RawHtmlInlineProcessor("math", _MATH_RE, md), "catsoop_math", 201
+            RawHtmlInlineProcessor("math", _MATH_RE, md), "catsoop_math", 182
         )
         md.inlinePatterns.register(
-            SimpleTextInlineProcessor(_ESCAPED_DOLLAR_RE), "catsoop_emath", 200
+            SimpleTextInlineProcessor(_ESCAPED_DOLLAR_RE), "catsoop_emath", 181
         )

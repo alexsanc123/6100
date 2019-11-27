@@ -37,6 +37,13 @@ def dmath(x, env=""):
     return "<displaymath%s>%s</displaymath>" % (env, x)
 
 
+def _md(x):
+    out = language._md(x)
+    if out.startswith("<p>") and out.endswith("</p>"):
+        out = out[3:-4]
+    return out
+
+
 class TestMarkdownMath(CATSOOPTest):
     def setUp(self):
         CATSOOPTest.setUp(self)
@@ -63,7 +70,7 @@ class TestMarkdownMath(CATSOOPTest):
         ]
 
         for i, o in pairs:
-            self.assertEqual(language._md_format_string(self.ctx, i, False), o)
+            self.assertEqual(_md(i), o)
 
     def test_display_math(self):
         self.maxDiff = 10000
@@ -90,12 +97,12 @@ class TestMarkdownMath(CATSOOPTest):
         ]
 
         for i, o in pairs:
-            self.assertEqual(language._md_format_string(self.ctx, i, False), o)
+            self.assertEqual(_md(i), o)
 
-    def test_dollar_signs(self):
+    def test_dollar_sign_escapes(self):
         self.maxDiff = 10000
 
-        allmath = [r"$\$2 + \$3$", r"$x = \$200$"]
+        allmath = [r"$\$2 + \$3$", r"$x = \$200$", "$math$"]
         identities = [
             r"$x + $300",
             r"some people might type 200$ + 400$ instead.",
@@ -107,16 +114,16 @@ class TestMarkdownMath(CATSOOPTest):
             (r"\$x + y$ + $200", "$x + y$ + $200"),
             (r"\$x + y\$", "$x + y$"),
             (r"\$\$x + y\$\$", "$$x + y$$"),
+            (r"`$not math$`", r"<code>$not math$</code>"),
+            (r"```\n$not math$\n```", r"<code>\n$not math$\n</code>"),
         ]
 
         for i in allmath:
-            self.assertEqual(
-                language._md_format_string(self.ctx, i, False), math(i[1:-1])
-            )
+            self.assertEqual(_md(i), math(i[1:-1]))
         for i in identities:
-            self.assertEqual(language._md_format_string(self.ctx, i, False), i)
+            self.assertEqual(_md(i), i)
         for i, o in pairs:
-            self.assertEqual(language._md_format_string(self.ctx, i, False), o)
+            self.assertEqual(_md(i), o)
 
 
 if __name__ == "__main__":
