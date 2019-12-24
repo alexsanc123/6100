@@ -103,15 +103,7 @@ class TestMarkdownMath(CATSOOPTest):
         self.maxDiff = 10000
 
         allmath = [r"$\$2 + \$3$", r"$x = \$200$", "$math$"]
-        identities = [
-            r"$x + $300",
-            r"some people might type 200$ + 400$ instead.",
-            r"$ 2 $",
-            r"$x $",
-            r"$ x$",
-        ]
         pairs = [
-            (r"\$x + y$ + $200", "$x + y$ + $200"),
             (r"\$x + y\$", "$x + y$"),
             (r"\$\$x + y\$\$", "$$x + y$$"),
             (r"`$not math$`", r"<code>$not math$</code>"),
@@ -120,8 +112,6 @@ class TestMarkdownMath(CATSOOPTest):
 
         for i in allmath:
             self.assertEqual(_md(i), math(i[1:-1]))
-        for i in identities:
-            self.assertEqual(_md(i), i)
         for i, o in pairs:
             self.assertEqual(_md(i), o)
 

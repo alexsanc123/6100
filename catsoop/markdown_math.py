@@ -26,7 +26,7 @@ _nodoc = {
     "unicode_literals",
 }
 
-_MATH_RE = r"(?:^|(?<!\\|\d))\$(?! )(?P<body>(?:\\\$|[^$])*)(?<!\s)\$(?!\d)"
+_MATH_RE = r"(?:^|(?<!\\))\$(?P<body>(?:\\\$|[^$])*)\$"
 _DMATH_RE = r"\$\$(?P<body>.*?)\$\$"
 _DMATHENV_RE = r"\\begin\s*{(?P<env>(?:equation|eqnarray|align)\*?)}(?P<body>(?s).*?)\\end\s*{(?P=env)}"
 _ESCAPED_DOLLAR_RE = r"(?<!\\)\\(\$)"
