@@ -31,6 +31,7 @@ from email.utils import formatdate
 from . import lti
 from . import auth
 from . import time
+from . import util
 from . import tutor
 from . import loader
 from . import errors
@@ -465,7 +466,7 @@ def _breadcrumbs_html(context):
 
 
 def md5(x):
-    return hashlib.md5(x.encode()).hexdigest()
+    return hashlib.md5(x.encode("utf-8")).hexdigest()
 
 
 def _top_menu_html(topmenu, header=True):
@@ -695,11 +696,12 @@ def main(environment, return_context=False, form_data=None):
             url_root = urllib.parse.urlparse(context["cs_url_root"])
             domain = url_root.netloc.rsplit(":", 1)[0]
             path = url_root.path or "/"
-            hdr["Set-Cookie"] = "sid=%s; Domain=%s; Path=%s" % (
-                context["cs_sid"],
-                domain,
-                path,
-            )
+            hdr["Set-Cookie"] = [
+                "catsoop_sid=%s; Domain=%s; Path=%s"
+                % (context["cs_sid"], domain, path),
+                "catsoop_checksum=%s; Domain=%s; Path=%s"
+                % (util.catsoop_loc_hash(), domain, path),
+            ]
         session_data = session.get_session_data(context, context["cs_sid"])
         try:
             session_data["ip_addr"] = get_client_ipaddr(environment)

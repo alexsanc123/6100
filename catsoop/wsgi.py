@@ -41,8 +41,15 @@ def application(environ, start_response):
     WSGI application interface for CAT-SOOP, as specified in
     [PEP 3333](http://www.python.org/dev/peps/pep-3333/).
     """
-    status, headers, content = dispatch.main(environ)
-    start_response("%s %s" % (status[0], status[1]), list(headers.items()))
+    status, _headers, content = dispatch.main(environ)
+    headers = []
+    for k, v in _headers.items():
+        if isinstance(v, list):
+            for elt in v:
+                headers.append((k, elt))
+        else:
+            headers.append((k, v))
+    start_response("%s %s" % (status[0], status[1]), headers)
     if isinstance(content, (str, bytes)):
         return [_ensure_bytes(content)]
     else:

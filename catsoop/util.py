@@ -17,10 +17,25 @@
 Extra utilities that don't have a home anywhere else
 """
 
+import os
 import ast
+import hashlib
 
 from collections import OrderedDict
 from datetime import datetime, timedelta
+
+from . import base_context
+
+
+def catsoop_loc_hash():
+    out = hashlib.sha512(base_context.cs_url_root.encode("utf-8"))
+    try:
+        with open("/etc/machine-id", "rb") as f:
+            out.update(f.read())
+    except:
+        pass
+    return out.hexdigest()
+
 
 _literal_eval_funcs = {
     "OrderedDict": OrderedDict,

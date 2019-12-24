@@ -21,11 +21,13 @@ import os
 import re
 import time
 import uuid
+import hashlib
 import traceback
 import importlib
 
 from http.cookies import SimpleCookie
 
+from . import util
 from . import cslog
 from . import debug_log
 from . import base_context
@@ -93,7 +95,9 @@ def get_session_id(environ):
             cookies = cookies.replace(
                 " ", ""
             )  # avoid unnecessary errors from cookie values with embedded spaces
-            cookie_sid = SimpleCookie(cookies)["sid"].value
+            cookie = SimpleCookie(cookies)
+            assert cookie["catsoop_checksum"].value == util.catsoop_loc_hash()
+            cookie_sid = cookie["catsoop_sid"].value
             if VALID_SESSION_RE.match(cookie_sid) is None:
                 LOGGER.error(
                     "[session] cookie_sid (%s) session mismatch, generating new sid"
