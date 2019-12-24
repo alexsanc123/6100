@@ -4,6 +4,9 @@ _Work toward next release. Currently under development._
 
 **ADDED:**
 
+* Added support for top-level math environments without `$` or `$$`:
+    `equation`, `equation*`, `align`, `align*`, `eqnarray`, `eqnarray*`
+
 **CHANGED:**
 
 * Upgraded KaTeX to v0.11.1.
