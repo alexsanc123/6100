@@ -96,13 +96,7 @@ def get_session_id(environ):
                 " ", ""
             )  # avoid unnecessary errors from cookie values with embedded spaces
             cookie = SimpleCookie(cookies)
-            cookie_checksum = cookie["catsoop_checksum"].value
-            expected_checksum = util.catsoop_loc_hash()
-            assert cookie_checksum == expected_checksum, (
-                "invalid cookie checksum.  expected %r, got %r."
-                % (expected_checksum, cookie_checksum)
-            )
-            cookie_sid = cookie["catsoop_sid"].value
+            cookie_sid = cookie["catsoop_sid_%s" % util.catsoop_loc_hash()].value
             if VALID_SESSION_RE.match(cookie_sid) is None:
                 LOGGER.error(
                     "[session] cookie_sid (%s) session mismatch, generating new sid"
