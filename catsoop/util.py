@@ -28,7 +28,7 @@ from . import base_context
 
 
 def catsoop_loc_hash():
-    return hashlib.sha512(base_context.cs_url_root.encode("utf-8")).hexdigest()
+    return hashlib.md5(base_context.cs_url_root.encode("utf-8")).hexdigest()
 
 
 _literal_eval_funcs = {
