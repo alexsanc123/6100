@@ -28,13 +28,7 @@ from . import base_context
 
 
 def catsoop_loc_hash():
-    out = hashlib.sha512(base_context.cs_url_root.encode("utf-8"))
-    try:
-        with open("/etc/machine-id", "rb") as f:
-            out.update(f.read())
-    except:
-        pass
-    return out.hexdigest()
+    return hashlib.sha512(base_context.cs_url_root.encode("utf-8")).hexdigest()
 
 
 _literal_eval_funcs = {
