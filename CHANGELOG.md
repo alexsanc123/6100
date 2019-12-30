@@ -17,6 +17,9 @@ _Work toward next release. Currently under development._
 
 **FIXED:**
 
+* Attempted fix for an issue that occasionally prevented certain users from
+    logging in without using "incognito" mode or clearing cookies.
+
 **SECURITY:**
 
 **DOCUMENTATION:**
