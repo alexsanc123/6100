@@ -18,9 +18,17 @@ Extra utilities that don't have a home anywhere else
 """
 
 import ast
+import hashlib
 
 from collections import OrderedDict
 from datetime import datetime, timedelta
+
+from . import base_context
+
+
+def catsoop_loc_hash():
+    return hashlib.md5(base_context.cs_url_root.encode("utf-8")).hexdigest()
+
 
 _literal_eval_funcs = {
     "OrderedDict": OrderedDict,

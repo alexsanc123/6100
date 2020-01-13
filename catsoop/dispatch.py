@@ -31,6 +31,7 @@ from email.utils import formatdate
 from . import lti
 from . import auth
 from . import time
+from . import util
 from . import tutor
 from . import loader
 from . import errors
@@ -695,7 +696,8 @@ def main(environment, return_context=False, form_data=None):
             url_root = urllib.parse.urlparse(context["cs_url_root"])
             domain = url_root.netloc.rsplit(":", 1)[0]
             path = url_root.path or "/"
-            hdr["Set-Cookie"] = "sid=%s; Domain=%s; Path=%s" % (
+            hdr["Set-Cookie"] = "catsoop_sid_%s=%s; Domain=%s; Path=%s" % (
+                util.catsoop_loc_hash(),
                 context["cs_sid"],
                 domain,
                 path,
