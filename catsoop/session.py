@@ -25,8 +25,6 @@ import hashlib
 import traceback
 import importlib
 
-from http.cookies import SimpleCookie
-
 from . import util
 from . import cslog
 from . import debug_log
@@ -36,7 +34,7 @@ importlib.reload(base_context)
 
 LOGGER = debug_log.LOGGER
 
-_nodoc = {"SimpleCookie", "make_session_dir", "LOGGER"}
+_nodoc = {"make_session_dir", "LOGGER"}
 
 VALID_SESSION_RE = re.compile(r"^[A-Fa-f0-9]{32}$")
 """
@@ -89,32 +87,27 @@ def get_session_id(environ):
                 os.unlink(fullname)
         except:
             pass
-    if "HTTP_COOKIE" in environ:
-        try:
-            cookies = environ["HTTP_COOKIE"]
-            cookies = cookies.replace(
-                " ", ""
-            )  # avoid unnecessary errors from cookie values with embedded spaces
-            cookie = SimpleCookie(cookies)
-            cookie_sid = cookie["catsoop_sid_%s" % util.catsoop_loc_hash()].value
-            if VALID_SESSION_RE.match(cookie_sid) is None:
-                LOGGER.error(
-                    "[session] cookie_sid (%s) session mismatch, generating new sid"
-                    % cookie_sid
-                )
-                return new_session_id(), True
-            return cookie_sid, False
-        except Exception as err:
+
+    COOKIE_REGEX = re.compile(
+        r"(?:^|;)\s*catsoop_sid_%s\s*=\s*([^;\s]*)\s*(?:;|$)" % util.catsoop_loc_hash()
+    )
+    try:
+        cookie_sid = COOKIE_REGEX.search(environ["HTTP_COOKIE"]).group(1)
+        if VALID_SESSION_RE.match(cookie_sid) is None:
             LOGGER.error(
-                "[session] Error encountered retrieving session ID, err=%s" % str(err)
-            )
-            LOGGER.error("[session] traceback=%s" % traceback.format_exc())
-            LOGGER.error("[session] HTTP_COOKIE: %s" % environ["HTTP_COOKIE"])
-            LOGGER.error(
-                "[session] SimpleCookie: %s" % SimpleCookie(environ["HTTP_COOKIE"])
+                "[session] cookie_sid (%s) session mismatch, generating new sid"
+                % cookie_sid
             )
             return new_session_id(), True
-    else:
+        return cookie_sid, False
+    except Exception as err:
+        LOGGER.error(
+            "[session] Error encountered retrieving session ID with regex, err=%s"
+            % str(err)
+        )
+        LOGGER.error("[session] traceback=%s" % traceback.format_exc())
+        LOGGER.error("[session] HTTP_COOKIE: %r" % environ.get("HTTP_COOKIE", None))
+        LOGGER.error("[session] REGEX: %r" % COOKIE_REGEX)
         return new_session_id(), True
 
 
