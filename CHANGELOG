@@ -1,4 +1,14 @@
 ####################
+# Version 2019.9.5 #
+####################
+
+FIXED:
+
+  * Fixed long-standing issue whereby certain students could not log in due to
+    cookies being parsed incorrectly by SimpleCookie.
+
+
+####################
 # Version 2019.9.4 #
 ####################
 
