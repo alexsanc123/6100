@@ -17,12 +17,17 @@ _Work toward next release. Currently under development._
 
 **FIXED:**
 
-* Attempted fix for an issue that occasionally prevented certain users from
-    logging in without using "incognito" mode or clearing cookies.
-
 **SECURITY:**
 
 **DOCUMENTATION:**
+
+
+# Version 2019.9.5
+
+**FIXED:**
+
+* Fixed long-standing issue whereby certain students could not log in due to
+    cookies being parsed incorrectly by `SimpleCookie`.
 
 
 # Version 2019.9.4
