@@ -7,6 +7,8 @@ _Work toward next release. Currently under development._
 * Added support for top-level math environments without `$` or `$$`:
     `equation`, `equation*`, `align`, `align*`, `eqnarray`, `eqnarray*`
 
+* Added support for drawing diagrams using [Markdeep](https://casual-effects.com/markdeep)'s syntax.
+
 **CHANGED:**
 
 * Upgraded KaTeX to v0.11.1.

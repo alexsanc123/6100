@@ -31,6 +31,7 @@ import re
 import ast
 import sys
 import copy
+import json
 import random
 import string
 import hashlib
@@ -236,6 +237,112 @@ def py_pre_handle(context):
     pass
 
 
+DIAGRAM_START = re.compile(r"\*{5}\**")
+
+
+def _replace_diagrams(src):
+    if not DIAGRAM_START.search(src):
+        # try to short-circuit; this is probably faster than splitting and
+        # looping in the case where we have no diagrams.
+        return src, []
+
+    ix = 0
+    lines = src.splitlines(keepends=True)
+    diagrams = []
+    while ix < len(lines):
+        line = lines[ix]
+        match = DIAGRAM_START.search(line)
+        if not match:
+            ix += 1
+            continue
+
+        # if we're here, we found something that looks like the start of a
+        # diagram.  look for a match.
+        firstline = ix
+        firstix, lastix = match.span()
+        group = match.group(0)
+
+        jx = ix + 1
+        maybe_diagram = False
+        lastline = None
+        while True:
+            if jx >= len(lines):
+                # we got here without hitting our terminating condition, so
+                # this wasn't actually a diagram.  skip.
+                break
+
+            if lines[jx][firstix] != "*":
+                # no * on the left hand side; this must not have been a diagram
+                # after all.
+                break
+
+            if lines[jx][firstix:lastix] == group:
+                # this looks like a string of *'s.  we're done, and we found a
+                # diagram!
+                lastline = (
+                    jx + 1
+                )  # + 1 so this is exclusive to match span (loops below become easier)
+                maybe_diagram = True
+                break
+
+            jx += 1
+
+        # if we're out here, we left the loop.  if we're still considering
+        # whether something could be a diagram, make sure we've got either a
+        # solid border of *'s, or an open right-hand side with nothing beyond
+        # the right-most asterisk (this does not quite match Markdeep's
+        # heuristic, but I think it makes a lot more sense)
+
+        if maybe_diagram:
+            all_closed = True
+            trailing_text = False
+            leading_text = False
+            for l in range(firstline, lastline):
+                post = lines[l][lastix:]
+                if post and not post.isspace():
+                    trailing_text = True
+
+                pre = lines[l][:firstix]
+                if pre and not pre.isspace():
+                    leading_text = True
+
+                if lastix >= len(lines[l]) or lines[l][lastix - 1] != "*":
+                    all_closed = False
+
+            if all_closed or not trailing_text:
+                # we found a diagram.  now remove it and replace with a <pre> tag
+                # containing the source (our JS will pick this up after the page
+                # loads)...
+
+                alignment = "center"
+                if leading_text:
+                    alignment = "floatright"
+                elif trailing_text:
+                    alignment = "floatleft"
+
+                diagram_source = []
+                term = lastix - 1 if all_closed else lastix
+                for l in range(firstline, lastline):
+                    if l != firstline and l != lastline - 1:
+                        diagram_source.append(lines[l].rstrip("\n")[firstix + 1 : term])
+                    lines[l] = (
+                        "%s%s" % (lines[l][:firstix], lines[l][lastix:])
+                    ).rstrip() + "\n"
+
+                tag = '<pre class="cs-diagram-source" diagramalign="%s">%s</pre>' % (
+                    alignment,
+                    len(diagrams),
+                )
+                diagrams.append("\n".join(diagram_source))
+
+                lines.insert(firstline, tag)
+                ix = lastline
+
+        ix += 1
+
+    return "".join(lines), diagrams
+
+
 def _md_format_string(context, s, xml=True):
     # generate a unique string to split around
     splitter = None
@@ -259,6 +366,10 @@ def _md_format_string(context, s, xml=True):
 
     text = re.sub(checker, _replacer, s)
 
+    # parse diagrams
+    text, diagram_sources = _replace_diagrams(text)
+
+    # run through markdown
     text = _md(text)
 
     num_tags = len(tag_contents)
@@ -273,6 +384,11 @@ def _md_format_string(context, s, xml=True):
 
     if text.startswith("<p>") and text.endswith("</p>"):
         text = text[3:-4]
+
+    text = (
+        '%s\n\n<script type="text/javascript">\ncatsoop.diagram_sources = %s\n</script>'
+        % (text, json.dumps(diagram_sources))
+    )
 
     return _xml_format_string(context, text) if xml else text
 

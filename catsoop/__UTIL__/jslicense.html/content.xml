@@ -30,6 +30,11 @@ that are loaded by CAT-SOOP, including licensing information.
                 <td><a href="BASE/scripts/cs_math.js">cs_math.js</a></td>
             </tr>
             <tr>
+                <td><a href="BASE/scripts/cs_diagrams.js">cs_diagrams.js</a></td>
+                <td><a href="http://www.gnu.org/licenses/agpl-3.0.html">AGPL-3.0</a></td>
+                <td><a href="BASE/scripts/cs_diagrams.js">cs_diagrams.js</a></td>
+            </tr>
+            <tr>
                 <td><a href="_handler/default/cs_timer.js">cs_timer.js</a></td>
                 <td><a href="http://www.gnu.org/licenses/agpl-3.0.html">AGPL-3.0</a></td>
                 <td><a href="_handler/default/cs_timer.js">cs_timer.js</a></td>

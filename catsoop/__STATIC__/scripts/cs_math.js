@@ -22,7 +22,7 @@
  */
 
 // Math rendering for CAT-SOOP
-// Expects KaTeX, and MathJax to be loaded already
+// Expects KaTeX and MathJax to be loaded already
 
 // configure MathJax not to typeset on startup
 MathJax.Hub.Config({skipStartupTypeset:true,
