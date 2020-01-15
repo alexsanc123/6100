@@ -271,7 +271,7 @@ def _replace_diagrams(src):
                 # this wasn't actually a diagram.  skip.
                 break
 
-            if lines[jx][firstix] != "*":
+            if firstix >= len(lines[jx]) or lines[jx][firstix] != "*":
                 # no * on the left hand side; this must not have been a diagram
                 # after all.
                 break
