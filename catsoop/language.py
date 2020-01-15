@@ -790,6 +790,16 @@ def handle_custom_tags(context, text):
 
     text = re.sub(section_star, _section_star_matcher, text)
 
+    # hints (<showhide>)
+    def _showhide_replacer(match):
+        body = source_transform_string(context, match.groupdict()['body'])
+        out = '''<div class="response"><button class="btn-catsoop" onclick="if(this.parentElement.children[1].style.display === 'none'){this.parentElement.children[1].style.display = 'block';}else{this.parentElement.children[1].style.display = 'none';}">Show/Hide</button>\n'''
+        out += '<div style="display:none;">%s</div>' % (body,)
+        return out + '</div>'
+
+    text = re.sub(_environment_matcher("showhide"), _showhide_replacer, text)
+
+
     tree = BeautifulSoup(text, "html.parser")
 
     # handle sections, etc.
@@ -934,25 +944,6 @@ def handle_custom_tags(context, text):
     if not context.get("cs_footnotes", ""):
         context["cs_footnotes"] = fnote
 
-    # hints (<showhide>)
-
-    for ix, i in enumerate(tree.find_all("showhide")):
-        i.name = "div"
-        i.attrs["style"] = "display:none;"
-        contents = i.decode_contents()
-        i.clear()
-        i.append(
-            BeautifulSoup(source_transform_string(context, contents), "html.parser")
-        )
-        wrap = tree.new_tag("div")
-        wrap["class"] = ["response"]
-        i.wrap(wrap)
-        button = tree.new_tag(
-            "button",
-            onclick="if(this.nextSibling.style.display === 'none'){this.nextSibling.style.display = 'block';}else{this.nextSibling.style.display = 'none';}",
-        )
-        button.string = "Show/Hide"
-        i.insert_before(button)
 
     # custom URL handling in img, a, script, link
 

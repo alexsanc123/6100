@@ -7,7 +7,8 @@ _Work toward next release. Currently under development._
 * Added support for top-level math environments without `$` or `$$`:
     `equation`, `equation*`, `align`, `align*`, `eqnarray`, `eqnarray*`
 
-* Added support for drawing SVG diagrams using ASCII art (ported from [Markdeep](https://casual-effects.com/markdeep_)).
+* Added support for drawing SVG diagrams using ASCII art
+    (ported from [Markdeep](https://casual-effects.com/markdeep_)).
 
 **CHANGED:**
 
@@ -18,6 +19,9 @@ _Work toward next release. Currently under development._
 **REMOVED:**
 
 **FIXED:**
+
+* Fixed an issue with `showhide` tags that prevented them from properly
+    handling arbitrary contents (at the expense of nested `showhide` tags).
 
 **SECURITY:**
 
