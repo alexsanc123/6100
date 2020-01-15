@@ -71,6 +71,10 @@ _valid_qname = re.compile(r"^[A-Za-z][_A-Za-z0-9]*$")
 _unsafe_title = re.compile(r"[^A-Za-z0-9_]")
 
 
+def _md5(x):
+    return hashlib.md5(x.encode("utf-8")).hexdigest()
+
+
 def _safe_title(t, disallowed=None):
     disallowed = disallowed if disallowed is not None else set()
     title = otitle = "_%s" % (
@@ -248,7 +252,7 @@ def _replace_diagrams(src):
 
     ix = 0
     lines = src.splitlines(keepends=True)
-    diagrams = []
+    diagrams = {}
     while ix < len(lines):
         line = lines[ix]
         match = DIAGRAM_START.search(line)
@@ -329,11 +333,13 @@ def _replace_diagrams(src):
                         "%s%s" % (lines[l][:firstix], lines[l][lastix:])
                     ).rstrip() + "\n"
 
-                tag = '<pre class="cs-diagram-source" diagramalign="%s">%s</pre>' % (
-                    alignment,
-                    len(diagrams),
+                this_source = "\n".join(diagram_source)
+                hash_ = _md5(this_source)
+                tag = (
+                    '<div class="cs-diagram-source" diagramalign="%s">Placeholder for Diagram <code class="cs-diagram-id">%s</span></div>\n'
+                    % (alignment, hash_,)
                 )
-                diagrams.append("\n".join(diagram_source))
+                diagrams[hash_] = this_source
 
                 lines.insert(firstline, tag)
                 ix = lastline
@@ -385,10 +391,12 @@ def _md_format_string(context, s, xml=True):
     if text.startswith("<p>") and text.endswith("</p>"):
         text = text[3:-4]
 
-    text = (
-        '%s\n\n<script type="text/javascript">\ncatsoop.diagram_sources = %s\n</script>'
-        % (text, json.dumps(diagram_sources))
-    )
+    if diagram_sources:
+        script = "\n".join(
+            "catsoop.diagram_sources[%s] = %s;" % (json.dumps(k), json.dumps(v))
+            for k, v in diagram_sources.items()
+        )
+        text = '%s<script type="text/javascript">%s</script>' % (text, script)
 
     return _xml_format_string(context, text) if xml else text
 
@@ -927,9 +935,6 @@ def handle_custom_tags(context, text):
         context["cs_footnotes"] = fnote
 
     # hints (<showhide>)
-
-    def _md5(x):
-        return hashlib.md5(x.encode()).hexdigest()
 
     for ix, i in enumerate(tree.find_all("showhide")):
         i.name = "div"

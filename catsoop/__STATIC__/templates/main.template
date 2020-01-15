@@ -40,6 +40,9 @@
 
     <!-- load in diagram stuff -->
     <script type="text/javascript" src="BASE/scripts/cs_diagrams.js"></script>
+    <script type="text/javascript">
+        catsoop.diagram_sources = {{}};
+    </script>
 
     <!-- Syntax Highlighting -->
     <script type="text/javascript" src="BASE/scripts/highlight/cs_highlight.pack.min.js"></script>

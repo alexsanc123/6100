@@ -1335,10 +1335,10 @@ catsoop.diagram_stylesheet_rules = ['svg.diagram{' +
     '}']
 
 catsoop.render_all_diagrams = function (elt) {
-    if (catsoop.diagram_sources.length > 0) {
-        elt.querySelectorAll("pre.cs-diagram-source").forEach(
+    if (Object.keys(catsoop.diagram_sources).length > 0) {
+        elt.querySelectorAll("div.cs-diagram-source").forEach(
             function(b){
-                b.outerHTML = diagramToSVG(catsoop.diagram_sources[parseInt(b.innerText)], b.attributes.diagramalign.value);
+                b.outerHTML = diagramToSVG(catsoop.diagram_sources[b.querySelector('code.cs-diagram-id').innerText], b.attributes.diagramalign.value);
             }
         );
         for (var i=0; i < catsoop.diagram_stylesheet_rules.length; i++){
