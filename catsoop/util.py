@@ -21,10 +21,26 @@ import os
 import ast
 import hashlib
 
-from collections import OrderedDict
 from datetime import datetime, timedelta
+from collections import OrderedDict
+from nacl.bindings import (
+    crypto_secretbox,
+    crypto_secretbox_open,
+)
+
 
 from . import base_context
+
+
+def simple_encrypt(key, msg):
+    nonce = os.urandom(24)
+    cipher = crypto_secretbox(msg, nonce, key)
+    return b"%s%s" % (nonce, cipher)
+
+
+def simple_decrypt(key, cipher):
+    nonce = cipher[:24]
+    return crypto_secretbox_open(cipher[24:], nonce, key)
 
 
 def catsoop_loc_hash():

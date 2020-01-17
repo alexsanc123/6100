@@ -403,7 +403,6 @@ cs_all_pieces = [
     "cslog",
     "dispatch",
     "errors",
-    "fernet",
     "groups",
     "language",
     "loader",

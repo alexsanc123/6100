@@ -48,10 +48,6 @@ import contextlib
 from collections import OrderedDict
 from datetime import datetime, timedelta
 
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-from .fernet import RawFernet
-
 _nodoc = {
     "passthrough",
     "FileLock",
@@ -83,6 +79,7 @@ def passthrough():
     yield
 
 
+from . import util
 from . import base_context
 from filelock import FileLock
 
@@ -101,8 +98,6 @@ if ENCRYPT_PASS is not None:
     ENCRYPT_KEY = hashlib.pbkdf2_hmac(
         "sha256", ENCRYPT_PASS.encode("utf8"), SALT, 100000, dklen=32
     )
-    XTS_KEY = hashlib.pbkdf2_hmac("sha256", ENCRYPT_PASS.encode("utf8"), SALT, 100000)
-    FERNET = RawFernet(ENCRYPT_KEY)
 
 
 def log_lock(path):
@@ -115,7 +110,7 @@ def compress_encrypt(x):
     if COMPRESS:
         x = lzma.compress(x)
     if ENCRYPT_KEY is not None:
-        x = FERNET.encrypt(x)
+        x = util.simple_encrypt(ENCRYPT_KEY, x)
     return x
 
 
@@ -128,7 +123,7 @@ def prep(x):
 
 def decompress_decrypt(x):
     if ENCRYPT_KEY is not None:
-        x = FERNET.decrypt(x)
+        x = util.simple_decrypt(ENCRYPT_KEY, x)
     if COMPRESS:
         x = lzma.decompress(x)
     return x
@@ -141,20 +136,11 @@ def unprep(x):
     return pickle.loads(decompress_decrypt(x))
 
 
-def _e(x, seed):  # not sure seed is the right term here...
-    x = x.encode("utf8") + bytes([0] * (16 - len(x)))
-    b = hashlib.sha512(seed.encode("utf8") + ENCRYPT_KEY + SALT).digest()[-16:]
-    c = Cipher(algorithms.AES(XTS_KEY), modes.XTS(b), backend=default_backend())
-    e = c.encryptor()
-    return base64.urlsafe_b64encode(e.update(x) + e.finalize()).decode("utf8")
-
-
-def _d(x, seed):  # not sure seed is the right term here...
-    x = base64.urlsafe_b64decode(x)
-    b = hashlib.sha512(seed.encode("utf8") + ENCRYPT_KEY + SALT).digest()[-16:]
-    c = Cipher(algorithms.AES(XTS_KEY), modes.XTS(b), backend=default_backend())
-    d = c.decryptor()
-    return (d.update(x) + d.finalize()).rstrip(b"\x00").decode("utf8")
+def _e(x, person):
+    p = hashlib.sha512(person.encode("utf-8")).digest()[:9]
+    return base64.urlsafe_b64encode(
+        hashlib.blake2b(x.encode("utf-8"), person=b"catsoop%s" % p).digest()
+    ).decode("utf-8")
 
 
 def get_log_filename(db_name, path, logname):
@@ -169,7 +155,7 @@ def get_log_filename(db_name, path, logname):
     """
     if ENCRYPT_KEY is not None:
         seed = path[0] if path else db_name
-        path = [_e(i, seed + i) for i in path]
+        path = [_e(p, seed + repr(path[:ix])) for ix, p in enumerate(path)]
         db_name = _e(db_name, seed + db_name)
         logname = _e(logname, seed + repr(path))
     if path:
@@ -248,6 +234,7 @@ def overwrite_log(db_name, path, logname, new, lock=True):
 
 def _read_log(db_name, path, logname, lock=True):
     fname = get_log_filename(db_name, path, logname)
+    print(fname)
     # get an exclusive lock on this file before reading it
     cm = log_lock([db_name] + path + [logname]) if lock else passthrough()
     with cm:

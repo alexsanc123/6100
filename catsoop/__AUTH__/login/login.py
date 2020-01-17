@@ -555,7 +555,9 @@ def check_password(context, provided, uname, iterations=500000):
     pass_hash = user_login_info.get("password_hash", None)
     if pass_hash is not None:
         if context["csm_cslog"].ENCRYPT_KEY is not None:
-            pass_hash = context["csm_cslog"].FERNET.decrypt(pass_hash)
+            pass_hash = context["csm_util"].simple_decrypt(
+                context["csm_cslog"].ENCRYPT_KEY, pass_hash
+            )
         salt = user_login_info.get("password_salt", None)
         hashed_pass = compute_password_hash(
             context, provided, salt, iterations, encrypt=False
@@ -592,8 +594,10 @@ def compute_password_hash(
     hash_ = hashlib.pbkdf2_hmac(
         "sha512", _ensure_bytes(password), _ensure_bytes(salt), iterations
     )
-    if encrypt and (context["csm_cslog"].ENCRYPT_KEY is not None):
-        hash_ = context["csm_cslog"].FERNET.encrypt(hash_)
+    if encrypt:
+        enc_key = context["csm_cslog"].ENCRYPT_KEY
+        if enc_key is not None:
+            hash_ = context["csm_util"].simple_encrypt(enc_key, hash_)
     return hash_
 
 

@@ -14,6 +14,8 @@ _Work toward next release. Currently under development._
 
 * Upgraded KaTeX to v0.11.1.
 
+* Replaced Fernet encryption with simpler encryption scheme.
+
 **DEPRECATED:**
 
 **REMOVED:**

@@ -1,11 +1,11 @@
 bs4
 cheroot
-cryptography
 filelock
 python-jose
 markdown>=3
 mpmath
 ply
+pynacl
 uwsgi
 websockets
 lxml
