@@ -109,9 +109,7 @@ class lti4cs_response(object):
         Load LTI data from logs (cs database) if available
         """
         if lti_data:
-            self.lti_data = (
-                lti_data
-            )  # use provided LTI data (e.g. for asynchronous grading response)
+            self.lti_data = lti_data  # use provided LTI data (e.g. for asynchronous grading response)
         else:
             logging = context["csm_cslog"]
             uname = context["cs_user_info"]["username"]

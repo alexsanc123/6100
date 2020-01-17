@@ -234,7 +234,6 @@ def overwrite_log(db_name, path, logname, new, lock=True):
 
 def _read_log(db_name, path, logname, lock=True):
     fname = get_log_filename(db_name, path, logname)
-    print(fname)
     # get an exclusive lock on this file before reading it
     cm = log_lock([db_name] + path + [logname]) if lock else passthrough()
     with cm:

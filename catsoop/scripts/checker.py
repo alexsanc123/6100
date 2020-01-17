@@ -117,8 +117,8 @@ def do_check(row):
             namemap[m["csq_name"]] = elt
             csq_npoints = m.get("csq_npoints", 0)
             total_possible_npoints += (
-                csq_npoints
-            )  # used to compute total aggregate score pct
+                csq_npoints  # used to compute total aggregate score pct
+            )
             if DEBUG:
                 question = elt[0]["handle_submission"]
                 dn = m.get("csq_display_name")

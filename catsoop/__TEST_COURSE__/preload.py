@@ -52,8 +52,8 @@ cs_top_menu = [
 # AUTHENTICATION
 
 cs_auth_type = (
-    "login"
-)  # use the default (username/password based) authentication method
+    "login"  # use the default (username/password based) authentication method
+)
 # for actually running a course at MIT, I like using OpenID Connect instead (https://oidc.mit.edu/).
 # instructions on that later...
 
