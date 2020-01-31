@@ -25,6 +25,8 @@ _Work toward next release. Currently under development._
 * Fixed an issue with `showhide` tags that prevented them from properly
     handling arbitrary contents (at the expense of nested `showhide` tags).
 
+* Fixed alignment of first line within `<pre><code>` tags.
+
 **SECURITY:**
 
 **DOCUMENTATION:**
