@@ -792,13 +792,12 @@ def handle_custom_tags(context, text):
 
     # hints (<showhide>)
     def _showhide_replacer(match):
-        body = source_transform_string(context, match.groupdict()['body'])
-        out = '''<div class="response"><button class="btn-catsoop" onclick="if(this.parentElement.children[1].style.display === 'none'){this.parentElement.children[1].style.display = 'block';}else{this.parentElement.children[1].style.display = 'none';}">Show/Hide</button>\n'''
+        body = source_transform_string(context, match.groupdict()["body"])
+        out = """<div class="response"><button class="btn-catsoop" onclick="if(this.parentElement.children[1].style.display === 'none'){this.parentElement.children[1].style.display = 'block';}else{this.parentElement.children[1].style.display = 'none';}">Show/Hide</button>\n"""
         out += '<div style="display:none;">%s</div>' % (body,)
-        return out + '</div>'
+        return out + "</div>"
 
     text = re.sub(_environment_matcher("showhide"), _showhide_replacer, text)
-
 
     tree = BeautifulSoup(text, "html.parser")
 
@@ -943,7 +942,6 @@ def handle_custom_tags(context, text):
             ) % (ix, ix, f, ix)
     if not context.get("cs_footnotes", ""):
         context["cs_footnotes"] = fnote
-
 
     # custom URL handling in img, a, script, link
 
