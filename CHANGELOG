@@ -6,6 +6,8 @@ FIXED:
 
   * BACKPORT: Fixed alignment of first line within `<pre><code>` tags.
 
+  * BACKPORT: Fixed issue with `csq_rerender` ignoring prompts (courtesy of
+    Valerie Richmond).
 
 ####################
 # Version 2019.9.6 #
