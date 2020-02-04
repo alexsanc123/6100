@@ -27,6 +27,9 @@ _Work toward next release. Currently under development._
 
 * Fixed alignment of first line within `<pre><code>` tags.
 
+* Fixed issue with `csq_rerender` ignoring prompts (courtesy of Valerie
+    Richmond).
+
 **SECURITY:**
 
 **DOCUMENTATION:**
