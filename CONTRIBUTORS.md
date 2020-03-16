@@ -5,18 +5,19 @@
 
 ### Code Contributions
 
-* Ike Chuang (ichuang@mit.edu)
-* Jeremy Kaplan (jdkaplan@mit.edu)
-* Katrina LaCurts (lacurts@mit.edu)
-* Tomas Lozano-Perez (tlp@mit.edu)
-* Sanjoy Mahajan (sanjoy@olin.edu)
-* Kade Phillips (kade@mit.edu)
-* Joe Steinmeyer (jodalyst@mit.edu)
-* Rodrigo Toste Gomes (rgomes@codeblurb.com)
-* Jeremy Wright (jtwright@mit.edu)
+* Ike Chuang
+* Jeremy Kaplan
+* Katrina LaCurts
+* Tomas Lozano-Perez
+* Sanjoy Mahajan
+* Kade Phillips
+* Valerie Richmond
+* Joe Steinmeyer
+* Rodrigo Toste Gomes
+* Jeremy Wright
 
 
 ### Security Reports
 
-* Max Justicz (maxj@mit.edu)
-* Aleksejs Popovs (aleksejs@mit.edu)
+* Max Justicz
+* Aleksejs Popovs
