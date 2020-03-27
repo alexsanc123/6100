@@ -724,7 +724,9 @@ function diagramToSVG(diagramString, alignmentHint) {
                     var up = grid(A);
                     var upup = grid(A.x, A.y - 1);
 
-                    if (! isVertex(up) && ((upup === '-') || (upup === '_') || (grid(A.x - 1, A.y - 1) === '_') ||
+                    if (! isVertex(up) && ((upup === '-') || (upup === '_') ||
+                                           (upup === '┳') ||
+                                           (grid(A.x - 1, A.y - 1) === '_') ||
                                            (grid(A.x + 1, A.y - 1) === '_') ||
                                            isBottomVertex(upup)) || isJump(upup)) {
                         // Stretch up to almost reach the line above (if there is a decoration,
@@ -734,7 +736,7 @@ function diagramToSVG(diagramString, alignmentHint) {
 
                     var dn = grid(B);
                     var dndn = grid(B.x, B.y + 1);
-                    if (! isVertex(dn) && ((dndn === '-') || isTopVertex(dndn)) || isJump(dndn) ||
+                    if (! isVertex(dn) && ((dndn === '-') || (dndn === '┻') || isTopVertex(dndn)) || isJump(dndn) ||
                         (grid(B.x - 1, B.y) === '_') || (grid(B.x + 1, B.y) === '_')) {
                         // Stretch down to almost reach the line below
                         B.y += 0.5;
@@ -751,7 +753,7 @@ function diagramToSVG(diagramString, alignmentHint) {
                 // Some very special patterns for the short lines needed on
                 // circuit diagrams. Only invoke these if not also on a curve
                 //      _  _
-                //    -'    '-
+                //    -'    '-   -'
                 else if ((grid(x, y) === "'") &&
                     (((grid(x - 1, y) === '-') && (grid(x + 1, y - 1) === '_') &&
                      ! isSolidVLineOrJumpOrPoint(grid(x - 1, y - 1))) ||
@@ -769,6 +771,20 @@ function diagramToSVG(diagramString, alignmentHint) {
                     pathSet.insert(new Path(Vec2(x, y), Vec2(x, y + 0.5)));
                 }
 
+                // For drawing resistors: -.╱
+                else if ((grid(x, y) === '.') &&
+                         (grid(x - 1, y) === '-') &&
+                         (grid(x + 1, y) === '╱')) {
+                    pathSet.insert(new Path(Vec2(x, y), Vec2(x + 0.5, y + 0.5)));
+                }
+
+                // For drawing resistors: ╱'-
+                else if ((grid(x, y) === "'") &&
+                         (grid(x + 1, y) === '-') &&
+                         (grid(x - 1, y) === '╱')) {
+                    pathSet.insert(new Path(Vec2(x, y), Vec2(x - 0.5, y - 0.5)));
+                }
+
             } // y
         } // x
 
@@ -780,6 +796,10 @@ function diagramToSVG(diagramString, alignmentHint) {
                     var A = Vec2(x, y);
                     do { grid.setUsed(x, y); ++x; } while (grid.isSolidHLineAt(x, y));
                     var B = Vec2(x - 1, y);
+
+                    // Detect adjacent box-drawing characters and lengthen the edge
+                    if (grid(B.x + 1, B.y) === '┫') { B.x += 0.5; }
+                    if (grid(A.x - 1, A.y) === '┣') { A.x -= 0.5; }
 
                     // Detect curves and shorten the edge
                     if ( ! isVertex(grid(A.x - 1, A.y)) &&
@@ -794,10 +814,11 @@ function diagramToSVG(diagramString, alignmentHint) {
                         --B.x;
                     }
 
-                    // Don't insert degenerate lines
+                    // Only insert non-degenerate lines
                     if ((A.x !== B.x) || (A.y !== B.y)) {
                         pathSet.insert(new Path(A, B));
                     }
+
                     // Continue the search from the end x+1
                 }
             }
@@ -1226,12 +1247,35 @@ function diagramToSVG(diagramString, alignmentHint) {
         } // x
     } // findArrowHeads
 
+    // Cases where we want to redraw at graphical unicode character
+    // to adjust its weight or shape for a conventional application
+    // in constructing a diagram.
+    function findReplacementCharacters(grid, pathSet) {
+        for (var x = 0; x < grid.width; ++x) {
+            for (var y = 0; y < grid.height; ++y) {
+                if (grid.isUsed(x, y)) continue;
+                var c = grid(x, y);
+                switch (c) {
+                case '╱':
+                    pathSet.insert(new Path(Vec2(x - 0.5, y + 0.5), Vec2(x + 0.5, y - 0.5)));
+                    grid.setUsed(x, y);
+                    break;
+                case '╲':
+                    pathSet.insert(new Path(Vec2(x - 0.5, y - 0.5), Vec2(x + 0.5, y + 0.5)));
+                    grid.setUsed(x, y);
+                    break;
+                }
+            }
+        }
+    } // findReplacementCharacters
+
     var grid = makeGrid(diagramString);
 
     var pathSet = new PathSet();
     var decorationSet = new DecorationSet();
 
     findPaths(grid, pathSet);
+    findReplacementCharacters(grid, pathSet);
     findDecorations(grid, pathSet, decorationSet);
 
     var svg = '<svg class="diagram" xmlns="http://www.w3.org/2000/svg" version="1.1" height="' +
@@ -1303,8 +1347,11 @@ function diagramToSVG(diagramString, alignmentHint) {
 
     svg = svg.rp(new RegExp(HIDE_O, 'g'), 'o');
 
+
     return svg;
 }
+
+
 
 catsoop.diagram_stylesheet_rules = ['svg.diagram{' +
     'display:block;' +
