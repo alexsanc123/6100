@@ -64,7 +64,10 @@ def handle_submission(submissions, **info):
         if check is defaults["csq_check_function"]:
             check = defaults["csq_checkbox_check_function"]
     else:
-        sub = int(sub)
+        if len(sub) == 0:
+            sub = -1
+        else:
+            sub = int(sub)
         if info["csq_soln_mode"] == "value":
             sub = info["csq_options"][sub] if sub >= 0 else "--"
     check_result = check(sub, soln)

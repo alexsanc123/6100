@@ -30,6 +30,10 @@ _Work toward next release. Currently under development._
 * Fixed issue with `csq_rerender` ignoring prompts (courtesy of Valerie
     Richmond).
 
+* Fixed an issue whereby submitting a multiplechoice question using the
+    `'radio'` renderer would cause an error if no option was selected (courtesy
+    of Kade Phillips)
+
 **SECURITY:**
 
 **DOCUMENTATION:**
