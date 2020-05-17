@@ -1,6 +1,4 @@
-# Current Developments
-
-_Work toward next release. Currently under development._
+# Version 2020.2.0
 
 **ADDED:**
 
@@ -16,10 +14,6 @@ _Work toward next release. Currently under development._
 
 * Replaced Fernet encryption with simpler encryption scheme.
 
-**DEPRECATED:**
-
-**REMOVED:**
-
 **FIXED:**
 
 * Fixed an issue with `showhide` tags that prevented them from properly
@@ -29,10 +23,6 @@ _Work toward next release. Currently under development._
 
 * Fixed issue with `csq_rerender` ignoring prompts (courtesy of Valerie
     Richmond).
-
-**SECURITY:**
-
-**DOCUMENTATION:**
 
 
 # Version 2019.9.6
