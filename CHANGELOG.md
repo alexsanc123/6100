@@ -30,13 +30,16 @@ _Work toward next release. Currently under development._
 * Fixed issue with `csq_rerender` ignoring prompts (courtesy of Valerie
     Richmond).
 
-* Fixed an issue whereby submitting a multiplechoice question using the
-    `'radio'` renderer would cause an error if no option was selected (courtesy
-    of Kade Phillips)
-
 **SECURITY:**
 
 **DOCUMENTATION:**
+
+
+# Version 2019.9.6
+
+* Fixed an issue whereby submitting a multiplechoice question using the
+    `'radio'` renderer would cause an error if no option was selected (courtesy
+    of Kade Phillips)
 
 
 # Version 2019.9.5
