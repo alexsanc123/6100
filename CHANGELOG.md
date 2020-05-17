@@ -1,3 +1,21 @@
+# Current Developments
+
+_Work toward next release. Currently under development._
+
+**ADDED:**
+
+**CHANGED:**
+
+**DEPRECATED:**
+
+**REMOVED:**
+
+**FIXED:**
+
+**SECURITY:**
+
+**DOCUMENTATION:**
+
 # Version 2020.2.0
 
 **ADDED:**
