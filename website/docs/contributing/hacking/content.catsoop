@@ -27,7 +27,7 @@ After you have set up an account on the Gitea instance and added an SSH key,
 you should "fork" the [main repository](/git/catsoop/catsoop) by navigating to
 it and clicking the "fork" button.  This will create a copy of the repository
 associated with your username.
- 
+
 Then you can clone that repository:
 
 ```nohighlight
@@ -182,7 +182,7 @@ We prefer using Gitea's "pull request" feature for managing contributed changes
 to catsoop.  In order to start the process, you should push your changes to a
 new branch on your fork of the main repository.  When pushing, you should see a
 link for creating a new pull request.  You can follow this link, fill out a
-little bit of information about the changes, and submit your pull request. 
+little bit of information about the changes, and submit your pull request.
 
 Alternatively, if you prefer it, feel free to send patches via e-mail to
 `catsoop-dev@mit.edu` using `git format-patch` or `git send-email`.
