@@ -48,7 +48,7 @@ else:
 
 <section>Download CAT-SOOP</section>
 
-There are several ways you can install CAT-SOOP (as of version 14.0).
+There are several ways you can install CAT-SOOP.
 
 <subsection>Installation via pip</subsection>
 
@@ -60,15 +60,16 @@ $ sudo pip3 install catsoop
 
 <subsection>Manual Installation</subsection>
 
-Alternatively, you can clone the Mercurial repository (or the Git mirror):
+Alternatively, you can clone the Git repository:
 
-* Mercurial: `@{TOR_STRING('hg')} clone @{cs_url_root}/hg/catsoop`
-* Git: `@{TOR_STRING('git')} clone git://@{cs_url_root.split('/',2)[-1]}/catsoop.git`
+```
+$ @{TOR_STRING('git')} clone git://@{cs_url_root.split('/',2)[-1]}/catsoop.git
+```
 
 After you have a local copy, you can then run:
 
 ```
-$ sudo python3 setup.py install
+$ sudo pip3 install .
 ```
 
 from the source directory.  You can also run the unit tests by running:

@@ -4,7 +4,46 @@ cs_content_header = cs_long_name
 
 @{todo}
 
-# Courses Using CAT-SOOP
+<tableofcontents/>
+
+<section>About CAT-SOOP</section>
+
+CAT-SOOP is a flexible, programmable learning management system based on the
+Python programming language.  During the 2018-2019 academic year, CAT-SOOP was
+used in 12 subjects at MIT, and total enrollment in these subjects was around
+3000 students.  While CAT-SOOP's core functionality is the collection and
+assessment of online exercises, it has been extended to support a variety of
+different features including, among others:
+
+* content presentation (via text, video, interactive simulations, etc)
+* grade reports and analytics (including fine-grained control over grading, due dates, extensions, and lateness penalties)
+* queueing system for managing requests for help in an in-class lab environment or office hours
+* real-time analytics for synchronous lab assignments
+* timed quizzes
+* a variety of subject-specific question types
+* group exercises (with randomly-assigned or self-selected groups)
+* finely-grained control over release/due dates (by section, or for individuals)
+* an interface for online grading of paper exams
+
+<subsection>Design Goals</subsection>
+
+<subsection>History</subsection>
+
+CAT-SOOP is a descendent of a system written by Tom&aacute;s
+Lozano-P&eacute;rez in the early-to-mid 1990's, referred to around MIT as "the
+tutor."  The tutor was widely used at MIT and other universities.  In 2011,
+CAT-SOOP and another system (Ike Chuang's `tutor2`, which I understand
+eventually grew into [Open edX](https://open.edx.org)) were both developed in
+parallel as potential replacements for the tutor in MIT's 6.01 (Introduction to
+Electrical Engineering and Computer Science via Robotics).  Despite having been
+designed for 6.01, CAT-SOOP was actually first used in the fall 2011 offering
+of 6.003 (Signals and Systems), while `tutor2` was used in 6.01.  CAT-SOOP was
+first used in 6.01 in the spring 2013 semester, and it began to see use in other
+subjects in later semesters.
+
+
+
+<section>Courses Using CAT-SOOP</section>
 
 The following are some of the courses I know of that use (or have used) CAT-SOOP:
 

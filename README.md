@@ -8,7 +8,7 @@
 
 ## CAT-SOOP
 
-* Web Site: <https://catsoop.org>
+* Web Site: <https://catsoop.mit.edu>
 * IRC: `#catsoop` on OFTC (`irc.oftc.net`)
 * Mailing List: [catsoop-users@mit.edu](mailto:catsoop-users@mit.edu)
   (subscribe at <http://mailman.mit.edu/mailman/listinfo/catsoop-users>)
@@ -44,7 +44,7 @@ $ catsoop configure
 
 If you are setting up a public-facing copy of CAT-SOOP (as opposed to a local
 copy for debugging purposes), see the instructions at
-<https://catsoop.org/website/docs/installing/server_configuration>
+<https://catsoop.mit.edu/website/docs/installing/server_configuration>
 
 To start the server, run:
 ```nohighlight
@@ -59,7 +59,7 @@ $ python3 setup.py test
 
 ### HACKING
 
-See <https://catsoop.org/website/docs/contributing/hacking>
+See <https://catsoop.mit.edu/website/docs/contributing/hacking>
 
 
 ### INCLUDED SOFTWARE

@@ -207,7 +207,7 @@ CAT-SOOP default page!
 
 All of CAT-SOOP's data are stored in files on disk in a directory called
 `__LOGS__` in the `cs_data_root` location specified above (by default,
-`~/.local/share/cat-soop`).  CAT-SOOP itself will not back these files up, but
+`~/.local/share/catsoop`).  CAT-SOOP itself will not back these files up, but
 there are many strategies for backups using common utilities.
 
 I have used many approaches in the past, but my usual approach involves setting
@@ -218,26 +218,26 @@ locations.  This approach has several advantages over simply using `rsync` or
 roll back to any past backup while keeping size down by only storing diffs
 (instead of storing a complete copy of each file for each backup).
 
-Here, we'll set up a backup using Git (which tends to be more efficient for
-this purpose, both in time and in memory, than Mercurial).  To set this up,
-first move yourself to the `__LOGS__` directory and run `git init`, followed by
-`git add -A .` and `git gc --aggressive`.  This will set your `__LOGS__`
-directory up as a Git repository.  You can then set up a cron job to commit all
-changes and push these changes to an arbitrary number of backup locations
-(local or remote).
+Here, we'll set up a backup using Mercurial (which tends to be better than Git
+at efficiently storing the binary logs without manual intervention).  To set
+this up, first move yourself to the `__LOGS__` directory and run `hg init`,
+followed by `hg add .`.  This will set your `__LOGS__` directory up as a
+Mercurial repository.  You can then set up a cron job to commit all changes and
+push these changes to an arbitrary number of backup locations (local or
+remote).
 
 The following example script (`/home/catsoop/do_backup.sh`) was used by several
-classes in fall 2018.  It commits local changes to a Git repository, and it
-then pushes those changes to one local location (on a separate disk) and to one
-remote location.
+classes in fall 2018.  It commits local changes to a Mercurial repository, and
+it then pushes those changes to one local location (on a separate disk) and to
+one remote location.
 
 ```bash
 #!/bin/bash
-cd /home/catsoop/cat-soop-data/__LOGS__;
-git add -A;
-git commit -m "$(date +'%Y-%m-%d:%H:%M')";
-git push /storage2/backup master;
-git push catsoop@cat-soop.org:backups/py master;
+cd /home/catsoop/.local/share/catsoop/_logs;
+hg addremove .;
+hg commit -m "$(date +'%Y-%m-%d:%H:%M')";
+hg push /storage2/backup;
+hg push ssh://catsoop@catsoop.org/backups/py;
 ```
 
 It can then be configured to run, for example, every hour at xx:05 and xx:35
@@ -251,7 +251,7 @@ with the following crontab entry:
 
 By default, Python code that needs to be sandboxed (for example, student code
 from the `pythonic` or `pythoncode` question types) will be sent to
-`cat-soop.org` to be run.
+`catsoop.org` to be run.
 
 It is fine to leave things this way if you'd like.  I will keep that service up
 as long as is feasible, and the sandbox doesn't log anything about the code it

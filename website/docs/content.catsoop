@@ -1,5 +1,5 @@
 <python>
-cs_content_header = "CAT-SOOP v14.x Documentation"
+cs_content_header = "CAT-SOOP Documentation (v%s)" % ('.'.join(i.lstrip('0') for i in cs_version.split('.')[:2]))
 </python>
 
 <center>
