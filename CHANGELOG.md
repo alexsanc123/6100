@@ -12,6 +12,8 @@ _Work toward next release. Currently under development._
 
 **FIXED:**
 
+* Show an error message when two questions would have the same name (#53)
+
 **SECURITY:**
 
 **DOCUMENTATION:**

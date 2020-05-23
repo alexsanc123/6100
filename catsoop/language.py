@@ -108,6 +108,7 @@ def xml_pre_handle(context):
     tmp = text.split("<question")
     qcount = 0
     o = [tmp[0]]
+    names_seen = set()
     for piece in tmp[1:]:
         chunks = piece.strip().split(">", 1)
         if len(chunks) != 2:
@@ -138,9 +139,20 @@ def xml_pre_handle(context):
             if "csq_name" not in e:
                 e["csq_name"] = "q%06d" % qcount
                 qcount += 1
-            if _valid_qname.match(e["csq_name"]):
+            if e["csq_name"] in names_seen:
+                o.append(
+                    (
+                        '<div class="question">'
+                        '<font color="red">'
+                        "ERROR: Duplicate question name <code>%r</code>"
+                        "</font></div>"
+                    )
+                    % e["csq_name"]
+                )
+            elif _valid_qname.match(e["csq_name"]):
                 if type_ != "dummy":
                     o.append(tutor.question(context, type_, **e))
+                names_seen.add(e["csq_name"])
             else:
                 o.append(
                     (
