@@ -285,8 +285,15 @@ def handle_submission(submissions, **info):
         )
         out, err, log = info["sandbox_run_test"](info, code, test)
         if "cached_result" in test:
-            log_s = repr(test["cached_result"])
-            err_s = "Loaded cached result"
+            log_s = {
+                "result": test["cached_result"],
+                "complete": True,
+                "duration": 0.0,
+                "opcode_count": 0,
+                "opcode_limit_reached": False,
+            }
+            err_s = ""
+            out_s = ""
         else:
             out_s, err_s, log_s = info["sandbox_run_test"](info, info["csq_soln"], test)
         if count != 1:

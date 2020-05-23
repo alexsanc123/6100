@@ -17,6 +17,8 @@ _Work toward next release. Currently under development._
 
 * Show an error message when two questions would have the same name (#53)
 
+* Fixed an issue with using cached results in the `pythoncode` question type (#63)
+
 **SECURITY:**
 
 **DOCUMENTATION:**
