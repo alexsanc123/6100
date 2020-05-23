@@ -820,7 +820,7 @@ def handle_custom_tags(context, text):
     tree = BeautifulSoup(text, "html.parser")
 
     # remove conditional includes that aren't falsy
-    FALSY = {"0", "false", "", "[]", "()", "set()"}
+    FALSY = {"0", "false", "", "[]", "()", "set()", "{}"}
     for t in tree.find_all(["div", "span", "p"]):
         if (
             t.get("cs-hide-if", "false").lower() not in FALSY
