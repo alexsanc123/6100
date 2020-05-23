@@ -969,16 +969,35 @@ def handle_custom_tags(context, text):
 
     # code blocks: specific default behavior
     default_code_class = context.get("cs_default_code_language", "nohighlight")
-    if default_code_class is not None:
-        for i in tree.find_all("code"):
-            if i.parent.name != "pre":
-                continue
-            if "class" in i.attrs and (
-                isinstance(i.attrs["class"], str) or len(i.attrs["class"]) > 0
+    all_lines = context.get("cs_code_line_numbers", False)
+    for i in tree.find_all("code"):
+        if i.parent.name != "pre":
+            continue
+
+        if isinstance(i.attrs.setdefault("class", []), str):
+            i.attrs["class"] = [i.attrs["class"]]
+
+        for j in range(len(i.attrs["class"])):
+            if (
+                not i.attrs["class"][j].startswith("lang-")
+                and i.attrs["class"][j] != "highlight-lines"
             ):
-                # this already has a class; skip!
-                continue
-            i.attrs["class"] = [default_code_class]
+                i.attrs["class"][j] = "lang-%s" % i.attrs["class"][j]
+
+        # set default language if no language is given
+        if default_code_class is not None:
+            if len(i.attrs["class"]) == 0:
+                i.attrs["class"] = [default_code_class]
+
+        # add line numbers if we need to:
+        classes = i.attrs["class"]
+        if all_lines:
+            classes.append("highlight-lines")
+        else:
+            for j in range(len(i.attrs["class"])):
+                if classes[j].endswith("-lines") and classes[j] != "highlight-lines":
+                    classes[j] = classes[j][:-6]
+                    classes.append("highlight-lines")
 
     return str(tree)
 
