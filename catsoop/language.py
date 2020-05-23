@@ -199,6 +199,7 @@ def _md(x):
     o = markdown.markdown(
         x,
         extensions=[
+            "extra",
             tables.TableExtension(),
             fenced_code.FencedCodeExtension(),
             sane_lists.SaneListExtension(),
@@ -227,6 +228,8 @@ def md_pre_handle(context, xml=True):
     text = context["cs_content"]
 
     text = re.sub(_environment_matcher("comment"), "", text)
+
+    text = re.sub(r"<div([^>]*)>\n\s*?\n", r"<div\1 markdown>\n\n", text)
 
     text = _md_format_string(context, text, False)
 
