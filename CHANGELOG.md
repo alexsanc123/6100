@@ -6,6 +6,9 @@ _Work toward next release. Currently under development._
 
 **CHANGED:**
 
+* Auto-generated `csq_name` fields increment for every question, even those
+    that have names specified.
+
 **DEPRECATED:**
 
 **REMOVED:**
