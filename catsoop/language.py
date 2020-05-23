@@ -823,8 +823,8 @@ def handle_custom_tags(context, text):
     FALSY = {"0", "false", "", "[]", "()", "set()", "{}"}
     for t in tree.find_all(["div", "span", "p"]):
         if (
-            t.get("cs-hide-if", "false").lower() not in FALSY
-            or t.get("cs-show-if", "true").lower() in FALSY
+            t.get("cs-hide-if", "false").lower().strip() not in FALSY
+            or t.get("cs-show-if", "true").lower().strip() in FALSY
         ):
             t.extract()
 
