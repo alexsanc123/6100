@@ -819,13 +819,12 @@ def handle_custom_tags(context, text):
 
     tree = BeautifulSoup(text, "html.parser")
 
-    # remove conditional includes that aren't falsy
-    FALSY = {"0", "false", "", "[]", "()", "set()", "{}"}
-    for t in tree.find_all(["div", "span", "p"]):
-        if (
-            t.get("cs-hide-if", "false").lower().strip() not in FALSY
-            or t.get("cs-show-if", "true").lower().strip() in FALSY
-        ):
+    for t in tree.find_all(attrs={"cs-show-if": re.compile(".*")}):
+        if not eval(t.attrs["cs-show-if"], context):
+            t.extract()
+
+    for t in tree.find_all(attrs={"cs-hide-if": re.compile(".*")}):
+        if eval(t.attrs["cs-hide-if"], context):
             t.extract()
 
     # handle sections, etc.
