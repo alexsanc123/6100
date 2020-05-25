@@ -651,7 +651,7 @@ def _make_python_handler(context, fulltext):
         # decide whether to show the code
         if "show" in opts:
             opts.remove("show")
-            code = '<pre><code class="lang-python">%s</code></pre>'
+            code = '<pre><code class="language-python">%s</code></pre>'
             out += code % html_format(body)
         # decide whether to run the code
         if "norun" in opts:
@@ -976,13 +976,6 @@ def handle_custom_tags(context, text):
 
         if isinstance(i.attrs.setdefault("class", []), str):
             i.attrs["class"] = [i.attrs["class"]]
-
-        for j in range(len(i.attrs["class"])):
-            if (
-                not i.attrs["class"][j].startswith("lang-")
-                and i.attrs["class"][j] != "highlight-lines"
-            ):
-                i.attrs["class"][j] = "lang-%s" % i.attrs["class"][j]
 
         # set default language if no language is given
         if default_code_class is not None:
