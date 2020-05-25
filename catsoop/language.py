@@ -45,10 +45,6 @@ from . import dispatch
 from . import markdown_math
 from .errors import html_format, clear_info
 
-import markdown
-from markdown.extensions import tables
-from markdown.extensions import fenced_code
-from markdown.extensions import sane_lists
 from bs4 import BeautifulSoup
 from unidecode import unidecode
 
@@ -196,16 +192,7 @@ def xml_pre_handle(context):
 
 
 def _md(x):
-    o = markdown.markdown(
-        x,
-        extensions=[
-            tables.TableExtension(),
-            fenced_code.FencedCodeExtension(),
-            sane_lists.SaneListExtension(),
-            markdown_math.MathExtension(),
-        ],
-    )
-    return o
+    return markdown_math.markdown(x)
 
 
 def md_pre_handle(context, xml=True):
@@ -226,7 +213,12 @@ def md_pre_handle(context, xml=True):
     """
     text = context["cs_content"]
 
+    # remove comments
     text = re.sub(_environment_matcher("comment"), "", text)
+
+    # allow inline markdown processing inside of <div> tags starting with a
+    # blank line
+    text = re.sub(r"<div([^>]*)>\n\s*?\n", r"<div\1 markdown>\n\n", text)
 
     text = _md_format_string(context, text, False)
 
@@ -812,6 +804,14 @@ def handle_custom_tags(context, text):
     text = re.sub(_environment_matcher("showhide"), _showhide_replacer, text)
 
     tree = BeautifulSoup(text, "html.parser")
+
+    for t in tree.find_all(attrs={"cs-show-if": re.compile(".*")}):
+        if not eval(t.attrs["cs-show-if"], context):
+            t.extract()
+
+    for t in tree.find_all(attrs={"cs-hide-if": re.compile(".*")}):
+        if eval(t.attrs["cs-hide-if"], context):
+            t.extract()
 
     # handle sections, etc.
 

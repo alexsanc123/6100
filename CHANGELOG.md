@@ -4,10 +4,16 @@ _Work toward next release. Currently under development._
 
 **ADDED:**
 
+* Added ability to conditionally show or hide HTML elements via the
+    `cs-show-if` and `cs-hide-if` attributes.
+
 **CHANGED:**
 
 * Auto-generated `csq_name` fields increment for every question, even those
     that have names specified.
+
+* Use [mistletoe](https://github.com/miyuchina/mistletoe) for handling Markdown
+    (CommonMark) instead of Python-Markdown.
 
 **DEPRECATED:**
 
