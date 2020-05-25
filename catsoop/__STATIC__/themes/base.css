@@ -75,10 +75,9 @@
 }
  code, kbd, pre, samp, tt {
      font-family: Menlo, Consolas, Courier, Courier New, monospace;
-     font-size: 0.85em;
+     font-size: 0.95em;
 }
  blockquote {
-     font: 14px/22px normal helvetica, sans-serif;
      margin-top: 10px;
      margin-bottom: 10px;
      margin-left: 50px;
@@ -90,14 +89,14 @@
  code {
      padding: 2px;
      border-radius: 5px;
-     background-color: #eee;
+     background-color: #f0f0f0;
      color: inherit;
 }
  pre {
      padding: 1em;
      white-space: pre-wrap;
      border-radius: 5px;
-     background-color: #eee;
+     background-color: #f0f0f0;
 }
  pre code {
      padding: 0px;
@@ -768,4 +767,16 @@
 
 .hljs-emphasis {
   font-style: italic;
+}
+
+td.hljs-ln-numbers {
+  border-right: 2px solid #aaa;
+  text-align: right;
+  padding-left: 5px !important;
+  padding-right: 5px !important;
+  background-color: #e0e0e0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", Helvetica, sans-serif;
+}
+td.hljs-ln-code {
+  padding-left: 10px !important;
 }

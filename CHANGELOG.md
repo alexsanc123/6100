@@ -7,6 +7,9 @@ _Work toward next release. Currently under development._
 * Added ability to conditionally show or hide HTML elements via the
     `cs-show-if` and `cs-hide-if` attributes.
 
+* Added support for showing line numbers next to code snippets by adding
+    `-lines` to the end of the language specified for a code block.
+
 **CHANGED:**
 
 * Auto-generated `csq_name` fields increment for every question, even those
@@ -16,6 +19,8 @@ _Work toward next release. Currently under development._
     Markdown (CommonMark) instead of Python-Markdown.
 
 * Upgraded [highlight.js](https://highlightjs.org/) to version 10.0.2.
+
+* Some small changes to the way code is displayed, to improve readability.
 
 **DEPRECATED:**
 

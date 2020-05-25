@@ -651,7 +651,7 @@ def _make_python_handler(context, fulltext):
         # decide whether to show the code
         if "show" in opts:
             opts.remove("show")
-            code = '<pre><code class="lang-python">%s</code></pre>'
+            code = '<pre><code class="language-python">%s</code></pre>'
             out += code % html_format(body)
         # decide whether to run the code
         if "norun" in opts:
@@ -969,16 +969,28 @@ def handle_custom_tags(context, text):
 
     # code blocks: specific default behavior
     default_code_class = context.get("cs_default_code_language", "nohighlight")
-    if default_code_class is not None:
-        for i in tree.find_all("code"):
-            if i.parent.name != "pre":
-                continue
-            if "class" in i.attrs and (
-                isinstance(i.attrs["class"], str) or len(i.attrs["class"]) > 0
-            ):
-                # this already has a class; skip!
-                continue
-            i.attrs["class"] = [default_code_class]
+    all_lines = context.get("cs_code_line_numbers", False)
+    for i in tree.find_all("code"):
+        if i.parent.name != "pre":
+            continue
+
+        if isinstance(i.attrs.setdefault("class", []), str):
+            i.attrs["class"] = [i.attrs["class"]]
+
+        # set default language if no language is given
+        if default_code_class is not None:
+            if len(i.attrs["class"]) == 0:
+                i.attrs["class"] = [default_code_class]
+
+        # add line numbers if we need to:
+        classes = i.attrs["class"]
+        if all_lines:
+            classes.append("highlight-lines")
+        else:
+            for j in range(len(i.attrs["class"])):
+                if classes[j].endswith("-lines") and classes[j] != "highlight-lines":
+                    classes[j] = classes[j][:-6]
+                    classes.append("highlight-lines")
 
     return str(tree)
 
