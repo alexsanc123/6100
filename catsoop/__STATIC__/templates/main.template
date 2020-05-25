@@ -51,10 +51,11 @@
     // @license magnet:?xt=urn:btih:0b31508aeb0634b347b8270c7bee4d411b5d4109&dn=agpl-3.0.txt AGPL-v3
     hljs.initHighlightingOnLoad();
     window.addEventListener('DOMContentLoaded', function(){{
-        document.querySelectorAll('code.hljs.highlight-lines').forEach(function(b){{
+        document.querySelectorAll('code.highlight-lines').forEach(function(b){{
             hljs.lineNumbersBlock(b);
             if ((b.innerHTML.trim().match(/\r\n|\r|\n/g) || []).length > 0){{
                 b.parentElement.style = "padding-left: 0px !important;"
+                b.classList.add('hljs');
             }}
         }});
     }});
