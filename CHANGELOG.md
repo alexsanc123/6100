@@ -12,8 +12,10 @@ _Work toward next release. Currently under development._
 * Auto-generated `csq_name` fields increment for every question, even those
     that have names specified.
 
-* Use [mistletoe](https://github.com/miyuchina/mistletoe) for handling Markdown
-    (CommonMark) instead of Python-Markdown.
+* Switched to  [mistletoe](https://github.com/miyuchina/mistletoe) for handling
+    Markdown (CommonMark) instead of Python-Markdown.
+
+* Upgraded [highlight.js](https://highlightjs.org/) to version 10.0.2.
 
 **DEPRECATED:**
 
