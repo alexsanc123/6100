@@ -68,15 +68,6 @@ for i in ace_files:
                   <td><a href="BASE/scripts/%s">%s</a></td>
               </tr>""" % (i, i, i, i))
 </python>
-<python>
-for i in mathjax_files:
-    print("""\
-              <tr>
-                  <td><a href="BASE/scripts/%s">%s</a></td>
-                  <td><a href="http://www.apache.org/licenses/LICENSE-2.0">Apache-2.0</a></td>
-                  <td><a href="BASE/scripts/%s">%s</a></td>
-              </tr>""" % (i, i, i, i))
-</python>
         </tbody>
     </table>
 <center>
