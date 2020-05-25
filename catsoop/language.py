@@ -45,10 +45,6 @@ from . import dispatch
 from . import markdown_math
 from .errors import html_format, clear_info
 
-import markdown
-from markdown.extensions import tables
-from markdown.extensions import fenced_code
-from markdown.extensions import sane_lists
 from bs4 import BeautifulSoup
 from unidecode import unidecode
 
@@ -196,17 +192,7 @@ def xml_pre_handle(context):
 
 
 def _md(x):
-    o = markdown.markdown(
-        x,
-        extensions=[
-            "extra",
-            tables.TableExtension(),
-            fenced_code.FencedCodeExtension(),
-            sane_lists.SaneListExtension(),
-            markdown_math.MathExtension(),
-        ],
-    )
-    return o
+    return markdown_math.markdown(x)
 
 
 def md_pre_handle(context, xml=True):

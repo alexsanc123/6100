@@ -38,7 +38,7 @@ def dmath(x, env=""):
 
 
 def _md(x):
-    out = language._md(x)
+    out = language._md(x).strip()
     if out.startswith("<p>") and out.endswith("</p>"):
         out = out[3:-4]
     return out
@@ -88,11 +88,11 @@ class TestMarkdownMath(CATSOOPTest):
             ),
             (
                 "\\begin{align}\n  x & \\text{if $y$} \\\\\n  y & \\text{else}\n\end{align}",
-                dmath("\n  x & \\text{if $y$} \\\\\n  y & \\text{else}\n", "align"),
+                dmath("\nx & \\text{if $y$} \\\\\ny & \\text{else}\n", "align"),
             ),
             (
                 "\\begin{align*}\n  x & \\text{if $y$} \\\\\n  y & \\text{else}\n\end{align*}",
-                dmath("\n  x & \\text{if $y$} \\\\\n  y & \\text{else}\n", "align*"),
+                dmath("\nx & \\text{if $y$} \\\\\ny & \\text{else}\n", "align*"),
             ),
         ]
 

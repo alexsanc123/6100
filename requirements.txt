@@ -2,7 +2,7 @@ bs4
 cheroot
 filelock
 python-jose
-markdown>=3
+mistletoe
 mpmath
 ply
 pynacl
