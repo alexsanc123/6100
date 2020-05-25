@@ -504,7 +504,7 @@ def handle_clearanswer(context):
 
 
 def explanation_display(x):
-    return "<hr /><p><b>Explanation:</b></p>%s" % x
+    return "<hr /><p><b>Explanation:</b></p>\n\n%s" % x
 
 
 def handle_viewexplanation(context, outdict=None, skip_empty=False):
