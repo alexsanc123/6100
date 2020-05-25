@@ -33,7 +33,7 @@ class Math(SpanToken):
 class DisplayMath(SpanToken):
     pattern = re.compile(r"\$\$(?P<body>.*?)\$\$", re.MULTILINE | re.DOTALL)
     parse_inner = False
-    precedence = SpanToken.precedence + 1
+    precedence = SpanToken.precedence + 2
 
     def __init__(self, match):
         self.body = match.group("body")
@@ -45,6 +45,7 @@ class DisplayMathEnv(SpanToken):
         re.MULTILINE | re.DOTALL,
     )
     parse_inner = False
+    precedence = SpanToken.precedence + 1
 
     def __init__(self, match):
         self.body = match.group("body")
