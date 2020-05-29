@@ -41,7 +41,7 @@ VERSION_FNAME = os.path.join(os.path.dirname(__file__), "catsoop", "__init__.py"
 ORIGINAL_VERSION = None
 
 
-def dev_number_git():
+def dev_number():
     try:
         last_version = subprocess.check_output(
             ["git", "describe", "--tags", "--match", "v*"]
@@ -65,37 +65,6 @@ def dev_number_git():
         _date = ""
         print("failed to get git commit date", file=sys.stderr)
     return ("Git", sha, N, _date)
-
-
-def _version_sort(x):
-    return tuple(map(int, x[1:].split("."))) if x.startswith("v") else (float("-inf"),)
-
-
-def dev_number_hg():
-    try:
-        tags = subprocess.check_output(["hg", "tags"]).decode("ascii")
-        tags = dict(i.strip().split() for i in tags.splitlines())
-        tags = {k: v.split(":") for k, v in tags.items()}
-    except Exception:
-        print("failed to find hg tags", file=sys.stderr)
-        return
-    sha = tags["tip"][1]
-    N = int(tags["tip"][0]) - int(tags[max(tags, key=_version_sort)][0])
-    if N <= 1:
-        return
-    try:
-        _cmd = ["hg", "log", "-r", "tip"]
-        _info = subprocess.check_output(_cmd).decode("ascii")
-        _info = dict(i.strip().split(" ", 1) for i in _info.strip().splitlines())
-        _date = _info["date:"].strip()
-    except Exception:
-        _date = ""
-        print("failed to get hg commit date", file=sys.stderr)
-    return ("Mercurial", sha, N, _date)
-
-
-def dev_number():
-    return dev_number_hg() or dev_number_git()
 
 
 def dirty_version():
