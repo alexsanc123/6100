@@ -546,13 +546,16 @@ def load_content(context, course, path, into, content_file=None):
             (".".join(i.split(".")[1:]) if re.match(r"\d*\..*", i) else i)
             for i in subdirs
         ]
-        children = dict([(i, dict(into)) for i in shortnames])
-        for d, name in zip(subdirs, shortnames):
-            new_name = os.path.join(directory, d, "preload.py")
-            into["cs_local_python_import"] = _make_file_importer(d)
-            if os.path.isfile(new_name):
-                exec(cs_compile(new_name), children[name])
-            children[name]["directory"] = d
+        if context.get("cs_load_children", True):
+            children = dict([(i, dict(into)) for i in shortnames])
+            for d, name in zip(subdirs, shortnames):
+                new_name = os.path.join(directory, d, "preload.py")
+                into["cs_local_python_import"] = _make_file_importer(d)
+                if os.path.isfile(new_name):
+                    exec(cs_compile(new_name), children[name])
+                children[name]["directory"] = d
+        else:
+            children = {}
         into["cs_children"] = children
     else:
         into["cs_children"] = {}

@@ -10,6 +10,9 @@ _Work toward next release. Currently under development._
 * Added support for showing line numbers next to code snippets by adding
     `-lines` to the end of the language specified for a code block.
 
+* Added ability to avoid running childrens' preloads into `cs_children`, by
+    setting `cs_load_children = False`
+
 **CHANGED:**
 
 * Auto-generated `csq_name` fields increment for every question, even those
