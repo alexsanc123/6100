@@ -48,92 +48,23 @@ import contextlib
 from collections import OrderedDict
 from datetime import datetime, timedelta
 
-_nodoc = {
-    "passthrough",
-    "FileLock",
-    "SEP_CHARS",
-    "get_separator",
-    "good_separator",
-    "modify_most_recent",
-    "NoneType",
-    "OrderedDict",
-    "datetime",
-    "timedelta",
-    "COMPRESS",
-    "Cipher",
-    "ENCRYPT_KEY",
-    "ENCRYPT_PASS",
-    "RawFernet",
-    "compress_encrypt",
-    "decompress_decrypt",
-    "default_backend",
-    "log_lock",
-    "prep",
-    "sep",
-    "unprep",
-}
-
-
-@contextlib.contextmanager
-def passthrough():
-    yield
-
-
-from . import util
-from . import base_context
 from filelock import FileLock
 
-importlib.reload(base_context)
+from .. import base_context
 
-COMPRESS = base_context.cs_log_compression
-
-ENCRYPT_KEY = None
-ENCRYPT_PASS = os.environ.get("CATSOOP_PASSPHRASE", None)
-if ENCRYPT_PASS is not None:
-    with open(
-        os.path.join(os.path.dirname(os.environ["CATSOOP_CONFIG"]), "encryption_salt"),
-        "rb",
-    ) as f:
-        SALT = f.read()
-    ENCRYPT_KEY = hashlib.pbkdf2_hmac(
-        "sha256", ENCRYPT_PASS.encode("utf8"), SALT, 100000, dklen=32
-    )
+from . import (
+    prep,
+    unprep,
+    compress_encrypt,
+    decompress_decrypt,
+    ENCRYPT_KEY,
+)
 
 
 def log_lock(path):
     lock_loc = os.path.join(base_context.cs_data_root, "_locks", *path) + ".lock"
     os.makedirs(os.path.dirname(lock_loc), exist_ok=True)
     return FileLock(lock_loc)
-
-
-def compress_encrypt(x):
-    if COMPRESS:
-        x = lzma.compress(x)
-    if ENCRYPT_KEY is not None:
-        x = util.simple_encrypt(ENCRYPT_KEY, x)
-    return x
-
-
-def prep(x):
-    """
-    Helper function to serialize a Python object.
-    """
-    return compress_encrypt(pickle.dumps(x, -1))
-
-
-def decompress_decrypt(x):
-    if ENCRYPT_KEY is not None:
-        x = util.simple_decrypt(ENCRYPT_KEY, x)
-    if COMPRESS:
-        x = lzma.decompress(x)
-    return x
-
-
-def unprep(x):
-    """
-    Helper function to deserialize a Python object.
-    """
-    return pickle.loads(decompress_decrypt(x))
 
 
 def _e(x, person):
@@ -327,3 +258,30 @@ def modify_most_recent(
             updater = overwrite_log
         updater(db_name, path, logname, new_val, lock=False)
     return new_val
+
+
+def initialize_database():
+    """
+    Initialize the log storage on disk (i.e., create the proper directory structure)
+    """
+    checker_db_loc = os.path.join(base_context.cs_data_root, "_logs", "_checker")
+    for subdir in ("queued", "running", "results", "staging"):
+        os.makedirs(os.path.join(checker_db_loc, subdir), exist_ok=True)
+
+
+def clear_old_logs(db_name, path, timestamp):
+    """
+    Clear logs whose updated timestamp is below the given value.  Primarily used for session handling
+    """
+    directory = os.path.dirname(get_log_filename(db_name, path, "test"))
+    try:
+        logs = os.listdir(directory)
+    except:
+        return
+    for log in logs:
+        fullname = os.path.join(directory, log)
+        try:
+            if os.stat(fullname).st_mtime < timestamp:
+                os.unlink(fullname)
+        except:
+            pass

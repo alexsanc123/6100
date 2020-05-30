@@ -78,15 +78,7 @@ def get_session_id(environ):
     ID is new (just now generated), and `False` if the session ID is not new.
     """
     # clear out dead sessions first
-    make_session_dir()
-    now = time.time()
-    for i in os.listdir(SESSION_DIR):
-        fullname = os.path.join(SESSION_DIR, i)
-        try:
-            if os.stat(fullname).st_mtime < now - EXPIRE:
-                os.unlink(fullname)
-        except:
-            pass
+    cslog.clear_old_logs("_sessions", [], time.time() - EXPIRE)
 
     COOKIE_REGEX = re.compile(
         r"(?:^|;)\s*catsoop_sid_%s\s*=\s*([^;\s]*)\s*(?:;|$)" % util.catsoop_loc_hash()
@@ -111,13 +103,6 @@ def get_session_id(environ):
         return new_session_id(), True
 
 
-def make_session_dir():
-    """
-    Create the session directory if it does not exist.
-    """
-    os.makedirs(SESSION_DIR, exist_ok=True)
-
-
 def get_session_data(context, sid):
     """
     Returns the session data associated with a given session ID
@@ -129,15 +114,7 @@ def get_session_data(context, sid):
 
     **Returns:** a dictionary mapping session variables to their values
     """
-    make_session_dir()
-    fname = os.path.join(SESSION_DIR, sid)
-    with cslog.log_lock(["_sessions", sid]):
-        try:
-            with open(fname, "rb") as f:
-                out = cslog.unprep(f.read())
-        except:
-            out = {}  # default to returning empty session
-    return out
+    return cslog.most_recent("_sessions", [], sid, {})
 
 
 def set_session_data(context, sid, data):
@@ -152,8 +129,4 @@ def set_session_data(context, sid, data):
 
     **Returns:** `None`
     """
-    make_session_dir()
-    fname = os.path.join(SESSION_DIR, sid)
-    with cslog.log_lock(["_sessions", sid]):
-        with open(fname, "wb") as f:
-            f.write(cslog.prep(data))
+    cslog.overwrite_log("_sessions", [], sid, data)
