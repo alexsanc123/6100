@@ -14,12 +14,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-Logging mechanisms in catsoopdb
-
-From a high-level perspective, CAT-SOOP's logs are sequences of Python objects.
-
-A log is identified by a `db_name` (typically a username), a `path` (a list of
-strings starting with a course name), and a `logname` (a string).
+Logging mechanisms using the filesystem
 
 On disk, each log is a file containing one or more entries, where each entry
 consists of:
@@ -28,10 +23,6 @@ consists of:
 * a binary blob (pickled Python object, potentially encrypted and/or
     compressed)
 * the 8-bit length repeated
-
-This module provides functions for interacting with and modifying those logs.
-In particular, it provides ways to retrieve the Python objects in a log, or to
-add new Python objects to a log.
 """
 
 import os
