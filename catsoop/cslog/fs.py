@@ -247,11 +247,9 @@ def modify_most_recent(
 
 def initialize_database():
     """
-    Initialize the log storage on disk (i.e., create the proper directory structure)
+    Initialize the log storage on disk
     """
-    checker_db_loc = os.path.join(base_context.cs_data_root, "_logs", "_checker")
-    for subdir in ("queued", "running", "results", "staging"):
-        os.makedirs(os.path.join(checker_db_loc, subdir), exist_ok=True)
+    pass
 
 
 def clear_old_logs(db_name, path, timestamp):
