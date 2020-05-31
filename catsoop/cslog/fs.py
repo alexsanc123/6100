@@ -268,3 +268,9 @@ def clear_old_logs(db_name, path, timestamp):
                 os.unlink(fullname)
         except:
             pass
+
+def store_upload(username, path, question_name, data, filename):
+    pass
+
+def retrieve_upload(upload_id):
+    pass

@@ -217,3 +217,10 @@ def initialize_database():
     )
     CONNECTION.commit()
     c.close()
+
+
+def store_upload(username, path, question_name, data, filename):
+    pass
+
+def retrieve_upload(upload_id):
+    pass
