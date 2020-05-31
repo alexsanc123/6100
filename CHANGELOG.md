@@ -13,6 +13,8 @@ _Work toward next release. Currently under development._
 * Added ability to avoid running children's preloads into `cs_children`, by
     setting `cs_load_children = False`
 
+* Added support for using LTI with Canvas.
+
 **CHANGED:**
 
 * Auto-generated `csq_name` fields increment for every question, even those
