@@ -68,9 +68,10 @@ class lti4cs(pylti.common.LTIBase):
                 self.consumers, url, method, environment, params
             )
             LOGGER.info("[lti.lti4cs.verify_request] verify_request success")
-            extra_fields = [ self.config.get("lti_user_id_field") ] + ['tool_consumer_info_product_family_code',
-                                                                       'tool_consumer_.*',
-                                                                       'custom_canvas_.*',
+            extra_fields = [self.config.get("lti_user_id_field")] + [
+                "tool_consumer_info_product_family_code",
+                "tool_consumer_.*",
+                "custom_canvas_.*",
             ]
             for prop in pylti.common.LTI_PROPERTY_LIST + extra_fields:
                 if prop is None:
@@ -86,7 +87,11 @@ class lti4cs(pylti.common.LTIBase):
                 for key in params:
                     m = re.match(prop, key)
                     if m:
-                        LOGGER.info("[lti.lti4cs.verify_request] params %s=%s", prop, params.get(key, None))
+                        LOGGER.info(
+                            "[lti.lti4cs.verify_request] params %s=%s",
+                            prop,
+                            params.get(key, None),
+                        )
                         self.lti_data[key] = params[key]
 
             self.session["lti_data"] = self.lti_data
@@ -333,10 +338,12 @@ def serve_lti(context, path_info, environment, params, dispatch_main, return_con
         lti_data = session_data["lti_data"]
         lup = context["cs_lti_config"].get("lti_username_prefix", "lti_")
 
-        default_user_id_field = "user_id"	# used by OpenEdX
-        if 'canvas' in lti_data.get("tool_consumer_info_product_family_code"):
-            default_user_id_field = "custom_canvas_user_login_id"	# used by Canvas LMS
-        lti_user_id_field = context["cs_lti_config"].get("lti_user_id_field", default_user_id_field)	# allow config to override LTI field to use for uname
+        default_user_id_field = "user_id"  # used by OpenEdX
+        if "canvas" in lti_data.get("tool_consumer_info_product_family_code"):
+            default_user_id_field = "custom_canvas_user_login_id"  # used by Canvas LMS
+        lti_user_id_field = context["cs_lti_config"].get(
+            "lti_user_id_field", default_user_id_field
+        )  # allow config to override LTI field to use for uname
 
         lti_uname = lti_data[lti_user_id_field]
         if not context["cs_lti_config"].get("force_username_from_id"):
