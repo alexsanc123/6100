@@ -797,7 +797,7 @@ def handle_custom_tags(context, text):
     # hints (<showhide>)
     def _showhide_replacer(match):
         body = source_transform_string(context, match.groupdict()["body"])
-        out = """<div class="response"><button class="btn-catsoop" onclick="if(this.parentElement.children[1].style.display === 'none'){this.parentElement.children[1].style.display = 'block';}else{this.parentElement.children[1].style.display = 'none';}">Show/Hide</button>\n"""
+        out = """<div class="response"><button class="btn btn-catsoop" onclick="if(this.parentElement.children[1].style.display === 'none'){this.parentElement.children[1].style.display = 'block';}else{this.parentElement.children[1].style.display = 'none';}">Show/Hide</button>\n"""
         out += '<div style="display:none;">%s</div>' % (body,)
         return out + "</div>"
 
