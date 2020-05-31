@@ -5,10 +5,10 @@ _Work toward next release. Currently under development._
 **ADDED:**
 
 * Added ability to conditionally show or hide HTML elements via the
-    `cs-show-if` and `cs-hide-if` attributes.
+    `cs-show-if` and `cs-hide-if` attributes (#56 and #67)
 
 * Added support for showing line numbers next to code snippets by adding
-    `-lines` to the end of the language specified for a code block.
+    `-lines` to the end of the language specified for a code block (#62 and #68)
 
 * Added ability to avoid running children's preloads into `cs_children`, by
     setting `cs_load_children = False`
