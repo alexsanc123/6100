@@ -210,6 +210,9 @@ def initialize_database():
         "CREATE TABLE IF NOT EXISTS logs (id bigserial PRIMARY KEY, db_name text, path text, logname text, updated bigint, data bytea);"
     )
     c.execute(
+        "CREATE INDEX IF NOT EXISTS idx_logname ON logs (db_name, path, logname);"
+    )
+    c.execute(
         "CREATE TABLE IF NOT EXISTS uploads (id char(96) PRIMARY KEY, info bytea, content bytea);"
     )
     CONNECTION.commit()
