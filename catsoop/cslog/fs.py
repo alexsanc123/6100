@@ -26,15 +26,9 @@ consists of:
 """
 
 import os
-import ast
-import sys
-import lzma
 import base64
-import pickle
 import struct
 import hashlib
-import importlib
-import contextlib
 
 from collections import OrderedDict
 from datetime import datetime, timedelta
