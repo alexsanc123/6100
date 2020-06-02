@@ -89,7 +89,7 @@ class lti4cs(pylti.common.LTIBase):
                     if m:
                         LOGGER.info(
                             "[lti.lti4cs.verify_request] params %s=%s",
-                            prop,
+                            key,
                             params.get(key, None),
                         )
                         self.lti_data[key] = params[key]
