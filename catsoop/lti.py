@@ -346,7 +346,11 @@ def serve_lti(context, path_info, environment, params, dispatch_main, return_con
         )  # allow config to override LTI field to use for uname
 
         lti_uname = lti_data[lti_user_id_field]
-        if not context["cs_lti_config"].get("force_username_from_id"):
+        if context["cs_lti_config"].get("force_username_from_id"):
+            _trailing = context["cs_lti_config"].get("force_username_remove_trailing")
+            if _trailing and lti_uname.endswith(_trailing):
+                lti_uname = lti_uname[:-len(_trailing)]
+        else:
             lti_uname = lti_data.get(
                 "lis_person_sourcedid", lti_uname
             )  # prefer username to user_id
