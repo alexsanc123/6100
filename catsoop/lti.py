@@ -337,24 +337,29 @@ def serve_lti(context, path_info, environment, params, dispatch_main, return_con
     elif l4c is not None:
         lti_data = session_data["lti_data"]
         lup = context["cs_lti_config"].get("lti_username_prefix", "lti_")
-
-        default_user_id_field = "user_id"  # used by OpenEdX
-        if "canvas" in lti_data.get("tool_consumer_info_product_family_code"):
-            default_user_id_field = "custom_canvas_user_login_id"  # used by Canvas LMS
-        lti_user_id_field = context["cs_lti_config"].get(
-            "lti_user_id_field", default_user_id_field
-        )  # allow config to override LTI field to use for uname
-
-        lti_uname = lti_data[lti_user_id_field]
-        if context["cs_lti_config"].get("force_username_from_id"):
-            _trailing = context["cs_lti_config"].get("force_username_remove_trailing")
-            if _trailing and lti_uname.endswith(_trailing):
-                lti_uname = lti_uname[:-len(_trailing)]
+        if "lti_username_function" in context["cs_lti_config"]:
+            lti_uname = context["cs_lti_config"]["lti_username_function"](lti_data)
         else:
-            lti_uname = lti_data.get(
-                "lis_person_sourcedid", lti_uname
-            )  # prefer username to user_id
+            default_user_id_field = "user_id"  # used by OpenEdX
+
+            if "canvas" in lti_data.get("tool_consumer_info_product_family_code"):
+                default_user_id_field = (
+                    "custom_canvas_user_login_id"  # used by Canvas LMS
+                )
+
+            lti_user_id_field = context["cs_lti_config"].get(
+                "lti_user_id_field", default_user_id_field
+            )  # allow config to override LTI field to use for uname
+
+            lti_uname = lti_data[lti_user_id_field]
+
+            if context["cs_lti_config"].get("prefer_username_to_userid", True):
+                lti_uname = lti_data.get(
+                    "lis_person_sourcedid", lti_uname
+                )  # prefer username to user_id
+
         uname = "%s%s" % (lup, lti_uname)
+
         email = lti_data.get("lis_person_contact_email_primary", "%s@unknown" % uname)
         name = lti_data.get("lis_person_name_full", uname)
         lti_data["cs_user_info"] = {
