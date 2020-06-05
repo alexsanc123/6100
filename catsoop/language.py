@@ -776,7 +776,7 @@ def handle_custom_tags(context, text):
         text = context["cs_course_handle_custom_tags"](text)
 
     section = r"((?:chapter)|(?:(?:sub){0,2}section))"
-    section_star = r"<(?P<tag>%s)\*>(?P<body>.*?)</(?P=tag)\*?>" % section
+    section_star = r"&lt;(?P<tag>%s)\*&gt;(?P<body>.*?)&lt;/(?P=tag)\*?&gt;" % section
     section_star = re.compile(section_star, re.MULTILINE | re.DOTALL | re.IGNORECASE)
 
     tag_map = {
