@@ -35,6 +35,7 @@ from datetime import datetime, timedelta
 
 from filelock import FileLock
 
+from .. import time
 from .. import base_context
 
 from . import (
@@ -42,7 +43,7 @@ from . import (
     unprep,
     compress_encrypt,
     decompress_decrypt,
-    ENCRYPT_KEY,
+    hash_db_info,
 )
 
 
@@ -50,13 +51,6 @@ def log_lock(path):
     lock_loc = os.path.join(base_context.cs_data_root, "_locks", *path) + ".lock"
     os.makedirs(os.path.dirname(lock_loc), exist_ok=True)
     return FileLock(lock_loc)
-
-
-def _e(x, person):
-    p = hashlib.sha512(person.encode("utf-8")).digest()[:9]
-    return base64.urlsafe_b64encode(
-        hashlib.blake2b(x.encode("utf-8"), person=b"catsoop%s" % p).digest()
-    ).decode("utf-8")
 
 
 def get_log_filename(db_name, path, logname):
@@ -69,11 +63,7 @@ def get_log_filename(db_name, path, logname):
     * `path`: the path to the page associated with the log
     * `logname`: the name of the log
     """
-    if ENCRYPT_KEY is not None:
-        seed = path[0] if path else db_name
-        path = [_e(p, seed + repr(path[:ix])) for ix, p in enumerate(path)]
-        db_name = _e(db_name, seed + db_name)
-        logname = _e(logname, seed + repr(path))
+    db_name, path, logname = hash_db_info(db_name, path, logname)
     if path:
         course = path[0]
         return os.path.join(
@@ -269,8 +259,24 @@ def clear_old_logs(db_name, path, timestamp):
         except:
             pass
 
-def store_upload(username, path, question_name, data, filename):
-    pass
 
-def retrieve_upload(upload_id):
-    pass
+def store_upload(id_, info, data):
+    dir_ = os.path.join(
+        context["cs_data_root"], "_logs", "_uploads", id_[0], id_[1], id_
+    )
+    os.makedirs(dir_, exist_ok=True)
+    with open(os.path.join(dir_, "info"), "wb") as f:
+        f.write(info)
+    with open(os.path.join(dir_, "content"), "wb") as f:
+        f.write(data)
+
+
+def retrieve_upload(id_):
+    dir_ = os.path.join(
+        context["cs_data_root"], "_logs", "_uploads", id_[0], id_[1], id_
+    )
+    with open(os.path.join(dir_, "info"), "rb") as f:
+        info = unprep(f.read())
+    with open(os.path.join(dir_, "info"), "rb") as f:
+        data = decompress_decrypt(f.read())
+    return info, data

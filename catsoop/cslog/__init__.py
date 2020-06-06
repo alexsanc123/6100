@@ -30,6 +30,7 @@ import os
 import ast
 import sys
 import lzma
+import uuid
 import base64
 import pickle
 import struct
@@ -71,6 +72,7 @@ def passthrough():
     yield
 
 
+from .. import time
 from .. import util
 from .. import base_context
 from filelock import FileLock
@@ -122,6 +124,33 @@ def unprep(x):
     return pickle.loads(decompress_decrypt(x))
 
 
+def _e(x, person):
+    p = hashlib.sha512(person.encode("utf-8")).digest()[:9]
+    return base64.urlsafe_b64encode(
+        hashlib.blake2b(x.encode("utf-8"), person=b"catsoop%s" % p).digest()
+    ).decode("utf-8")
+
+
+def hash_db_info(db_name, path, logname):
+    if ENCRYPT_KEY is not None:
+        seed = path[0] if path else db_name
+        path = [_e(p, seed + repr(path[:ix])) for ix, p in enumerate(path)]
+        db_name = _e(db_name, seed + repr(path))
+        logname = _e(logname, seed + repr(path))
+    return db_name, path, logname
+
+
+def prepare_upload(username, data, filename):
+    hstring = hashlib.sha256(data).hexdigest()
+    info = {
+        "filename": filename,
+        "username": username,
+        "time": time.detailed_timestamp(time.now()),
+        "hash": hstring,
+    }
+    return "%s%s" % (uuid.uuid4().hex, hstring), prep(info), compress_encrypt(data)
+
+
 _store = base_context.cs_log_storage_backend
 exec(
     """from .%s import (
@@ -132,6 +161,8 @@ exec(
     modify_most_recent,
     initialize_database,
     clear_old_logs,
+    store_upload,
+    retrieve_upload,
 )"""
     % base_context.cs_log_storage_backend
 )

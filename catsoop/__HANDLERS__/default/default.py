@@ -1960,60 +1960,19 @@ def pre_handle(context):
         names = context["cs_form"].get("names", "[]")
         context[_n("question_names")] = json.loads(names)
         context[_n("form")] = json.loads(context["cs_form"].get("data", "{}"))
-        if context["cs_upload_management"] == "file":
-            for name, value in context[_n("form")].items():
-                if name == "__names__":
-                    continue
-                if isinstance(value, list):
-                    data = csm_thirdparty.data_uri.DataURI(value[1]).data
-                    if context["csm_cslog"].ENCRYPT_KEY is not None:
-                        seed = (
-                            context["cs_path_info"][0]
-                            if context["cs_path_info"]
-                            else context["cs_path_info"]
-                        )
-                        _path = [
-                            context["csm_cslog"]._e(i, repr(seed))
-                            for i in context["cs_path_info"]
-                        ]
-                    else:
-                        _path = context["cs_path_info"]
-                    dir_ = os.path.join(
-                        context["cs_data_root"], "_logs", "_uploads", *_path
-                    )
-                    os.makedirs(dir_, exist_ok=True)
-                    value[0] = (
-                        value[0]
-                        .replace("<", "")
-                        .replace(">", "")
-                        .replace('"', "")
-                        .replace('"', "")
-                    )
-                    hstring = hashlib.sha256(data).hexdigest()
-                    info = {
-                        "filename": value[0],
-                        "username": context["cs_username"],
-                        "time": context["csm_time"].detailed_timestamp(
-                            context["cs_now"]
-                        ),
-                        "question": name,
-                        "hash": hstring,
-                    }
+        for name, value in context[_n("form")].items():
+            if name == "__names__":
+                continue
+            if isinstance(value, list):
 
-                    disk_fname = "_csfile.%s%s" % (uuid.uuid4().hex, hstring)
-                    dirname = os.path.join(dir_, disk_fname)
-                    os.makedirs(dirname, exist_ok=True)
-                    with open(os.path.join(dirname, "content"), "wb") as f:
-                        f.write(context["csm_cslog"].compress_encrypt(data))
-                    with open(os.path.join(dirname, "info"), "wb") as f:
-                        f.write(context["csm_cslog"].prep(info))
-                    value[1] = dirname
-        elif context["cs_upload_management"] == "db":
-            pass
-        else:
-            raise Exception(
-                "unknown upload management style: %r" % context["cs_upload_management"]
-            )
+                upload = cslog.prepare_upload(
+                    context["cs_username"],
+                    csm_thirdparty.data_uri.DataURI(value[1]).data,
+                    value[0],
+                )
+
+                cslog.store_upload(*upload)
+                value[1] = upload[0]
 
 
 def _get_auto_view(context):

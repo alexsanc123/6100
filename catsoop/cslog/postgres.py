@@ -18,6 +18,7 @@ Logging mechanisms using [PostgreSQL](https://www.postgresql.org/)
 """
 
 import time
+import uuid
 import psycopg2
 
 from . import (
@@ -34,16 +35,16 @@ CONNECTION = psycopg2.connect(**base_context.cs_postgres_options)
 
 
 def _read_log(db_name, path, logname):
-    c = CONNECTION.cursor()
-    c.execute(
-        "SELECT data FROM logs WHERE db_name=%s AND path=%s AND logname=%s ORDER BY id ASC",
-        (db_name, "/".join(path), logname),
-    )
-    r = c.fetchone()
-    while r is not None:
-        yield unprep(r[-1])
-        r = c.fetchone()
-    c.close()
+    with CONNECTION:
+        with CONNECTION.cursor() as c:
+            c.execute(
+                "SELECT data FROM logs WHERE db_name=%s AND path=%s AND logname=%s ORDER BY id ASC",
+                (db_name, "/".join(path), logname),
+            )
+            r = c.fetchone()
+            while r is not None:
+                yield unprep(r[-1])
+                r = c.fetchone()
 
 
 def read_log(db_name, path, logname):
@@ -90,14 +91,15 @@ def most_recent(db_name, path, logname, default=None):
     **Returns:** a single Python object representing the most recent entry in
     the log.
     """
-    c = CONNECTION.cursor()
-    c.execute(
-        "SELECT data FROM logs WHERE db_name=%s AND path=%s AND logname=%s ORDER BY id DESC LIMIT 1",
-        (db_name, "/".join(path), logname),
-    )
-    r = c.fetchone()
-    c.close()
-    return unprep(bytes(r[-1])) if r is not None else default
+    with CONNECTION:
+        with CONNECTION.cursor() as c:
+            c = CONNECTION.cursor()
+            c.execute(
+                "SELECT data FROM logs WHERE db_name=%s AND path=%s AND logname=%s ORDER BY id DESC LIMIT 1",
+                (db_name, "/".join(path), logname),
+            )
+            r = c.fetchone()
+            return unprep(bytes(r[-1])) if r is not None else default
 
 
 def update_log(db_name, path, logname, new):
@@ -116,13 +118,12 @@ def update_log(db_name, path, logname, new):
     * `lock` (default `True`): whether the database should be locked during
         this update
     """
-    c = CONNECTION.cursor()
-    c.execute(
-        "INSERT INTO logs (db_name, path, logname, updated, data) VALUES(%s, %s, %s, %s, %s)",
-        (db_name, "/".join(path), logname, int(time.time()), prep(new)),
-    )
-    CONNECTION.commit()
-    c.close()
+    with CONNECTION:
+        with CONNECTION.cursor() as c:
+            c.execute(
+                "INSERT INTO logs (db_name, path, logname, updated, data) VALUES(%s, %s, %s, %s, %s)",
+                (db_name, "/".join(path), logname, int(time.time()), prep(new)),
+            )
 
 
 def overwrite_log(db_name, path, logname, new):
@@ -141,19 +142,16 @@ def overwrite_log(db_name, path, logname, new):
     * `lock` (default `True`): whether the database should be locked during
         this update
     """
-    c = CONNECTION.cursor()
-    c.execute("BEGIN WORK")
-    c.execute(
-        "DELETE FROM logs WHERE db_name=%s AND path=%s AND logname=%s",
-        (db_name, "/".join(path), logname),
-    )
-    c.execute(
-        "INSERT INTO logs (db_name, path, logname, updated, data) VALUES(%s, %s, %s, %s, %s)",
-        (db_name, "/".join(path), logname, int(time.time()), prep(new)),
-    )
-    c.execute("COMMIT WORK")
-    CONNECTION.commit()
-    c.close()
+    with CONNECTION:
+        with CONNECTION.cursor() as c:
+            c.execute(
+                "DELETE FROM logs WHERE db_name=%s AND path=%s AND logname=%s",
+                (db_name, "/".join(path), logname),
+            )
+            c.execute(
+                "INSERT INTO logs (db_name, path, logname, updated, data) VALUES(%s, %s, %s, %s, %s)",
+                (db_name, "/".join(path), logname, int(time.time()), prep(new)),
+            )
 
 
 def modify_most_recent(
@@ -166,61 +164,61 @@ def modify_most_recent(
     connection=None,
 ):
     path = "/".join(path)
-    c = CONNECTION.cursor()
-    try:
-        c.execute(
-            "SELECT * FROM logs WHERE db_name=%s AND path=%s AND logname=%s ORDER BY id DESC LIMIT 1",
-            (db_name, path, logname),
-        )
-        res = c.fetchone()
-        if res:
-            old_val = unprep(res[-1])
-            id_ = res[0]
-        else:
-            method = "update"
-            old_val = default
-        new_val = prep(transform_func(old_val))
-        if method == "update":
+    with CONNECTION:
+        with CONNECTION.cursor() as c:
             c.execute(
-                "INSERT INTO logs(db_name, path, logname, update, data) VALUES(%s, %s, %s, %s)",
-                (db_name, path, logname, int(time.time()), new_val),
+                "SELECT * FROM logs WHERE db_name=%s AND path=%s AND logname=%s ORDER BY id DESC LIMIT 1",
+                (db_name, path, logname),
             )
-        else:  # overwrite
-            c.execute(
-                "UPDATE logs SET data=%s,updated=%s WHERE id=%s",
-                (new_val, int(time.time()), id_),
-            )
-        CONNECTION.commit()
-    except:
-        CONNECTION.rollback()
-    finally:
-        c.close()
+            res = c.fetchone()
+            if res:
+                old_val = unprep(res[-1])
+                id_ = res[0]
+            else:
+                method = "update"
+                old_val = default
+            new_val = prep(transform_func(old_val))
+            if method == "update":
+                c.execute(
+                    "INSERT INTO logs(db_name, path, logname, update, data) VALUES(%s, %s, %s, %s)",
+                    (db_name, path, logname, int(time.time()), new_val),
+                )
+            else:  # overwrite
+                c.execute(
+                    "UPDATE logs SET data=%s,updated=%s WHERE id=%s",
+                    (new_val, int(time.time()), id_),
+                )
 
 
 def clear_old_logs(db_name, path, timestamp):
-    c = CONNECTION.cursor()
-    c.execute("DELETE FROM logs WHERE updated < %s", (timestamp,))
-    CONNECTION.commit()
-    c.close()
+    with CONNECTION:
+        with CONNECTION.cursor() as c:
+            c.execute("DELETE FROM logs WHERE updated < %s", (timestamp,))
 
 
 def initialize_database():
-    c = CONNECTION.cursor()
-    c.execute(
-        "CREATE TABLE IF NOT EXISTS logs (id bigserial PRIMARY KEY, db_name text, path text, logname text, updated bigint, data bytea);"
-    )
-    c.execute(
-        "CREATE INDEX IF NOT EXISTS idx_logname ON logs (db_name, path, logname);"
-    )
-    c.execute(
-        "CREATE TABLE IF NOT EXISTS uploads (id char(96) PRIMARY KEY, info bytea, content bytea);"
-    )
-    CONNECTION.commit()
-    c.close()
+    with CONNECTION:
+        with CONNECTION.cursor() as c:
+            c.execute(
+                "CREATE TABLE IF NOT EXISTS logs (id bigserial PRIMARY KEY, db_name text, path text, logname text, updated bigint, data bytea);"
+            )
+            c.execute(
+                "CREATE INDEX IF NOT EXISTS idx_logname ON logs (db_name, path, logname);"
+            )
+            c.execute(
+                "CREATE TABLE IF NOT EXISTS uploads (id char(96) PRIMARY KEY, info bytea, content bytea);"
+            )
 
 
-def store_upload(username, path, question_name, data, filename):
-    pass
+def store_upload(id_, info, data):
+    with CONNECTION:
+        with CONNECTION.cursor() as c:
+            c.execute("INSERT INTO uploads VALUES (%s, %s, %s)", (id_, info, data))
+
 
 def retrieve_upload(upload_id):
-    pass
+    with CONNECTION:
+        with CONNECTION.cursor() as c:
+            c.execute("SELECT info,content FROM uploads WHERE id=%s", (upload_id))
+            info, content = c.fetchone()
+    return unprep(info, decompress_decrypt(content))
