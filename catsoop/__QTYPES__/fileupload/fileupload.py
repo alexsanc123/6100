@@ -15,6 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+import html
 import json
 import base64
 import mimetypes
@@ -87,19 +88,13 @@ def render_html(last_log, **info):
                 ]
             else:
                 _path = info["cs_path_info"]
-            qstring = urlencode({"path": json.dumps(_path), "fname": loc})
-            safe_fname = (
-                fname.replace("<", "")
-                .replace(">", "")
-                .replace('"', "")
-                .replace("'", "")
-            )
+            qstring = urlencode({"id": loc})
             out += "<br/>"
             out += (
                 '<a href="%s/_util/get_upload?%s" '
                 'download="%s">Download Most '
                 "Recent Submission</a>"
-            ) % (info["cs_url_root"], qstring, safe_fname)
+            ) % (info["cs_url_root"], qstring, html.escape(fname))
         except:
             pass
     return out

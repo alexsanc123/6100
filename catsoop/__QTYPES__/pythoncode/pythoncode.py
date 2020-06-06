@@ -16,6 +16,7 @@
 
 import os
 import ast
+import html
 import json
 import logging
 import traceback
@@ -560,19 +561,13 @@ def render_html_upload(last_log, **info):
                 ]
             else:
                 _path = info["cs_path_info"]
-            qstring = urlencode({"path": json.dumps(_path), "fname": loc})
+            qstring = urlencode({"id": loc})
             out += "<br/>"
-            safe_fname = (
-                fname.replace("<", "")
-                .replace(">", "")
-                .replace('"', "")
-                .replace("'", "")
-            )
             out += (
                 '<a href="%s/_util/get_upload?%s" '
                 'download="%s">Download Most '
                 "Recent Submission</a><br/>"
-            ) % (info["cs_url_root"], qstring, safe_fname)
+            ) % (info["cs_url_root"], qstring, html.escape(fname))
         except:
             pass
     out += (
