@@ -219,6 +219,6 @@ def store_upload(id_, info, data):
 def retrieve_upload(upload_id):
     with CONNECTION:
         with CONNECTION.cursor() as c:
-            c.execute("SELECT info,content FROM uploads WHERE id=%s", (upload_id))
+            c.execute("SELECT info,content FROM uploads WHERE id=%s", (upload_id,))
             info, content = c.fetchone()
-    return unprep(info, decompress_decrypt(content))
+    return unprep(info), decompress_decrypt(content)
