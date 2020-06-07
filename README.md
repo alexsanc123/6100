@@ -6,10 +6,16 @@
  |_ |_ |_ |_
 ```
 
+[![Build Status](https://catsoop.mit.edu/jenkins/buildStatus/icon?job=catsoop%2Fcatsoop%2Fmaster)](https://catsoop.mit.edu/jenkins/job/catsoop/job/catsoop/job/master/)
+[![PyPI: Latest Version](https://img.shields.io/pypi/v/catsoop.svg)](https://pypi.org/project/catsoop/)
+![Supported Python Versions](https://img.shields.io/pypi/pyversions/catsoop.svg)
+[![License: AGPLv3+](https://img.shields.io/pypi/l/catsoop.svg)](https://catsoop.mit.edu/git/catsoop/catsoop/raw/branch/master/LICENSE)
+
 ## CAT-SOOP
 
 * Web Site: <https://catsoop.mit.edu>
 * IRC: `#catsoop` on OFTC (`irc.oftc.net`)
+* Forum: <https://catsoop.mit.edu/forum>
 * Mailing List: [catsoop-users@mit.edu](mailto:catsoop-users@mit.edu)
   (subscribe at <http://mailman.mit.edu/mailman/listinfo/catsoop-users>)
 
@@ -20,9 +26,8 @@ Engineering and Computer Science via Robotics).
 
 CAT-SOOP is free/libre software, available under the terms of the GNU Affero
 General Public License, version 3+.  Please note that the terms of this license
-apply to the CAT-SOOP system itself and any plugins in use, but not to any
-course material hosted on a CAT-SOOP instance, unless explicitly stated
-otherwise.
+apply to the CAT-SOOP system itself, but not to any course material hosted on a
+CAT-SOOP instance, unless explicitly stated otherwise.
 
 
 ### INSTALLING
