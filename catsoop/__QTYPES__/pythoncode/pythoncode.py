@@ -159,8 +159,8 @@ checktext = "Run Code"
 
 def handle_check(submissions, **info):
     try:
-        code = info["csm_loader"].get_file_data(info, submissions, info["csq_name"])
-        code = code.decode().replace("\r\n", "\n")
+        code = info["csm_cslog"].retrieve_upload(submissions[info["csq_name"]][1])[1]
+        code = code.decode("utf-8").replace("\r\n", "\n")
     except:
         return {
             "score": 0,

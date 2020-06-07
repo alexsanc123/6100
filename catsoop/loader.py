@@ -40,43 +40,6 @@ from . import base_context
 importlib.reload(base_context)
 
 
-def get_file_data(context, form, name):
-    """
-    Load the contents of a submission to the question with the given name in
-    the given form, taking file upload preferences into account.
-
-    Depending on the value of `cs_upload_management`, the data for a file might
-    be stored directly on disk, or as part of a CAT-SOOP log.  This function
-    grabs the associated data as a bytestring.
-
-    **Parameters:**
-
-    * `context`: the context associated with this request
-    * `form`: a dictionary mapping names to values, as in `cs_form`
-    * `name`: the name of the question whose data we should grab
-
-    **Returns:** a bytestring containing the data
-    """
-    data = form[name]
-    up = context["cs_upload_management"]
-    if isinstance(data, list):
-        if up == "file":
-            path = os.path.join(
-                context["cs_data_root"], "_logs", "_uploads", data[1], "content"
-            )
-            with open(path, "rb") as f:
-                data = f.read()
-            return cslog.decompress_decrypt(data)
-        elif up == "db":
-            return context["csm_thirdparty"].data_uri.DataURI(data[1]).data
-        else:
-            raise Exception("unknown upload management style: %r" % up)
-    elif isinstance(data, str):
-        return data.encode()
-    else:  # bytes
-        return data
-
-
 def clean_builtins(d):
     """
     Removes the `'__builtins__'` key from a dictionary to make it serializable
