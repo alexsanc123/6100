@@ -1,0 +1,23 @@
+pipeline {
+    agent { dockerfile { 
+                filename '.dockerfile.build' 
+                args '-u root'
+           } }
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        stage('Test') {
+            steps {
+                sh 'python3 setup.py test'
+            }
+        }
+        stage('Style') {
+            steps {
+                sh 'black --exclude catsoop/__QTYPES__/pythoncode/__SANDBOXES__/_template.py .'
+            }
+        }
+    }
+}
