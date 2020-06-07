@@ -8,7 +8,6 @@
 
 [![Build Status](https://catsoop.mit.edu/jenkins/buildStatus/icon?job=catsoop%2Fcatsoop%2Fmaster)](https://catsoop.mit.edu/jenkins/job/catsoop/job/catsoop/job/master/)
 [![PyPI: Latest Version](https://img.shields.io/pypi/v/catsoop.svg)](https://pypi.org/project/catsoop/)
-![Supported Python Versions](https://img.shields.io/pypi/pyversions/catsoop.svg)
 [![License: AGPLv3+](https://img.shields.io/pypi/l/catsoop.svg)](https://catsoop.mit.edu/git/catsoop/catsoop/raw/branch/master/LICENSE)
 
 ## CAT-SOOP
