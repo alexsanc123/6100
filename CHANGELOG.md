@@ -34,6 +34,8 @@ _Work toward next release. Currently under development._
 * Removed slow/broken code for logging in via e-mail instead of username when
     using the `login` auth type.
 
+* Custom authentication types can no longer be specified at the course level.
+
 **FIXED:**
 
 * Show an error message when two questions would have the same name (#53)

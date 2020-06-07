@@ -70,18 +70,12 @@ def get_auth_type_by_name(context, auth_type):
     authentication type specified by `auth_type`.
     """
     fs_root = context.get("cs_fs_root", base_context.cs_fs_root)
-    data_root = context.get("cs_data_root", base_context.cs_data_root)
-    course = context["cs_course"]
 
     tail = os.path.join("__AUTH__", auth_type, "%s.py" % auth_type)
-    course_loc = os.path.join(data_root, "courses", course, tail)
     global_loc = os.path.join(fs_root, tail)
 
     e = dict(context)
-    # look in course, then global; error if not found
-    if course is not None and os.path.isfile(course_loc):
-        _execfile(course_loc, e)
-    elif os.path.isfile(global_loc):
+    if os.path.isfile(global_loc):
         _execfile(global_loc, e)
     else:
         # no valid auth type found
