@@ -114,8 +114,6 @@ class lti4cs(pylti.common.LTIBase):
         uname = context["cs_user_info"]["username"]
         db_name = "_lti_data"
         logging.overwrite_log(db_name, [], uname, self.lti_data)
-        lfn = logging.get_log_filename(db_name, [], uname)
-        LOGGER.info("[lti] saved lti_data for user %s in file %s" % (uname, lfn))
 
 
 class lti4cs_response(object):
