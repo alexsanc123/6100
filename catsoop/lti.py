@@ -342,7 +342,7 @@ def serve_lti(context, path_info, environment, params, dispatch_main, return_con
         else:
             default_user_id_field = "user_id"  # used by OpenEdX
 
-            if "canvas" in lti_data.get("tool_consumer_info_product_family_code"):
+            if "canvas" in lti_data.get("tool_consumer_info_product_family_code", ""):
                 default_user_id_field = (
                     "custom_canvas_user_login_id"  # used by Canvas LMS
                 )
