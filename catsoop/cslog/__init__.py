@@ -151,6 +151,14 @@ def prepare_upload(username, data, filename):
     return "%s%s" % (uuid.uuid4().hex, hstring), prep(info), compress_encrypt(data)
 
 
+try:
+    with open("/etc/machine-id", "rb") as f:
+        WORKER_ID = hashlib.blake2b(
+            f.read(), key=b"catsoop_checker", person=b"=(o_O)=", digest_size=16
+        ).hexdigest()
+except:
+    WORKER_ID = None
+
 _store = base_context.cs_log_storage_backend
 exec(
     """from .%s import (
@@ -163,6 +171,10 @@ exec(
     clear_old_logs,
     store_upload,
     retrieve_upload,
+    queue_push,
+    queue_pop,
+    queue_update,
+    queue_all_entries,
 )"""
     % base_context.cs_log_storage_backend
 )

@@ -43,7 +43,6 @@ def new_entry(context, qname, action):
 
     Returns uuid for the new queue entry.
     """
-    id_ = str(uuid.uuid4())
     obj = {
         "path": context["cs_path_info"],
         "username": context.get("cs_username", "None"),
@@ -58,20 +57,7 @@ def new_entry(context, qname, action):
     if session.get("is_lti_user"):
         obj["lti_data"] = session.get("lti_data")
 
-    # safely save queue entry in database file (stage then mv)
-    loc = os.path.join(context["cs_data_root"], "_logs", "_checker", "staging", id_)
-    os.makedirs(os.path.dirname(loc), exist_ok=True)
-    with open(loc, "wb") as f:
-        f.write(context["csm_cslog"].prep(obj))
-    newloc = os.path.join(
-        context["cs_data_root"],
-        "_logs",
-        "_checker",
-        "queued",
-        "%s_%s" % (time.time(), id_),
-    )
-    shutil.move(loc, newloc)
-    return id_
+    return context["csm_cslog"].queue_push("checker", "queued", obj)
 
 
 def _n(n):

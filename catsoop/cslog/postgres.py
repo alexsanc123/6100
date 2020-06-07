@@ -26,7 +26,8 @@ from . import (
     unprep,
     compress_encrypt,
     decompress_decrypt,
-    ENCRYPT_KEY,
+    hash_db_info,
+    WORKER_ID,
 )
 
 from .. import base_context
@@ -208,6 +209,10 @@ def initialize_database():
             c.execute(
                 "CREATE TABLE IF NOT EXISTS uploads (id char(96) PRIMARY KEY, info bytea, content bytea);"
             )
+            c.execute(
+                "CREATE TABLE IF NOT EXISTS queues (id char(36) PRIMARY KEY, queuename text, status text, worker char(32), created timestamp, updated timestamp, data bytea);"
+            )
+            c.execute("CREATE INDEX IF NOT EXISTS idx_queuename ON queues(queuename);")
 
 
 def store_upload(id_, info, data):
@@ -222,3 +227,75 @@ def retrieve_upload(upload_id):
             c.execute("SELECT info,content FROM uploads WHERE id=%s", (upload_id,))
             info, content = c.fetchone()
     return unprep(info), decompress_decrypt(content)
+
+
+def queue_push(queuename, initial_status, data, id=None):
+    id = id or str(uuid.uuid4())
+    query = "INSERT INTO queues (id, queuename, status, worker, created, updated, data) VALUES (%s,%s,%s,%s,NOW(),NOW(),%s) RETURNING *"
+    with CONNECTION:
+        with CONNECTION.cursor() as c:
+            c.execute(query, (id, queuename, initial_status, None, prep(data)))
+    return id
+
+
+def queue_pop(queuename, old_status, new_status=None):
+    """
+    Pop the oldest entry from the given queue with the given status, set its
+    status to new_status and its worker to this worker, and return the entry.
+    Returns None if no entry was found.  Otherwise returns the id and data
+    associated with this queue entry.
+    """
+    query = "UPDATE queues SET status=%s,worker=%s WHERE id=(SELECT id FROM queues WHERE queuename=%s AND status=%s ORDER BY created ASC FOR UPDATE SKIP LOCKED LIMIT 1) RETURNING *"
+    with CONNECTION:
+        with CONNECTION.cursor() as c:
+            c.execute(
+                query, (new_status or old_status, WORKER_ID, queuename, old_status)
+            )
+            res = c.fetchall()  # id, queuename, status, created, updated, data
+    if not res:
+        return None
+    else:
+        return _prep_entries(res)[0]
+
+
+def queue_update(id, new_data, new_status=None):
+    """
+    Update the queue entry with the given id, optionally also updating the
+    status.
+    """
+    if new_status:
+        query = "UPDATE queues SET data=%s,status=%s WHERE id=%s"
+        args = (prep(new_data), new_status, id)
+    else:
+        query = "UPDATE queues SET data=%s WHERE id=%s"
+        args = (prep(new_data), id)
+    with CONNECTION:
+        with CONNECTION.cursor() as c:
+            c.execute(query, args)
+
+
+def queue_all_entries(queuename, status):
+    """
+    Return the current queue contents, appropriately ordered
+    """
+    with CONNECTION:
+        with CONNECTION.cursor() as c:
+            c.execute(
+                f"SELECT * FROM queues WHERE queuename=%s AND status=%s ORDER BY created ASC",
+                (queuename, status),
+            )
+            res = c.fetchall()
+    return _prep_entries(res)
+
+
+def _prep_entries(entries):
+    return [
+        {
+            "id": i[0],
+            "worker": i[3],
+            "created": i[4],
+            "updated": i[5],
+            "data": unprep(i[6]),
+        }
+        for i in entries
+    ]

@@ -126,6 +126,7 @@ def main():
             "--http",
             ":%s" % base_context.cs_wsgi_server_port,
             "--thunder-lock",
+            "--lazy",
             "--wsgi-file",
             "wsgi.py",
             "--touch-reload",
