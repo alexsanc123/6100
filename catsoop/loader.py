@@ -544,7 +544,11 @@ def load_content(context, course, path, into, content_file=None):
 
     last_mod = os.stat(content_file).st_mtime
     cache = into["csm_cslog"].most_recent(
-        "_question_info", [course] + path, "question_info", None
+        "_question_info",
+        [course] + path,
+        "question_info",
+        None,
+        **context["cs_logging_kwargs"],
     )
     if (
         course not in {None, "_util"}
@@ -565,4 +569,5 @@ def load_content(context, course, path, into, content_file=None):
             [course] + path,
             "question_info",
             {"timestamp": last_mod, "questions": qs},
+            **context["cs_logging_kwargs"],
         )

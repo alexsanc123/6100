@@ -21,6 +21,8 @@ import time
 import uuid
 import psycopg2
 
+from datetime import datetime, timedelta
+
 from . import (
     prep,
     unprep,
@@ -32,12 +34,26 @@ from . import (
 
 from .. import base_context
 
-CONNECTION = psycopg2.connect(**base_context.cs_postgres_options)
+
+def _connect():
+    return psycopg2.connect(**base_context.cs_postgres_options)
 
 
-def _read_log(db_name, path, logname):
-    with CONNECTION:
-        with CONNECTION.cursor() as c:
+def setup_kwargs():
+    return {"connection": _connect()}
+
+
+def teardown_kwargs(kwargs):
+    try:
+        kwargs["connection"].close()
+    except:
+        pass
+
+
+def _read_log(db_name, path, logname, connection=None):
+    conn = _connect() if connection is None else connection
+    with conn:
+        with conn.cursor() as c:
             c.execute(
                 "SELECT data FROM logs WHERE db_name=%s AND path=%s AND logname=%s ORDER BY id ASC",
                 (db_name, "/".join(path), logname),
@@ -46,9 +62,11 @@ def _read_log(db_name, path, logname):
             while r is not None:
                 yield unprep(r[-1])
                 r = c.fetchone()
+    if connection is None:
+        conn.close()
 
 
-def read_log(db_name, path, logname):
+def read_log(db_name, path, logname, connection=None):
     """
     Reads all entries of a log.
 
@@ -65,10 +83,10 @@ def read_log(db_name, path, logname):
 
     **Returns:** a list containing the Python objects in the log
     """
-    return list(_read_log(db_name, path, logname))
+    return list(_read_log(db_name, path, logname, connection=connection))
 
 
-def most_recent(db_name, path, logname, default=None):
+def most_recent(db_name, path, logname, default=None, connection=None):
     """
     Ignoring most of the log, grab the last entry.
 
@@ -92,18 +110,22 @@ def most_recent(db_name, path, logname, default=None):
     **Returns:** a single Python object representing the most recent entry in
     the log.
     """
-    with CONNECTION:
-        with CONNECTION.cursor() as c:
-            c = CONNECTION.cursor()
+    conn = _connect() if connection is None else connection
+    with conn:
+        with conn.cursor() as c:
+            c = conn.cursor()
             c.execute(
-                "SELECT data FROM logs WHERE db_name=%s AND path=%s AND logname=%s ORDER BY id DESC LIMIT 1",
+                "SELECT data FROM logs WHERE db_name=%s AND path=%s AND logname=%s ORDER BY updated DESC LIMIT 1",
                 (db_name, "/".join(path), logname),
             )
             r = c.fetchone()
-            return unprep(bytes(r[-1])) if r is not None else default
+    out = unprep(bytes(r[-1])) if r is not None else default
+    if connection is None:
+        conn.close()
+    return out
 
 
-def update_log(db_name, path, logname, new):
+def update_log(db_name, path, logname, new, connection=None):
     """
     Adds a new entry to the end of the specified log.
 
@@ -119,15 +141,18 @@ def update_log(db_name, path, logname, new):
     * `lock` (default `True`): whether the database should be locked during
         this update
     """
-    with CONNECTION:
-        with CONNECTION.cursor() as c:
+    conn = _connect() if connection is None else connection
+    with conn:
+        with conn.cursor() as c:
             c.execute(
-                "INSERT INTO logs (db_name, path, logname, updated, data) VALUES(%s, %s, %s, %s, %s)",
-                (db_name, "/".join(path), logname, int(time.time()), prep(new)),
+                "INSERT INTO logs (db_name, path, logname, updated, data) VALUES(%s, %s, %s, NOW(), %s)",
+                (db_name, "/".join(path), logname, prep(new)),
             )
+    if connection is None:
+        conn.close()
 
 
-def overwrite_log(db_name, path, logname, new):
+def overwrite_log(db_name, path, logname, new, connection=None):
     """
     Overwrites the entire log with a new log with a single (given) entry.
 
@@ -143,16 +168,19 @@ def overwrite_log(db_name, path, logname, new):
     * `lock` (default `True`): whether the database should be locked during
         this update
     """
-    with CONNECTION:
-        with CONNECTION.cursor() as c:
+    conn = _connect() if connection is None else connection
+    with conn:
+        with conn.cursor() as c:
             c.execute(
                 "DELETE FROM logs WHERE db_name=%s AND path=%s AND logname=%s",
                 (db_name, "/".join(path), logname),
             )
             c.execute(
-                "INSERT INTO logs (db_name, path, logname, updated, data) VALUES(%s, %s, %s, %s, %s)",
-                (db_name, "/".join(path), logname, int(time.time()), prep(new)),
+                "INSERT INTO logs (db_name, path, logname, updated, data) VALUES(%s, %s, %s, NOW(), %s)",
+                (db_name, "/".join(path), logname, prep(new)),
             )
+    if connection is None:
+        conn.close()
 
 
 def modify_most_recent(
@@ -164,44 +192,53 @@ def modify_most_recent(
     method="update",
     connection=None,
 ):
+    conn = _connect() if connection is None else connection
     path = "/".join(path)
-    with CONNECTION:
-        with CONNECTION.cursor() as c:
+    c = conn.cursor()
+    c.execute(
+        "SELECT * FROM logs WHERE db_name=%s AND path=%s AND logname=%s ORDER BY updated DESC LIMIT 1",
+        (db_name, path, logname),
+    )
+    res = c.fetchone()
+    if res:
+        old_val = unprep(bytes(res[-1]))
+        id_ = res[0]
+    else:
+        method = "update"
+        old_val = default
+    new_val = prep(transform_func(old_val))
+    if method == "update":
+        c.execute(
+            "INSERT INTO logs(db_name, path, logname, updated, data) VALUES(%s, %s, %s, NOW(), %s)",
+            (db_name, path, logname, new_val),
+        )
+    else:  # overwrite
+        c.execute(
+            "UPDATE logs SET data=%s,updated=NOW() WHERE id=%s", (new_val, id_),
+        )
+    conn.commit()
+    if connection is None:
+        conn.close()
+
+
+def clear_old_logs(db_name, path, age, connection=None):
+    conn = _connect() if connection is None else connection
+    with conn:
+        with conn.cursor() as c:
             c.execute(
-                "SELECT * FROM logs WHERE db_name=%s AND path=%s AND logname=%s ORDER BY id DESC LIMIT 1",
-                (db_name, path, logname),
+                "DELETE FROM logs WHERE updated < %s",
+                (datetime.now() - timedelta(seconds=age),),
             )
-            res = c.fetchone()
-            if res:
-                old_val = unprep(res[-1])
-                id_ = res[0]
-            else:
-                method = "update"
-                old_val = default
-            new_val = prep(transform_func(old_val))
-            if method == "update":
-                c.execute(
-                    "INSERT INTO logs(db_name, path, logname, update, data) VALUES(%s, %s, %s, %s)",
-                    (db_name, path, logname, int(time.time()), new_val),
-                )
-            else:  # overwrite
-                c.execute(
-                    "UPDATE logs SET data=%s,updated=%s WHERE id=%s",
-                    (new_val, int(time.time()), id_),
-                )
+    if connection is None:
+        conn.close()
 
 
-def clear_old_logs(db_name, path, timestamp):
-    with CONNECTION:
-        with CONNECTION.cursor() as c:
-            c.execute("DELETE FROM logs WHERE updated < %s", (timestamp,))
-
-
-def initialize_database():
-    with CONNECTION:
-        with CONNECTION.cursor() as c:
+def initialize_database(connection=None):
+    conn = _connect() if connection is None else connection
+    with conn:
+        with conn.cursor() as c:
             c.execute(
-                "CREATE TABLE IF NOT EXISTS logs (id bigserial PRIMARY KEY, db_name text, path text, logname text, updated bigint, data bytea);"
+                "CREATE TABLE IF NOT EXISTS logs (id bigserial PRIMARY KEY, db_name text, path text, logname text, updated timestamp, data bytea);"
             )
             c.execute(
                 "CREATE INDEX IF NOT EXISTS idx_logname ON logs (db_name, path, logname);"
@@ -213,32 +250,43 @@ def initialize_database():
                 "CREATE TABLE IF NOT EXISTS queues (id char(36) PRIMARY KEY, queuename text, status text, worker char(32), created timestamp, updated timestamp, data bytea);"
             )
             c.execute("CREATE INDEX IF NOT EXISTS idx_queuename ON queues(queuename);")
+    if connection is None:
+        conn.close()
 
 
-def store_upload(id_, info, data):
-    with CONNECTION:
-        with CONNECTION.cursor() as c:
+def store_upload(id_, info, data, connection=None):
+    conn = _connect() if connection is None else connection
+    with conn:
+        with conn.cursor() as c:
             c.execute("INSERT INTO uploads VALUES (%s, %s, %s)", (id_, info, data))
+    if connection is None:
+        conn.close()
 
 
-def retrieve_upload(upload_id):
-    with CONNECTION:
-        with CONNECTION.cursor() as c:
+def retrieve_upload(upload_id, connection=None):
+    conn = _connect() if connection is None else connection
+    with conn:
+        with conn.cursor() as c:
             c.execute("SELECT info,content FROM uploads WHERE id=%s", (upload_id,))
             info, content = c.fetchone()
-    return unprep(info), decompress_decrypt(content)
+    if connection is None:
+        conn.close()
+    return unprep(bytes(info)), decompress_decrypt(bytes(content))
 
 
-def queue_push(queuename, initial_status, data, id=None):
-    id = id or str(uuid.uuid4())
+def queue_push(queuename, initial_status, data, connection=None):
+    id = str(uuid.uuid4())
     query = "INSERT INTO queues (id, queuename, status, worker, created, updated, data) VALUES (%s,%s,%s,%s,NOW(),NOW(),%s) RETURNING *"
-    with CONNECTION:
-        with CONNECTION.cursor() as c:
+    conn = _connect() if connection is None else connection
+    with conn:
+        with conn.cursor() as c:
             c.execute(query, (id, queuename, initial_status, None, prep(data)))
+    if connection is None:
+        conn.close()
     return id
 
 
-def queue_pop(queuename, old_status, new_status=None):
+def queue_pop(queuename, old_status, new_status=None, connection=None):
     """
     Pop the oldest entry from the given queue with the given status, set its
     status to new_status and its worker to this worker, and return the entry.
@@ -246,19 +294,22 @@ def queue_pop(queuename, old_status, new_status=None):
     associated with this queue entry.
     """
     query = "UPDATE queues SET status=%s,worker=%s WHERE id=(SELECT id FROM queues WHERE queuename=%s AND status=%s ORDER BY created ASC FOR UPDATE SKIP LOCKED LIMIT 1) RETURNING *"
-    with CONNECTION:
-        with CONNECTION.cursor() as c:
+    conn = _connect() if connection is None else connection
+    with conn:
+        with conn.cursor() as c:
             c.execute(
                 query, (new_status or old_status, WORKER_ID, queuename, old_status)
             )
             res = c.fetchall()  # id, queuename, status, created, updated, data
+    if connection is None:
+        conn.close()
     if not res:
         return None
     else:
         return _prep_entries(res)[0]
 
 
-def queue_update(id, new_data, new_status=None):
+def queue_update(id, new_data, new_status=None, connection=None):
     """
     Update the queue entry with the given id, optionally also updating the
     status.
@@ -269,22 +320,41 @@ def queue_update(id, new_data, new_status=None):
     else:
         query = "UPDATE queues SET data=%s WHERE id=%s"
         args = (prep(new_data), id)
-    with CONNECTION:
-        with CONNECTION.cursor() as c:
+    conn = _connect() if connection is None else connection
+    with conn:
+        with conn.cursor() as c:
             c.execute(query, args)
+    if connection is None:
+        conn.close()
 
 
-def queue_all_entries(queuename, status):
+def queue_get(id, connection=None):
+    """
+    """
+    conn = _connect() if connection is None else connection
+    with conn:
+        with conn.cursor() as c:
+            c.execute("SELECT * FROM queues WHERE id=%s", (id,))
+            res = c.fetchall()
+    if connection is None:
+        conn.close()
+    return _prep_entries(res)[0]
+
+
+def queue_all_entries(queuename, status, connection=None):
     """
     Return the current queue contents, appropriately ordered
     """
-    with CONNECTION:
-        with CONNECTION.cursor() as c:
+    conn = _connect() if connection is None else connection
+    with conn:
+        with conn.cursor() as c:
             c.execute(
                 f"SELECT * FROM queues WHERE queuename=%s AND status=%s ORDER BY created ASC",
                 (queuename, status),
             )
             res = c.fetchall()
+    if connection is None:
+        conn.close()
     return _prep_entries(res)
 
 
@@ -292,10 +362,12 @@ def _prep_entries(entries):
     return [
         {
             "id": i[0],
+            "queuename": i[1],
+            "status": i[2],
             "worker": i[3],
             "created": i[4],
             "updated": i[5],
-            "data": unprep(i[6]),
+            "data": unprep(bytes(i[6])),
         }
         for i in entries
     ]

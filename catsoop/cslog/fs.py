@@ -47,6 +47,14 @@ from . import (
 )
 
 
+def setup_kwargs():
+    return {}
+
+
+def teardown_kwargs(kwargs):
+    return
+
+
 def log_lock(path):
     lock_loc = os.path.join(base_context.cs_data_root, "_locks", *path) + ".lock"
     os.makedirs(os.path.dirname(lock_loc), exist_ok=True)

@@ -42,7 +42,9 @@ def handle_submission(submissions, **info):
     ll = submissions.get(name, None)
     if ll is not None:
         if info["csq_extract_data"]:
-            submissions[name] = info["csm_cslog"].retrieve_upload(ll[1])[1]
+            submissions[name] = info["csm_cslog"].retrieve_upload(
+                ll[1], **info["cs_logging_kwargs"]
+            )[1]
         o.update(base["handle_submission"](submissions, **info))
     return o
 
@@ -73,18 +75,6 @@ def render_html(last_log, **info):
     if ll is not None:
         try:
             fname, loc = ll
-            loc = os.path.basename(loc)
-            if info["csm_cslog"].ENCRYPT_KEY is not None:
-                seed = (
-                    info["cs_path_info"][0]
-                    if info["cs_path_info"]
-                    else info["cs_path_info"]
-                )
-                _path = [
-                    info["csm_cslog"]._e(i, repr(seed)) for i in info["cs_path_info"]
-                ]
-            else:
-                _path = info["cs_path_info"]
             qstring = urlencode({"id": loc})
             out += "<br/>"
             out += (

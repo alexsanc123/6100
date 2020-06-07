@@ -159,7 +159,9 @@ checktext = "Run Code"
 
 def handle_check(submissions, **info):
     try:
-        code = info["csm_cslog"].retrieve_upload(submissions[info["csq_name"]][1])[1]
+        code = info["csm_cslog"].retrieve_upload(
+            submissions[info["csq_name"]][1], **info["cs_logging_kwargs"]
+        )[1]
         code = code.decode("utf-8").replace("\r\n", "\n")
     except:
         return {
@@ -223,7 +225,9 @@ def handle_check(submissions, **info):
 def handle_submission(submissions, **info):
     try:
         code = bytes(
-            info["csm_cslog"].retrieve_upload(submissions[info["csq_name"]][1])[1]
+            info["csm_cslog"].retrieve_upload(
+                submissions[info["csq_name"]][1], **info["cs_logging_kwargs"]
+            )[1]
         )
         code = code.decode("utf-8").replace("\r\n", "\n")
     except Exception as err:

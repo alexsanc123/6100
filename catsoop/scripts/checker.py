@@ -75,6 +75,7 @@ def do_check(row):
     set_pdeathsig()()  # but make it die if the parent dies.  will this work?
 
     context = loader.generate_context(row["path"])
+    context["cs_logging_kwargs"] = cslog.setup_kwargs()
     context["cs_course"] = row["path"][0]
     context["cs_path_info"] = row["path"]
     context["cs_username"] = row["username"]
@@ -246,16 +247,19 @@ def do_check(row):
             transform_func=log_mutator,
             method="overwrite",
         )
+    cslog.teardown_kwargs(context["cs_logging_kwargs"])
 
+
+LOGGING_KWARGS = cslog.setup_kwargs()
 
 running = []
 
 # if anything is in the "running" dir when we start, and it's owned by us,
 # that's an error.  turn those back to queued to force them to run again (put
 # them at the front of the queue).
-for entry in cslog.queue_all_entries(CHECKER, RUNNING):
+for entry in cslog.queue_all_entries(CHECKER, RUNNING, **LOGGING_KWARGS):
     if entry["worker"] == cslog.WORKER_ID:
-        cslog.queue_update(entry["id"], entry["data"], QUEUED)
+        cslog.queue_update(entry["id"], entry["data"], QUEUED, **LOGGING_KWARGS)
 
 
 # and now actually start running
@@ -288,7 +292,9 @@ while True:
                         "<font color='red'><b>An unknown error occurred when "
                         "processing your submission</b></font>"
                     )
-                queue_update(p._entry["data"]["id"], p._entry["data"], RESULTS)
+                cslog.queue_update(
+                    p._entry["data"]["id"], p._entry["data"], RESULTS, **LOGGING_KWARGS
+                )
             dead.add(i)
         elif time.time() - p._started > REAL_TIMEOUT:
             # kill this now, next pass through the loop will clean it up
@@ -303,7 +309,7 @@ while True:
 
     if base_context.cs_checker_parallel_checks - len(running) > 0:
         # otherwise, add an entry to running.
-        new_entry = cslog.queue_pop(CHECKER, QUEUED, RUNNING)
+        new_entry = cslog.queue_pop(CHECKER, QUEUED, RUNNING, **LOGGING_KWARGS)
         if new_entry is not None:
             new_entry["data"]["id"] = new_entry["id"]
             log("Starting checker with row=%s" % new_entry["data"])

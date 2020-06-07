@@ -78,7 +78,7 @@ def get_session_id(environ):
     ID is new (just now generated), and `False` if the session ID is not new.
     """
     # clear out dead sessions first
-    cslog.clear_old_logs("_sessions", [], time.time() - EXPIRE)
+    cslog.clear_old_logs("_sessions", [], EXPIRE)
 
     COOKIE_REGEX = re.compile(
         r"(?:^|;)\s*catsoop_sid_%s\s*=\s*([^;\s]*)\s*(?:;|$)" % util.catsoop_loc_hash()

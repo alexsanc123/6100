@@ -57,7 +57,9 @@ def new_entry(context, qname, action):
     if session.get("is_lti_user"):
         obj["lti_data"] = session.get("lti_data")
 
-    return context["csm_cslog"].queue_push("checker", "queued", obj)
+    return context["csm_cslog"].queue_push(
+        "checker", "queued", obj, **context["cs_logging_kwargs"]
+    )
 
 
 def _n(n):
@@ -160,8 +162,12 @@ def handle_copy_seed(context):
         uname = context[_n("real_uname")]
         path = context["cs_path_info"]
         logname = "random_seed"
-        stored = context["csm_cslog"].most_recent(impersonated, path, logname, None)
-        context["csm_cslog"].update_log(uname, path, logname, stored)
+        stored = context["csm_cslog"].most_recent(
+            impersonated, path, logname, None, **context["cs_logging_kwargs"]
+        )
+        context["csm_cslog"].update_log(
+            uname, path, logname, stored, **context["cs_logging_kwargs"]
+        )
     return handle_save(context)
 
 
@@ -175,7 +181,11 @@ def _new_random_seed(n=100):
 def handle_new_seed(context):
     uname = context[_n("uname")]
     context["csm_cslog"].update_log(
-        uname, context["cs_path_info"], "random_seed", _new_random_seed()
+        uname,
+        context["cs_path_info"],
+        "random_seed",
+        _new_random_seed(),
+        **context["cs_logging_kwargs"]
     )
 
     # Rerender the questions
@@ -195,7 +205,11 @@ def handle_activate(context):
 
         uname = context[_n("uname")]
         context["csm_cslog"].overwrite_log(
-            uname, context["cs_path_info"], "problemstate", newstate
+            uname,
+            context["cs_path_info"],
+            "problemstate",
+            newstate,
+            **context["cs_logging_kwargs"]
         )
         context[_n("last_log")] = newstate
     return handle_view(context)
@@ -205,7 +219,11 @@ def handle_copy(context):
     if context[_n("impersonating")]:
         context[_n("uname")] = context[_n("real_uname")]
         ll = context["csm_cslog"].most_recent(
-            context[_n("uname")], context["cs_path_info"], "problemstate", {}
+            context[_n("uname")],
+            context["cs_path_info"],
+            "problemstate",
+            {},
+            **context["cs_logging_kwargs"]
         )
         context[_n("last_log")] = ll
     return handle_save(context)
@@ -424,7 +442,9 @@ def handle_view(context):
 
 def get_manual_grading_entry(context, name):
     uname = context["cs_user_info"].get("username", "None")
-    log = context["csm_cslog"].read_log(uname, context["cs_path_info"], "problemgrades")
+    log = context["csm_cslog"].read_log(
+        uname, context["cs_path_info"], "problemgrades", **context["cs_logging_kwargs"]
+    )
     out = None
     for i in log:
         if i["qname"] == name:
@@ -470,7 +490,11 @@ def handle_clearanswer(context):
     # update problemstate log
     uname = context[_n("uname")]
     context["csm_cslog"].overwrite_log(
-        uname, context["cs_path_info"], "problemstate", newstate
+        uname,
+        context["cs_path_info"],
+        "problemstate",
+        newstate,
+        **context["cs_logging_kwargs"]
     )
 
     # log submission in problemactions
@@ -537,7 +561,11 @@ def handle_viewexplanation(context, outdict=None, skip_empty=False):
     # update problemstate log
     uname = context[_n("uname")]
     context["csm_cslog"].overwrite_log(
-        uname, context["cs_path_info"], "problemstate", newstate
+        uname,
+        context["cs_path_info"],
+        "problemstate",
+        newstate,
+        **context["cs_logging_kwargs"]
     )
 
     # log submission in problemactions
@@ -595,7 +623,11 @@ def handle_viewanswer(context):
     # update problemstate log
     uname = context[_n("uname")]
     context["csm_cslog"].overwrite_log(
-        uname, context["cs_path_info"], "problemstate", newstate
+        uname,
+        context["cs_path_info"],
+        "problemstate",
+        newstate,
+        **context["cs_logging_kwargs"]
     )
 
     # log submission in problemactions
@@ -657,7 +689,11 @@ def handle_lock(context):
     # update problemstate log
     uname = context[_n("uname")]
     context["csm_cslog"].overwrite_log(
-        uname, context["cs_path_info"], "problemstate", newstate
+        uname,
+        context["cs_path_info"],
+        "problemstate",
+        newstate,
+        **context["cs_logging_kwargs"]
     )
 
     # log submission in problemactions
@@ -724,7 +760,11 @@ def handle_grade(context):
     uname = context[_n("uname")]
     for i in newentries:
         context["csm_cslog"].update_log(
-            uname, context["cs_path_info"], "problemgrades", i
+            uname,
+            context["cs_path_info"],
+            "problemgrades",
+            i,
+            **context["cs_logging_kwargs"]
         )
 
     # log submission in problemactions
@@ -763,7 +803,11 @@ def handle_unlock(context):
     # update problemstate log
     uname = context[_n("uname")]
     context["csm_cslog"].overwrite_log(
-        uname, context["cs_path_info"], "problemstate", newstate
+        uname,
+        context["cs_path_info"],
+        "problemstate",
+        newstate,
+        **context["cs_logging_kwargs"]
     )
 
     # log submission in problemactions
@@ -840,7 +884,11 @@ def handle_save(context):
     if len(saved_names) > 0:
         uname = context[_n("uname")]
         context["csm_cslog"].overwrite_log(
-            uname, context["cs_path_info"], "problemstate", newstate
+            uname,
+            context["cs_path_info"],
+            "problemstate",
+            newstate,
+            **context["cs_logging_kwargs"]
         )
 
         # log submission in problemactions
@@ -961,7 +1009,11 @@ def handle_check(context):
     # update problemstate log
     uname = context[_n("uname")]
     context["csm_cslog"].overwrite_log(
-        uname, context["cs_path_info"], "problemstate", newstate
+        uname,
+        context["cs_path_info"],
+        "problemstate",
+        newstate,
+        **context["cs_logging_kwargs"]
     )
 
     # log submission in problemactions
@@ -1173,7 +1225,11 @@ def handle_submit(context):
 
     # update problemstate log
     context["csm_cslog"].overwrite_log(
-        uname, context["cs_path_info"], "problemstate", newstate
+        uname,
+        context["cs_path_info"],
+        "problemstate",
+        newstate,
+        **context["cs_logging_kwargs"]
     )
 
     # log submission in problemactions
@@ -1513,7 +1569,11 @@ def log_action(context, log_entry):
     }
     entry.update(log_entry)
     context["csm_cslog"].update_log(
-        uname, context["cs_path_info"], "problemactions", entry
+        uname,
+        context["cs_path_info"],
+        "problemactions",
+        entry,
+        **context["cs_logging_kwargs"]
     )
 
 
@@ -1611,19 +1671,11 @@ def render_question(elt, context, lastsubmit, wrap=True):
     gmode = _get(args, "csq_grading_mode", "auto", str)
     message = context[_n("last_log")].get("cached_responses", {}).get(name, "")
     magic = context[_n("last_log")].get("checker_ids", {}).get(name, None)
+
     if magic is not None:
-        checker_loc = os.path.join(
-            context["cs_data_root"],
-            "_logs",
-            "_checker",
-            "results",
-            magic[0],
-            magic[1],
-            magic,
-        )
-        if os.path.isfile(checker_loc):
-            with open(checker_loc, "rb") as f:
-                result = context["csm_cslog"].unprep(f.read())
+        checker_entry = cslog.queue_get(magic, **context["cs_logging_kwargs"])
+        if checker_entry["status"] == "results":
+            result = checker_entry["data"]
             message = (
                 '\n<script type="text/javascript">'
                 "\n// @license magnet:?xt=urn:btih:0b31508aeb0634b347b8270c7bee4d411b5d4109&dn=agpl-3.0.txt AGPL-v3"
@@ -1909,7 +1961,11 @@ def pre_handle(context):
     # determine the right log name to look up, and grab the most recent entry
     loghead = "___".join(context["cs_path_info"][1:])
     ll = context["csm_cslog"].most_recent(
-        uname, context["cs_path_info"], "problemstate", {}
+        uname,
+        context["cs_path_info"],
+        "problemstate",
+        {},
+        **context["cs_logging_kwargs"]
     )
     _cs_group_path = context.get("cs_groups_to_use", context["cs_path_info"])
     context[_n("all_groups")] = context["csm_groups"].list_groups(
@@ -1957,7 +2013,7 @@ def pre_handle(context):
                     value[0],
                 )
 
-                cslog.store_upload(*upload)
+                cslog.store_upload(*upload, **context["cs_logging_kwargs"])
                 value[1] = upload[0]
 
 
@@ -2104,7 +2160,11 @@ def _get_scores(context):
         for student in students:
             username = student.get("username", "None")
             log = context["csm_cslog"].most_recent(
-                username, context["cs_path_info"], "problemstate", {}
+                username,
+                context["cs_path_info"],
+                "problemstate",
+                {},
+                **context["cs_logging_kwargs"]
             )
             log = context["csm_tutor"].compute_page_stats(
                 context, username, context["cs_path_info"], ["state"]
@@ -2212,7 +2272,10 @@ def handle_stats(context):
 
 def _real_name(context, username):
     return (
-        context["csm_cslog"].most_recent("_extra_info", [], username, None) or {}
+        context["csm_cslog"].most_recent(
+            "_extra_info", [], username, None, **context["cs_logging_kwargs"]
+        )
+        or {}
     ).get("name", None)
 
 

@@ -162,6 +162,8 @@ except:
 _store = base_context.cs_log_storage_backend
 exec(
     """from .%s import (
+    setup_kwargs,
+    teardown_kwargs,
     read_log,
     most_recent,
     update_log,
@@ -173,6 +175,7 @@ exec(
     retrieve_upload,
     queue_push,
     queue_pop,
+    queue_get,
     queue_update,
     queue_all_entries,
 )"""

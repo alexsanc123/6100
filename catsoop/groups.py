@@ -32,7 +32,9 @@ def list_groups(context, path):
     **Returns:** a dictionary mapping group names to lists of group members
     """
     log = context["csm_cslog"]
-    return log.most_recent("_groups", path, "groups", {})
+    return log.most_recent(
+        "_groups", path, "groups", {}, **context["cs_logging_kwargs"]
+    )
 
 
 def get_section(context, course, username):
@@ -115,7 +117,9 @@ def add_to_group(context, path, username, group):
         return x
 
     try:
-        log.modify_most_recent("_groups", path, "groups", {}, _transformer)
+        log.modify_most_recent(
+            "_groups", path, "groups", {}, _transformer, **context["cs_logging_kwargs"]
+        )
     except:
         return "An error occured when assigning to group."
 
@@ -148,7 +152,9 @@ def remove_from_group(context, path, username, group):
         return x
 
     try:
-        log.modify_most_recent("_groups", path, "groups", {}, _transformer)
+        log.modify_most_recent(
+            "_groups", path, "groups", {}, _transformer, **context["cs_logging_kwargs"]
+        )
     except:
         return "An error occured when removing from group."
 
@@ -174,7 +180,9 @@ def overwrite_groups(context, path, section, newdict):
         return x
 
     try:
-        log.modify_most_recent("_groups", path, "groups", {}, _transformer)
+        log.modify_most_recent(
+            "_groups", path, "groups", {}, _transformer, **context["cs_logging_kwargs"]
+        )
     except:
         return "An error occured when overwriting groups."
 
