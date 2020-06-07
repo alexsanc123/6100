@@ -5,5 +5,3 @@ TODOs:
 * is this too ugly as-is?  passing around the connection is a pain
 
 * load testing?
-
-* some issues with pythoncode when not using upload interface
