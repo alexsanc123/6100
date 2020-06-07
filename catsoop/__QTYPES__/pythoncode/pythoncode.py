@@ -157,17 +157,27 @@ def total_test_points(**info):
 checktext = "Run Code"
 
 
-def handle_check(submissions, **info):
+def get_code(sub, info):
     try:
-        code = info["csm_cslog"].retrieve_upload(
-            submissions[info["csq_name"]][1], **info["cs_logging_kwargs"]
-        )[1]
-        code = code.decode("utf-8").replace("\r\n", "\n")
+        try:
+            code = info["csm_cslog"].retrieve_upload(
+                sub[1], **info["cs_logging_kwargs"]
+            )[1]
+            code = code.decode("utf-8")
+        except:
+            code = sub
+        return code.replace("\r\n", "\n")
     except:
         return {
             "score": 0,
             "msg": '<div class="bs-callout bs-callout-danger"><span class="text-danger"><b>Error:</b> Unable to decode the specified file.  Is this the file you intended to upload?</span></div>',
         }
+
+
+def handle_check(submissions, **info):
+    code = get_code(submissions[info["csq_name"]], info)
+    if not isinstance(code, str):
+        return code
 
     code = "\n\n".join(["import os\nos.unlink(__file__)", info["csq_code_pre"], code])
 
@@ -223,22 +233,9 @@ def handle_check(submissions, **info):
 
 
 def handle_submission(submissions, **info):
-    try:
-        code = bytes(
-            info["csm_cslog"].retrieve_upload(
-                submissions[info["csq_name"]][1], **info["cs_logging_kwargs"]
-            )[1]
-        )
-        code = code.decode("utf-8").replace("\r\n", "\n")
-    except Exception as err:
-        LOGGER.warn(
-            "[pythoncode] handle_submission error '%s', traceback=%s"
-            % (err, traceback.format_exc())
-        )
-        return {
-            "score": 0,
-            "msg": '<div class="bs-callout bs-callout-danger"><span class="text-danger"><b>Error:</b> Unable to decode the specified file.  Is this the file you intended to upload?</span></div>',
-        }
+    code = get_code(submissions[info["csq_name"]], info)
+    if not isinstance(code, str):
+        return code
     if info["csq_use_simple_checker"]:
         if info["csq_result_as_string"]:
             default_checker = _default_string_check_function
