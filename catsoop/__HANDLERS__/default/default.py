@@ -1673,7 +1673,9 @@ def render_question(elt, context, lastsubmit, wrap=True):
     magic = context[_n("last_log")].get("checker_ids", {}).get(name, None)
 
     if magic is not None:
-        checker_entry = cslog.queue_get(magic, **context["cs_logging_kwargs"])
+        checker_entry = cslog.queue_get(
+            "checker", magic, **context["cs_logging_kwargs"]
+        )
         if checker_entry["status"] == "results":
             result = checker_entry["data"]
             message = (

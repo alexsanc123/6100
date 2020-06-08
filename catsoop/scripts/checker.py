@@ -187,7 +187,7 @@ def do_check(row):
         row["extra_data"] = extra
 
         # store the results
-        cslog.queue_update(row["id"], row, RESULTS)
+        cslog.queue_update(CHECKER, row["id"], row, RESULTS)
 
         # now update the log appropriately
         def log_mutator(x):
@@ -259,7 +259,9 @@ running = []
 # them at the front of the queue).
 for entry in cslog.queue_all_entries(CHECKER, RUNNING, **LOGGING_KWARGS):
     if entry["worker"] == cslog.WORKER_ID:
-        cslog.queue_update(entry["id"], entry["data"], QUEUED, **LOGGING_KWARGS)
+        cslog.queue_update(
+            CHECKER, entry["id"], entry["data"], QUEUED, **LOGGING_KWARGS
+        )
 
 
 # and now actually start running
@@ -293,7 +295,11 @@ while True:
                         "processing your submission</b></font>"
                     )
                 cslog.queue_update(
-                    p._entry["data"]["id"], p._entry["data"], RESULTS, **LOGGING_KWARGS
+                    CHECKER,
+                    p._entry["data"]["id"],
+                    p._entry["data"],
+                    RESULTS,
+                    **LOGGING_KWARGS
                 )
             dead.add(i)
         elif time.time() - p._started > REAL_TIMEOUT:

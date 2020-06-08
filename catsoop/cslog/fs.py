@@ -26,7 +26,12 @@ consists of:
 """
 
 import os
+import glob
+import time
+import uuid
 import base64
+import pickle
+import shutil
 import struct
 import hashlib
 
@@ -35,7 +40,7 @@ from datetime import datetime, timedelta
 
 from filelock import FileLock
 
-from .. import time
+from .. import time as cstime
 from .. import base_context
 
 from . import (
@@ -44,6 +49,7 @@ from . import (
     compress_encrypt,
     decompress_decrypt,
     hash_db_info,
+    WORKER_ID,
 )
 
 
@@ -81,7 +87,7 @@ def get_log_filename(db_name, path, logname):
             course,
             db_name,
             *(path[1:]),
-            "%s.log" % logname
+            "%s.log" % logname,
         )
     else:
         return os.path.join(
@@ -288,3 +294,159 @@ def retrieve_upload(id_):
     with open(os.path.join(dir_, "content"), "rb") as f:
         data = decompress_decrypt(f.read())
     return info, data
+
+
+def _queue_location(queuename):
+    return os.path.join(base_context.cs_data_root, "_logs", "_queues", queuename)
+
+
+def _get_statuses(queuename):
+    return os.listdir(_queue_location(queuename))
+
+
+def _get_staging_filename(id):
+    return os.path.join(_queue_location(""), "_staging", id)
+
+
+def _new_queue_filename(queuename, status, created, updated, id):
+    basename = f"{created}_{updated}_{id}"
+    return os.path.join(_queue_location(queuename), status, basename)
+
+
+def _get_entries(queuename, status):
+    try:
+        root = os.path.join(_queue_location(queuename), status)
+        return {f: os.path.join(root, f) for f in os.listdir(root)}
+    except:
+        return {}
+
+
+def queue_push(queuename, initial_status, data):
+    now = int(time.time())
+    id = str(uuid.uuid4())
+    staging_name = _get_staging_filename(id)
+    final_name = _new_queue_filename(queuename, initial_status, now, now, id)
+    os.makedirs(os.path.dirname(staging_name), exist_ok=True)
+    with open(staging_name, "wb") as f:
+        pickle.dump({"id": id, "worker": None, "data": prep(data),}, f)
+    os.makedirs(os.path.dirname(final_name), exist_ok=True)
+    shutil.move(staging_name, final_name)
+    return id
+
+
+def queue_pop(queuename, old_status, new_status=None, sort_by="created"):
+    for shortname, fullname in sorted(_get_entries(queuename, old_status).items()):
+        try:
+            # try moving to staging area; that's our indication that we
+            # actually got an entry
+            current, updated, id = shortname.split("_")[-1]
+            staging_name = _get_staging_filename(id)
+            shutil.move(fullname, staging_name)
+        except:
+            continue
+
+        # if we get here, we moved this to staging, so it belongs to us.
+        # load the data first:
+
+        with open(staging_name, "rb") as f:
+            entry = pickle.load(f)
+        entry["queuename"] = queuename
+        entry["status"] = old_status
+        entry["worker"] = WORKER_ID
+        entry["created"] = int(created)
+        entry["updated"] = int(updated)
+
+        # want to set a new status, go for it.  otherwise, we'll just delete
+        # this entry from the queue.
+        if new_status is None:
+            shutil.rmtree(staging_name, ignore_errors=True)
+        else:
+            now = int(time.time())
+            entry["updated"] = now
+            entry["status"] = new_status
+            with open(staging_name, "wb") as f:
+                pickle.dump(entry, f)
+            new_name = _new_queue_filename(
+                queuename, new_status, created, int(time.time()), i
+            )
+            os.makedirs(os.path.dirname(new_name), exist_ok=True)
+            shutil.move(staging_name, new_name)
+
+        entry["data"] = unprep(entry["data"])  # unprep the data for the thing we return
+        return entry
+    return None
+
+
+def queue_update(queuename, id, new_data, new_status=None):
+    try:
+        cur_name = glob.glob(os.path.join(_queue_location(queuename), "*", f"*_{id}"))[
+            0
+        ]
+        staging_name = _get_staging_filename(id)
+        shutil.move(cur_name, staging_name)
+    except:
+        return None
+
+    status = cur_name.split(os.sep)[-2]
+    created, updated, _ = os.path.basename(cur_name).split("_")
+
+    with open(staging_name, "rb") as f:
+        entry = pickle.load(f)
+
+    entry["worker"] = WORKER_ID
+    entry["data"] = prep(new_data)
+    with open(staging_name, "wb") as f:
+        pickle.dump(entry, f)
+
+    new_status = new_status or status
+    new_name = _new_queue_filename(queuename, new_status, i, created, updated)
+    shutil.move(staging_name, new_name)
+
+    entry["queuename"] = queuename
+    entry["status"] = new_status
+    entry["created"] = int(created)
+    entry["updated"] = int(updated)
+    entry["data"] = new_data  # return the enprepped data here
+    return entry
+
+
+def queue_get(queuename, id):
+    try:
+        filename = glob.glob(os.path.join(_queue_location(queuename), "*", f"*_{id}"))[
+            0
+        ]
+        with open(filename, "rb") as f:
+            entry = pickle.load(f)
+
+        entry["queuename"] = queuename
+        entry["status"] = filename.split(os.sep)[-2]
+
+        created, updated, _ = os.path.basename(filename).split("_")
+        entry["created"] = int(created)
+        entry["updated"] = int(updated)
+
+        entry["data"] = unprep(entry["data"])
+
+        return entry
+    except:
+        raise
+        return None
+
+
+def queue_all_entries(queuename, status):
+    out = []
+    for shortname, fullname in sorted(_get_entries(queuename, status).items()):
+        with open(fullname, "rb") as f:
+            entry = pickle.load(f)
+
+        entry["queuename"] = queuename
+        entry["status"] = status
+
+        created, updated, _ = shortname.split("_")
+        entry["created"] = int(created)
+        entry["updated"] = int(updated)
+
+        entry["data"] = unprep(entry["data"])
+
+        out.append(entry)
+    return out

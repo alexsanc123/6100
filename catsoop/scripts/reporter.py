@@ -84,8 +84,7 @@ async def reporter(websocket, path):
                 status = "running"
             else:
                 # try:
-                res = cslog.queue_get(magic, **LOGGING_KWARGS)
-                print(res)
+                res = cslog.queue_get("checker", magic, **LOGGING_KWARGS)
                 if res["status"] == "results":
                     status = "results"
                     results = res["data"]

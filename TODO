@@ -5,3 +5,7 @@ TODOs:
 * is this too ugly as-is?  passing around the connection is a pain
 
 * load testing?
+
+* postgres logs: queue_update should return the updated entry or None
+
+* both: sort queue by _either_ created or updated timestamps?

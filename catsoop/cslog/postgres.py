@@ -50,22 +50,6 @@ def teardown_kwargs(kwargs):
         pass
 
 
-def _read_log(db_name, path, logname, connection=None):
-    conn = _connect() if connection is None else connection
-    with conn:
-        with conn.cursor() as c:
-            c.execute(
-                "SELECT data FROM logs WHERE db_name=%s AND path=%s AND logname=%s ORDER BY id ASC",
-                (db_name, "/".join(path), logname),
-            )
-            r = c.fetchone()
-            while r is not None:
-                yield unprep(r[-1])
-                r = c.fetchone()
-    if connection is None:
-        conn.close()
-
-
 def read_log(db_name, path, logname, connection=None):
     """
     Reads all entries of a log.
@@ -83,7 +67,17 @@ def read_log(db_name, path, logname, connection=None):
 
     **Returns:** a list containing the Python objects in the log
     """
-    return list(_read_log(db_name, path, logname, connection=connection))
+    conn = _connect() if connection is None else connection
+    with conn:
+        with conn.cursor() as c:
+            c.execute(
+                "SELECT data FROM logs WHERE db_name=%s AND path=%s AND logname=%s ORDER BY created ASC",
+                (db_name, "/".join(path), logname),
+            )
+            res = c.fetchall()
+    if connection is None:
+        conn.close()
+    return [unprep(bytes(entry[-1])) for entry in res]
 
 
 def most_recent(db_name, path, logname, default=None, connection=None):
@@ -293,14 +287,17 @@ def queue_pop(queuename, old_status, new_status=None, connection=None):
     Returns None if no entry was found.  Otherwise returns the id and data
     associated with this queue entry.
     """
-    query = "UPDATE queues SET status=%s,worker=%s WHERE id=(SELECT id FROM queues WHERE queuename=%s AND status=%s ORDER BY created ASC FOR UPDATE SKIP LOCKED LIMIT 1) RETURNING *"
+    query = "UPDATE queues SET status=%s,worker=%s,updated=NOW() WHERE id=(SELECT id FROM queues WHERE queuename=%s AND status=%s ORDER BY created ASC FOR UPDATE SKIP LOCKED LIMIT 1) RETURNING *"
     conn = _connect() if connection is None else connection
     with conn:
         with conn.cursor() as c:
-            c.execute(
-                query, (new_status or old_status, WORKER_ID, queuename, old_status)
-            )
+            c.execute(query, (new_status, WORKER_ID, queuename, old_status))
             res = c.fetchall()  # id, queuename, status, created, updated, data
+
+            if new_status is None and res:
+                # if we found something and we don't want to set a new state,
+                # just delete it.
+                c.execute("DELETE FROM queues WHERE id=%s", res[0][0])
     if connection is None:
         conn.close()
     if not res:
@@ -309,17 +306,17 @@ def queue_pop(queuename, old_status, new_status=None, connection=None):
         return _prep_entries(res)[0]
 
 
-def queue_update(id, new_data, new_status=None, connection=None):
+def queue_update(queuename, id, new_data, new_status=None, connection=None):
     """
     Update the queue entry with the given id, optionally also updating the
     status.
     """
     if new_status:
-        query = "UPDATE queues SET data=%s,status=%s WHERE id=%s"
-        args = (prep(new_data), new_status, id)
+        query = "UPDATE queues SET data=%s,status=%s,updated=NOW() WHERE id=%s AND queuename=%s"
+        args = (prep(new_data), new_status, id, queuename)
     else:
-        query = "UPDATE queues SET data=%s WHERE id=%s"
-        args = (prep(new_data), id)
+        query = "UPDATE queues SET data=%s,updated=NOW() WHERE id=%s AND queuename=%s"
+        args = (prep(new_data), id, queuename)
     conn = _connect() if connection is None else connection
     with conn:
         with conn.cursor() as c:
@@ -328,17 +325,17 @@ def queue_update(id, new_data, new_status=None, connection=None):
         conn.close()
 
 
-def queue_get(id, connection=None):
-    """
-    """
+def queue_get(queuename, id, connection=None):
     conn = _connect() if connection is None else connection
     with conn:
         with conn.cursor() as c:
-            c.execute("SELECT * FROM queues WHERE id=%s", (id,))
+            c.execute(
+                "SELECT * FROM queues WHERE id=%s AND queuename=%s", (id, queuename)
+            )
             res = c.fetchall()
     if connection is None:
         conn.close()
-    return _prep_entries(res)[0]
+    return _prep_entries(res)[0] if res else None
 
 
 def queue_all_entries(queuename, status, connection=None):
