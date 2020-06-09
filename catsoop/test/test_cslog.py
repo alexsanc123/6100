@@ -22,6 +22,7 @@ import glob
 import shutil
 import math
 import time
+import pickle
 import random
 import unittest
 import subprocess
@@ -95,7 +96,6 @@ class _Base:
 
 
     def _pushes(self, n, size, offset=0, queue="test", status="stage1"):
-
         orig_len = len(self.cslog.queue_all_entries(queue, status))
 
         procs = []
@@ -144,39 +144,75 @@ class _Base:
         for i in range(20):
             this_entries = self.cslog.queue_all_entries("test", "stage%d" % (2 + i))
             all_entries.extend(this_entries)
-        self.assertEqual({i["data"] for i in all_entries}, set(range(6000)))
+        self.assertEqual({i["data"] for i in all_entries}, set(range(3000)))
         self.assertEqual(self.cslog.queue_all_entries("test", "stage1"), [])
 
     def test_queue_stress_poptonowhere(self):
-        self._pushes(10, 200)
+        self._pushes(10, 100)
         ids = [i['id'] for i in self.cslog.queue_all_entries("test", "stage1")]
 
-        q = multiprocessing.Queue()
         procs = []
-        def updatestuff(n, q, ids):
-            mystage = "stage%d" % (2 + n)
+        def popout(n):
             out = set()
-            random.shuffle(ids)
-            for i in ids:
-                print(n, i)
-                o = self.cslog.queue_update("test", i, 7, mystage)
+            o = -1
+            while o is not None:
+                o = self.cslog.queue_pop("test", "stage1")
                 if o is not None:
                     out.add(o['id'])
-            q.put(out)
+            with open('/tmp/catsoop_test_%s' % n, 'wb') as f:
+                pickle.dump(out, f)
 
-        for i in range(5):
-            p = multiprocessing.Process(target=updatestuff, args=(i, q, ids))
+        for i in range(100):
+            p = multiprocessing.Process(target=popout, args=(i,))
             p.start()
             procs.append(p)
 
-        allids = set()
         for p in procs:
             p.join()
-            a = q.get()
-            print(a)
-            allids |= a
-        self.assertEqual(allids, ids)
+
+        allids = set()
+        for i in range(100):
+            with open('/tmp/catsoop_test_%s' % i, 'rb') as f:
+                new = pickle.load(f)
+                allids |= new
+
+        self.assertEqual(allids, set(ids))
         self.assertEqual(self.cslog.queue_all_entries("test", "stage1"), [])
+
+    def test_queue_stress_update(self):
+        self._pushes(10, 10)
+        ids = [i['id'] for i in self.cslog.queue_all_entries("test", "stage1")]
+
+        procs = []
+        def update(n, ids):
+            mystage = "stage%s" % (2+n)
+            out = set()
+            o = -1
+            random.shuffle(ids)
+            for i in ids:
+                o = self.cslog.queue_update("test", i, 7, mystage)
+                if o is not None:
+                    out.add(o['id'])
+            with open('/tmp/catsoop_test_%s' % n, 'wb') as f:
+                pickle.dump(out, f)
+
+        for i in range(200):
+            p = multiprocessing.Process(target=update, args=(i,ids))
+            p.start()
+            procs.append(p)
+
+        for p in procs:
+            p.join()
+
+        allids = set()
+        for i in range(200):
+            with open('/tmp/catsoop_test_%s' % i, 'rb') as f:
+                new = pickle.load(f)
+                self.assertEqual(len(new), 100)
+                allids |= new
+
+        self.assertEqual(allids, set(ids))
+        self.assertEqual({self.cslog.queue_get("test", i)['data'] for i in ids}, {7})
 
 
 
