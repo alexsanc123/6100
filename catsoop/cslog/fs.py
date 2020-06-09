@@ -398,6 +398,7 @@ def queue_update(queuename, id, new_data, new_status=None):
 
     new_status = new_status or status
     new_name = _new_queue_filename(queuename, new_status, created, updated, id)
+    os.makedirs(os.path.dirname(new_name), exist_ok=True)
     os.rename(staging_name, new_name)
 
     entry["queuename"] = queuename
