@@ -322,7 +322,7 @@ def _get_entries(queuename, status):
 
 
 def queue_push(queuename, initial_status, data):
-    now = int(time.time())
+    now = time.time()
     id = str(uuid.uuid4())
     staging_name = _get_staging_filename(id)
     final_name = _new_queue_filename(queuename, initial_status, now, now, id)
@@ -334,12 +334,12 @@ def queue_push(queuename, initial_status, data):
     return id
 
 
-def queue_pop(queuename, old_status, new_status=None, sort_by="created"):
+def queue_pop(queuename, old_status, new_status=None):
     for shortname, fullname in sorted(_get_entries(queuename, old_status).items()):
         try:
             # try moving to staging area; that's our indication that we
             # actually got an entry
-            current, updated, id = shortname.split("_")[-1]
+            created, updated, id = shortname.split("_")
             staging_name = _get_staging_filename(id)
             shutil.move(fullname, staging_name)
         except:
@@ -353,22 +353,20 @@ def queue_pop(queuename, old_status, new_status=None, sort_by="created"):
         entry["queuename"] = queuename
         entry["status"] = old_status
         entry["worker"] = WORKER_ID
-        entry["created"] = int(created)
-        entry["updated"] = int(updated)
+        entry["created"] = float(created)
+        entry["updated"] = float(updated)
 
         # want to set a new status, go for it.  otherwise, we'll just delete
         # this entry from the queue.
         if new_status is None:
             shutil.rmtree(staging_name, ignore_errors=True)
         else:
-            now = int(time.time())
+            now = time.time()
             entry["updated"] = now
             entry["status"] = new_status
             with open(staging_name, "wb") as f:
                 pickle.dump(entry, f)
-            new_name = _new_queue_filename(
-                queuename, new_status, created, int(time.time()), i
-            )
+            new_name = _new_queue_filename(queuename, new_status, created, now, id)
             os.makedirs(os.path.dirname(new_name), exist_ok=True)
             shutil.move(staging_name, new_name)
 
@@ -399,13 +397,13 @@ def queue_update(queuename, id, new_data, new_status=None):
         pickle.dump(entry, f)
 
     new_status = new_status or status
-    new_name = _new_queue_filename(queuename, new_status, i, created, updated)
+    new_name = _new_queue_filename(queuename, new_status, created, updated, id)
     shutil.move(staging_name, new_name)
 
     entry["queuename"] = queuename
     entry["status"] = new_status
-    entry["created"] = int(created)
-    entry["updated"] = int(updated)
+    entry["created"] = float(created)
+    entry["updated"] = float(updated)
     entry["data"] = new_data  # return the enprepped data here
     return entry
 
@@ -422,8 +420,8 @@ def queue_get(queuename, id):
         entry["status"] = filename.split(os.sep)[-2]
 
         created, updated, _ = os.path.basename(filename).split("_")
-        entry["created"] = int(created)
-        entry["updated"] = int(updated)
+        entry["created"] = float(created)
+        entry["updated"] = float(updated)
 
         entry["data"] = unprep(entry["data"])
 
@@ -443,8 +441,8 @@ def queue_all_entries(queuename, status):
         entry["status"] = status
 
         created, updated, _ = shortname.split("_")
-        entry["created"] = int(created)
-        entry["updated"] = int(updated)
+        entry["created"] = float(created)
+        entry["updated"] = float(updated)
 
         entry["data"] = unprep(entry["data"])
 
