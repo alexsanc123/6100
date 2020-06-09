@@ -75,6 +75,10 @@ class _Base:
         y = self.cslog.queue_update(
             "testqueue", ids[3], "dog", new_status="something_else"
         )
+        self.assertEqual(x["data"], "cat")
+        self.assertEqual(x["status"], "something")
+        self.assertEqual(y["data"], "dog")
+        self.assertEqual(y["status"], "something_else")
 
         # try updating nonexistent one
         self.assertEqual(self.cslog.queue_update("testqueue", "ABCDEFG", 20), None)

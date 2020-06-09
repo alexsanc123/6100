@@ -312,17 +312,19 @@ def queue_update(queuename, id, new_data, new_status=None, connection=None):
     status.
     """
     if new_status:
-        query = "UPDATE queues SET data=%s,status=%s,updated=NOW() WHERE id=%s AND queuename=%s"
+        query = "UPDATE queues SET data=%s,status=%s,updated=NOW() WHERE id=%s AND queuename=%s RETURNING *"
         args = (prep(new_data), new_status, id, queuename)
     else:
-        query = "UPDATE queues SET data=%s,updated=NOW() WHERE id=%s AND queuename=%s"
+        query = "UPDATE queues SET data=%s,updated=NOW() WHERE id=%s AND queuename=%s RETURNING *"
         args = (prep(new_data), id, queuename)
     conn = _connect() if connection is None else connection
     with conn:
         with conn.cursor() as c:
             c.execute(query, args)
+            res = c.fetchall()
     if connection is None:
         conn.close()
+    return _prep_entries(res)[0] if res else None
 
 
 def queue_get(queuename, id, connection=None):

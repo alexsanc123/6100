@@ -3,5 +3,3 @@ TODOs:
 * is this too ugly as-is?  passing around the connection is a pain: need comments
 
 * load testing?
-
-* postgres logs: queue_update should return the updated entry or None
