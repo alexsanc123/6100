@@ -7,5 +7,6 @@ RUN apt -y install libpq-dev
 RUN pip3 install black
 RUN pip3 install psycopg2
 RUN apt -y install sudo
+RUN pip3 install pytest
 
 RUN useradd -d /home/catsoop -m catsoop

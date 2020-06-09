@@ -8,6 +8,6 @@ uninstall:
 	pip3 uninstall -y catsoop
 
 test:
-	python3 -m unittest -v catsoop/test/*test*.py
+	pytest catsoop/test
 
 .PHONY: install develop test uninstall
