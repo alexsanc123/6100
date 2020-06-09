@@ -376,13 +376,18 @@ def queue_pop(queuename, old_status, new_status=None):
 
 
 def queue_update(queuename, id, new_data, new_status=None):
-    try:
-        cur_name = glob.glob(os.path.join(_queue_location(queuename), "*", f"*_{id}"))[
-            0
-        ]
-        staging_name = _get_staging_filename(id)
-        os.rename(cur_name, staging_name)
-    except:
+    for i in range(20):
+        try:
+            cur_name = glob.glob(os.path.join(_queue_location(queuename), "*", f"*_{id}"))[
+                0
+            ]
+            staging_name = _get_staging_filename(id)
+            os.rename(cur_name, staging_name)
+            break
+        except:
+            time.sleep(0.001)
+            continue
+    else:
         return None
 
     status = cur_name.split(os.sep)[-2]
