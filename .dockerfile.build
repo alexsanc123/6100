@@ -2,11 +2,7 @@ FROM debian:buster
 
 RUN apt -y update
 RUN apt -y dist-upgrade
-RUN apt -y install python3-virtualenv python3 python3-pip uwsgi-plugin-python3 build-essential uwsgi git postgresql postgresql-contrib make
-RUN apt -y install libpq-dev
-RUN pip3 install black
-RUN pip3 install psycopg2
-RUN apt -y install sudo
-RUN pip3 install pytest
+RUN apt -y install python3-virtualenv python3 python3-pip uwsgi-plugin-python3 build-essential uwsgi git postgresql postgresql-contrib make libpq-dev sudo
+RUN pip3 install black pytest psycopg2
 
 RUN useradd -d /home/catsoop -m catsoop
