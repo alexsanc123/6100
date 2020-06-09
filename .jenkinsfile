@@ -16,7 +16,7 @@ pipeline {
         }
         stage('Test') {
             steps {
-                sh 'make test'
+                sh 'sudo -u catsoop make test'
             }
         }
         stage('Style') {
