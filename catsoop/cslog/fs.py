@@ -330,7 +330,7 @@ def queue_push(queuename, initial_status, data):
     with open(staging_name, "wb") as f:
         pickle.dump({"id": id, "worker": None, "data": prep(data),}, f)
     os.makedirs(os.path.dirname(final_name), exist_ok=True)
-    shutil.move(staging_name, final_name)
+    os.rename(staging_name, final_name)
     return id
 
 
@@ -341,7 +341,7 @@ def queue_pop(queuename, old_status, new_status=None):
             # actually got an entry
             created, updated, id = shortname.split("_")
             staging_name = _get_staging_filename(id)
-            shutil.move(fullname, staging_name)
+            os.rename(fullname, staging_name)
         except:
             continue
 
@@ -368,7 +368,7 @@ def queue_pop(queuename, old_status, new_status=None):
                 pickle.dump(entry, f)
             new_name = _new_queue_filename(queuename, new_status, created, now, id)
             os.makedirs(os.path.dirname(new_name), exist_ok=True)
-            shutil.move(staging_name, new_name)
+            os.rename(staging_name, new_name)
 
         entry["data"] = unprep(entry["data"])  # unprep the data for the thing we return
         return entry
@@ -381,7 +381,7 @@ def queue_update(queuename, id, new_data, new_status=None):
             0
         ]
         staging_name = _get_staging_filename(id)
-        shutil.move(cur_name, staging_name)
+        os.rename(cur_name, staging_name)
     except:
         return None
 
@@ -398,7 +398,7 @@ def queue_update(queuename, id, new_data, new_status=None):
 
     new_status = new_status or status
     new_name = _new_queue_filename(queuename, new_status, created, updated, id)
-    shutil.move(staging_name, new_name)
+    os.rename(staging_name, new_name)
 
     entry["queuename"] = queuename
     entry["status"] = new_status

@@ -25,6 +25,7 @@ import time
 import random
 import unittest
 import subprocess
+import multiprocessing
 
 from .. import base_context
 from .. import loader
@@ -88,9 +89,51 @@ class _Base:
         self.assertEqual([i["data"] for i in entries], [4, "dog"])
 
     def test_queue_load(self):
-        # can we spin up a bunch of processes here and have them hit the queue hard?
-        # how to test for inacuuracies in push/pop?
-        pass
+        procs = []
+
+        # first, push a bunch of stuff and make sure it all makes it in
+        def pushstuff(n):
+            for i in range(100):
+                self.cslog.queue_push("test", "stage1", 100 * n + i)
+
+        self.cslog.queue_push("test", "stage1", -1)
+        for i in range(20):
+            p = multiprocessing.Process(target=pushstuff, args=(i,))
+            p.start()
+            procs.append(p)
+
+        # we'll need to wait for everyone to finish!
+        for p in procs:
+            p.join()
+
+        self.assertEqual(len(self.cslog.queue_all_entries("test", "stage1")), 2001)
+
+        # now pop one thing off, this should be the first.
+        self.assertEqual(self.cslog.queue_pop("test", "stage1")["data"], -1)
+
+        # now pop a bunch of stuff off and make sure we get the right results
+        # back
+        procs = []
+
+        def popstuff(n):
+            mystage = "stage%d" % (2 + n)
+            o = -1
+            while o is not None:
+                o = self.cslog.queue_pop("test", "stage1", mystage)
+
+        for i in range(20):
+            p = multiprocessing.Process(target=popstuff, args=(i,))
+            p.start()
+            procs.append(p)
+        for p in procs:
+            p.join()
+
+        all_entries = []
+        for i in range(20):
+            this_entries = self.cslog.queue_all_entries("test", "stage%d" % (2 + i))
+            all_entries.extend(this_entries)
+        self.assertEqual({i["data"] for i in all_entries}, set(range(2000)))
+        self.assertEqual(self.cslog.queue_all_entries("test", "stage1"), [])
 
 
 class Test_cslog_fs(CATSOOPTest, _Base):

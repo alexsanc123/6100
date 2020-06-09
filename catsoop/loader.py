@@ -352,7 +352,7 @@ def _atomic_write(fname, contents):
     tname = fname + ".temp"
     with open(tname, "w") as f:
         f.write(contents)
-    shutil.move(tname, fname)
+    os.rename(tname, fname)
 
 
 def cs_compile(fname, pre_code="", post_code=""):
