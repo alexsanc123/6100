@@ -21,7 +21,7 @@ import os
 import random
 import string
 import importlib
-import collections
+import collections.abc
 
 from datetime import timedelta
 from collections import OrderedDict
@@ -39,7 +39,7 @@ _nodoc = {"timedelta", "OrderedDict"}
 
 def _get(context, key, default, cast=lambda x: x):
     v = context.get(key, default)
-    return cast(v(context) if isinstance(v, collections.Callable) else v)
+    return cast(v(context) if isinstance(v, collections.abc.Callable) else v)
 
 
 def get_manual_grading_entry(context, name):

@@ -26,6 +26,7 @@ import hashlib
 import binascii
 import traceback
 import collections
+import collections.abc
 
 from bs4 import BeautifulSoup
 
@@ -72,7 +73,7 @@ def _unknown_handler(action):
 
 def _get(context, key, default, cast=lambda x: x):
     v = context.get(key, default)
-    return cast(v(context) if isinstance(v, collections.Callable) else v)
+    return cast(v(context) if isinstance(v, collections.abc.Callable) else v)
 
 
 def handle(context):
