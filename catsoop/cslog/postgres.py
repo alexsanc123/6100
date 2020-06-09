@@ -297,7 +297,7 @@ def queue_pop(queuename, old_status, new_status=None, connection=None):
             if new_status is None and res:
                 # if we found something and we don't want to set a new state,
                 # just delete it.
-                c.execute("DELETE FROM queues WHERE id=%s", res[0][0])
+                c.execute("DELETE FROM queues WHERE id=%s", (res[0][0],))
     if connection is None:
         conn.close()
     if not res:
