@@ -82,6 +82,7 @@ class _Base:
 
         # try updating nonexistent one
         self.assertEqual(self.cslog.queue_update("testqueue", "ABCDEFG", 20), None)
+        self.assertEqual(self.cslog.queue_update("testq", x['id'], 20), None)
 
         # pop one entry away entirely (8 should still be at the front of the queue, then 'cat')
         self.assertEqual(self.cslog.queue_pop("testqueue", "something")["data"], 8)
