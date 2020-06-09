@@ -83,7 +83,7 @@ class _Base:
 
         # try updating nonexistent one
         self.assertEqual(self.cslog.queue_update("testqueue", "ABCDEFG", 20), None)
-        self.assertEqual(self.cslog.queue_update("testq", x['id'], 20), None)
+        self.assertEqual(self.cslog.queue_update("testq", x["id"], 20), None)
 
         # pop one entry away entirely (8 should still be at the front of the queue, then 'cat')
         self.assertEqual(self.cslog.queue_pop("testqueue", "something")["data"], 8)
@@ -93,7 +93,6 @@ class _Base:
         self.assertEqual([i["data"] for i in entries], ["cat", 23, 42])
         entries = self.cslog.queue_all_entries("testqueue", "something_else")
         self.assertEqual([i["data"] for i in entries], [4, "dog"])
-
 
     def _pushes(self, n, size, offset=0, queue="test", status="stage1"):
         orig_len = len(self.cslog.queue_all_entries(queue, status))
@@ -113,7 +112,9 @@ class _Base:
         for p in procs:
             p.join()
 
-        self.assertEqual(len(self.cslog.queue_all_entries(queue, status)), n*size + orig_len)
+        self.assertEqual(
+            len(self.cslog.queue_all_entries(queue, status)), n * size + orig_len
+        )
 
     def test_queue_stress_pop(self):
         # first, push one entry on
@@ -129,11 +130,13 @@ class _Base:
         # now pop a bunch of stuff off and make sure we get the right results
         # back
         procs = []
+
         def popstuff(n):
             mystage = "stage%d" % (2 + n)
             o = -1
             while o is not None:
                 o = self.cslog.queue_pop("test", "stage1", mystage)
+
         for i in range(20):
             p = multiprocessing.Process(target=popstuff, args=(i,))
             p.start()
@@ -149,17 +152,18 @@ class _Base:
 
     def test_queue_stress_poptonowhere(self):
         self._pushes(10, 100)
-        ids = [i['id'] for i in self.cslog.queue_all_entries("test", "stage1")]
+        ids = [i["id"] for i in self.cslog.queue_all_entries("test", "stage1")]
 
         procs = []
+
         def popout(n):
             out = set()
             o = -1
             while o is not None:
                 o = self.cslog.queue_pop("test", "stage1")
                 if o is not None:
-                    out.add(o['id'])
-            with open('/tmp/catsoop_test_%s' % n, 'wb') as f:
+                    out.add(o["id"])
+            with open("/tmp/catsoop_test_%s" % n, "wb") as f:
                 pickle.dump(out, f)
 
         for i in range(100):
@@ -172,7 +176,7 @@ class _Base:
 
         allids = set()
         for i in range(100):
-            with open('/tmp/catsoop_test_%s' % i, 'rb') as f:
+            with open("/tmp/catsoop_test_%s" % i, "rb") as f:
                 new = pickle.load(f)
                 allids |= new
 
@@ -181,23 +185,24 @@ class _Base:
 
     def test_queue_stress_update(self):
         self._pushes(10, 10)
-        ids = [i['id'] for i in self.cslog.queue_all_entries("test", "stage1")]
+        ids = [i["id"] for i in self.cslog.queue_all_entries("test", "stage1")]
 
         procs = []
+
         def update(n, ids):
-            mystage = "stage%s" % (2+n)
+            mystage = "stage%s" % (2 + n)
             out = set()
             o = -1
             random.shuffle(ids)
             for i in ids:
                 o = self.cslog.queue_update("test", i, 7, mystage)
                 if o is not None:
-                    out.add(o['id'])
-            with open('/tmp/catsoop_test_%s' % n, 'wb') as f:
+                    out.add(o["id"])
+            with open("/tmp/catsoop_test_%s" % n, "wb") as f:
                 pickle.dump(out, f)
 
         for i in range(200):
-            p = multiprocessing.Process(target=update, args=(i,ids))
+            p = multiprocessing.Process(target=update, args=(i, ids))
             p.start()
             procs.append(p)
 
@@ -206,14 +211,13 @@ class _Base:
 
         allids = set()
         for i in range(200):
-            with open('/tmp/catsoop_test_%s' % i, 'rb') as f:
+            with open("/tmp/catsoop_test_%s" % i, "rb") as f:
                 new = pickle.load(f)
                 self.assertEqual(len(new), 100)
                 allids |= new
 
         self.assertEqual(allids, set(ids))
-        self.assertEqual({self.cslog.queue_get("test", i)['data'] for i in ids}, {7})
-
+        self.assertEqual({self.cslog.queue_get("test", i)["data"] for i in ids}, {7})
 
 
 class Test_cslog_fs(CATSOOPTest, _Base):
