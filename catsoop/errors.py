@@ -209,8 +209,8 @@ def do_404_message(context):
 
 error_404_logo = (
     "\   ???????? "
-    "\n/    /\__/\  "
-    "\n\__=(  @_@ )="
+    "\n/    /\\__/\\  "
+    "\n\\__=(  @_@ )="
     "\n(__________) "
     "\n |_ |_ |_ |_ "
 )
@@ -222,7 +222,7 @@ error_500_logo = (
     "\n  _|__|__|__| "
     "\n (  _     ___)"
     "\n=( x X  )=   \\"
-    "\n  \/  \/     /"
+    "\n  \\/  \\/     /"
     "\n             \\"
 )
 """This alternate logo replaces the CAT-SOOP logo on when a 500 (Internal
