@@ -256,9 +256,9 @@ def initialize_database():
     pass
 
 
-def clear_old_logs(db_name, path, timestamp):
+def clear_old_logs(db_name, path, expire):
     """
-    Clear logs whose updated timestamp is below the given value.  Primarily used for session handling
+    Clear logs older than the given value.  Primarily used for session handling
     """
     directory = os.path.dirname(get_log_filename(db_name, path, "test"))
     try:
@@ -268,7 +268,7 @@ def clear_old_logs(db_name, path, timestamp):
     for log in logs:
         fullname = os.path.join(directory, log)
         try:
-            if os.stat(fullname).st_mtime < timestamp:
+            if os.stat(fullname).st_mtime < time.time() - expire:
                 os.unlink(fullname)
         except:
             pass
