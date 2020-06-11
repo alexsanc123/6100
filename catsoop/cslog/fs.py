@@ -19,10 +19,10 @@ Logging mechanisms using the filesystem
 On disk, each log is a file containing one or more entries, where each entry
 consists of:
 
-* 8 bits representing the length of the entry
+* 8 bytes representing the length of the entry
 * a binary blob (pickled Python object, potentially encrypted and/or
     compressed)
-* the 8-bit length repeated
+* the 8-byte length repeated
 """
 
 import os
