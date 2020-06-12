@@ -170,7 +170,7 @@ def overwrite_log(db_name, path, logname, new, connection=None):
     with conn:
         with conn.cursor() as c:
             c.execute(
-                "DELETE FROM logs WHERE db_name=%s AND path=%s AND logname=%s",
+                "DELETE FROM logs WHERE id IN (SELECT id FROM logs WHERE db_name=%s AND path=%s AND logname=%s FOR UPDATE)",
                 (db_name, "/".join(path), logname),
             )
             c.execute(
@@ -195,7 +195,7 @@ def modify_most_recent(
     path = "/".join(path)
     c = conn.cursor()
     c.execute(
-        "SELECT * FROM logs WHERE db_name=%s AND path=%s AND logname=%s ORDER BY updated DESC LIMIT 1",
+        "SELECT * FROM logs WHERE db_name=%s AND path=%s AND logname=%s ORDER BY updated DESC FOR UPDATE LIMIT 1",
         (db_name, path, logname),
     )
     res = c.fetchone()

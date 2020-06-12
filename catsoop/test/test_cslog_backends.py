@@ -27,6 +27,8 @@ import hashlib
 import unittest
 import multiprocessing
 
+from collections import Counter
+
 from ..test import CATSOOPTest
 
 from .. import cslog as cslog_base
@@ -110,8 +112,86 @@ class CSLogBase:
             self.assertEqual(self.cslog.read_log(users[0], path2, n), [0, 1, 2])
             self.assertEqual(self.cslog.read_log(users[1], path2, n), [0, 1, 2])
 
-    def test_logging_stress(self):
-        pass
+    def test_logging_stress_update(self):
+        user = "testuser"
+        path1 = ["test_subject", "some", "page"]
+        name = "problemstate"
+
+        procs = []
+
+        def append_a_bunch():
+            for i in range(100):
+                self.cslog.update_log(user, path1, name, i)
+
+        for i in range(50):
+            p = multiprocessing.Process(target=append_a_bunch, args=())
+            procs.append(p)
+
+        for p in procs:
+            p.start()
+
+        for p in procs:
+            p.join()  # wait for updaters to finish
+
+        entries = self.cslog.read_log(user, path1, name)
+        self.assertEqual(len(entries), 5000)
+        self.assertEqual(dict(Counter(entries)), {i: 50 for i in range(100)})
+
+    def test_logging_stress_overwrite(self):
+        user = "testuser"
+        path1 = ["test_subject", "some", "page"]
+        name = "problemstate"
+
+        procs = []
+
+        def overwrite_a_bunch():
+            for i in range(100):
+                self.cslog.overwrite_log(user, path1, name, 7)
+
+        for i in range(50):
+            p = multiprocessing.Process(target=overwrite_a_bunch, args=())
+            procs.append(p)
+
+        for p in procs:
+            p.start()
+
+        for p in procs:
+            p.join()  # wait for updaters to finish
+
+        entries = self.cslog.read_log(user, path1, name)
+        self.assertEqual(entries, [7])
+
+    def test_logging_stress_modify(self):
+        user = "testuser"
+        path1 = ["test_subject", "some", "page"]
+        name = "problemstate"
+
+        procs = []
+
+        self.cslog.update_log(user, path1, name, 0)
+
+        def modify_a_bunch():
+            for i in range(500):
+                self.cslog.modify_most_recent(
+                    user,
+                    path1,
+                    name,
+                    transform_func=lambda x: x + 1,
+                    method="overwrite",
+                )
+
+        for i in range(50):
+            p = multiprocessing.Process(target=modify_a_bunch, args=())
+            procs.append(p)
+
+        for p in procs:
+            p.start()
+
+        for p in procs:
+            p.join()  # wait for updaters to finish
+
+        entries = self.cslog.read_log(user, path1, name)
+        self.assertEqual(entries, [25000])
 
     def test_logging_uploads(self):
         content = "hello 🐈".encode("utf-8")
@@ -226,8 +306,9 @@ class CSLogBase:
 
         for i in range(20):
             p = multiprocessing.Process(target=popstuff, args=(i,))
-            p.start()
             procs.append(p)
+        for p in procs:
+            p.start()
         for p in procs:
             p.join()
         all_entries = []
@@ -255,9 +336,9 @@ class CSLogBase:
 
         for i in range(100):
             p = multiprocessing.Process(target=popout, args=(i,))
-            p.start()
             procs.append(p)
-
+        for p in procs:
+            p.start()
         for p in procs:
             p.join()
 
