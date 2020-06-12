@@ -144,6 +144,8 @@ class CSLogBackend:
 
         procs = []
 
+        self.cslog.update_log(user, path1, name, 8)
+
         def overwrite_a_bunch():
             for i in range(100):
                 self.cslog.overwrite_log(user, path1, name, 7)
