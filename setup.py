@@ -130,6 +130,7 @@ def main():
                 "console_scripts": ["catsoop = catsoop.main:command_line_interface"]
             },
             install_requires=requirements,
+            extras_require={'postgres': ['psycopg2'], 'test': ['pytest']},
             package_dir={"catsoop": "catsoop"},
             package_data={"catsoop": ["scripts/*"]},
             test_suite="catsoop.test",
