@@ -14,33 +14,28 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-Small suite of tests for cslog using the filesystem
+Common Test Cases for all CSLog Backends
 """
 
 import os
 import math
 import time
-import glob
 import pickle
 import random
 import shutil
 import hashlib
 import unittest
-import subprocess
 import multiprocessing
 
-from .. import base_context
-from .. import loader
 from ..test import CATSOOPTest
 
 from .. import cslog as cslog_base
 
-from ..cslog import fs as cslog_fs
 
 # -----------------------------------------------------------------------------
 
 
-class _Base:
+class CSLogBase:
     def test_logging_basic_ops(self):
         user = "testuser"
         path1 = ["test_subject", "some", "page"]
@@ -118,13 +113,6 @@ class _Base:
         self.assertEqual(ret_data, content)
 
         self.assertEqual(self.cslog.retrieve_upload(id_[::-1]), None)
-
-    def test_logging_encryption(self):
-        # TODO: write this.
-        # this will need to be overridden for each subclass, since the
-        # specifics of the encryption are going to depend on the details of how
-        # things are stored (though there will be some things in common)
-        assert False
 
     def test_queue_ops(self):
         # add a couple of queue entries
@@ -306,117 +294,3 @@ class _Base:
 
         self.assertEqual(allids, set(ids))
         self.assertEqual({self.cslog.queue_get("test", i)["data"] for i in ids}, {7})
-
-
-class Test_cslog_fs(CATSOOPTest, _Base):
-    def setUp(self,):
-        CATSOOPTest.setUp(self)
-
-        context = {}
-        loader.load_global_data(context)
-        self.cslog = cslog_fs
-
-        _logs_dir = os.path.join(context["cs_data_root"], "_logs")
-        shutil.rmtree(_logs_dir, ignore_errors=True)  # start with fresh logs each time
-
-
-initdb = shutil.which("initdb")
-postgres = shutil.which("postgres")
-if initdb is None:
-    # debian puts initdb in a weird spot...
-    try:
-        initdb = glob.glob("/usr/lib/postgresql/*/bin/initdb")[0]
-        postgres = glob.glob("/usr/lib/postgresql/*/bin/postgres")[0]
-    except:
-        pass
-try:
-    import psycopg2
-    from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
-    from ..cslog import postgres as cslog_postgres
-except:
-    psycopg2 = None
-
-
-@unittest.skipIf(
-    initdb is None or postgres is None,
-    "skipping PostgreSQL tests: cannot create dummy database for testing",
-)
-@unittest.skipIf(psycopg2 is None, "skipping PostgreSQL tests: please install psycopg2")
-class Test_cslog_postgres(CATSOOPTest, _Base):
-    db_loc = "/tmp/catsoop_psql"
-    port = 60037
-
-    def setUp(self,):
-        CATSOOPTest.setUp(self)
-        context = {}
-
-        loader.load_global_data(context)
-        self.cslog = cslog_postgres
-        cslog_postgres.base_context.cs_postgres_options = {
-            "host": "localhost",
-            "port": self.port,
-            "user": "catsoop",
-            "password": "catsoop",
-        }
-
-        # set up the database (inspired by https://github.com/tk0miya/testing.postgresql)
-        shutil.rmtree(self.db_loc, ignore_errors=True)
-
-        os.makedirs(os.path.join(self.db_loc, "tmp"))
-
-        p = subprocess.Popen(
-            [
-                initdb,
-                "-U",
-                "postgres",
-                "-A",
-                "trust",
-                "-D",
-                os.path.join(self.db_loc, "data"),
-            ],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
-        p.communicate()
-
-        # start postgres server
-        self.p = subprocess.Popen(
-            [
-                postgres,
-                "-p",
-                str(self.port),
-                "-D",
-                os.path.join(self.db_loc, "data"),
-                "-k",
-                os.path.join(self.db_loc, "tmp"),
-                "-h",
-                "127.0.0.1",
-                "-F",
-                "-c",
-                "logging_collector=off",
-            ],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
-        time.sleep(0.1)
-
-        # create database structure
-        conn = psycopg2.connect(host="localhost", port=self.port, user="postgres")
-        conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
-        c = conn.cursor()
-        c.execute("CREATE DATABASE catsoop;")
-        c.execute("CREATE USER catsoop WITH ENCRYPTED PASSWORD 'catsoop';")
-        c.execute("GRANT ALL PRIVILEGES ON DATABASE catsoop TO catsoop;")
-        c.close()
-        conn.close()
-        self.port += 1  # ugh this is gross
-
-        self.cslog.initialize_database()
-
-    def tearDown(self):
-        self.p.kill()
-        self.p.communicate()
-
-
-if __name__ == "__main__":
-    unittest.main()
