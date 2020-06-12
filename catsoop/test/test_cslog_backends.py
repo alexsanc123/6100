@@ -86,18 +86,29 @@ class CSLogBase:
         #
         # because of this, this test is lame, as it tests only the (lame)
         # guarantee we should have: that if _all_ entreis in a log are old
-        # enough, then the whole log should be deleted.
+        # enough, then the whole log should be deleted (and that logs on a
+        # different path are unaffected)
         path3 = ["test_subject", "some", "page3"]
         names = "test1", "test2", "test3"
-        for n in names:
-            for i in range(3):
-                self.cslog.update_log(user, path3, n, i)
-            self.assertEqual(self.cslog.read_log(user, path3, n), list(range(3)))
+        users = "user1", "user2"
+        for user in users:
+            for n in names:
+                for i in range(3):
+                    self.cslog.update_log(user, path3, n, i)
+                self.assertEqual(self.cslog.read_log(user, path3, n), [0, 1, 2])
+            for n in names:
+                for i in range(3):
+                    self.cslog.update_log(user, path2, n, i)
+                self.assertEqual(self.cslog.read_log(user, path2, n), [0, 1, 2])
 
         time.sleep(1)
-        self.cslog.clear_old_logs(user, path3, 1)
+        self.cslog.clear_old_logs(users[0], path3, 1)
         for n in names:
-            self.assertEqual(self.cslog.read_log(user, path3, n), [])
+            self.assertEqual(self.cslog.read_log(users[0], path3, n), [])
+            self.assertEqual(self.cslog.read_log(users[1], path3, n), [0, 1, 2])
+        for n in names:
+            self.assertEqual(self.cslog.read_log(users[0], path2, n), [0, 1, 2])
+            self.assertEqual(self.cslog.read_log(users[1], path2, n), [0, 1, 2])
 
     def test_logging_stress(self):
         pass

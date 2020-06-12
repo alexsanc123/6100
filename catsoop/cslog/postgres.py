@@ -67,6 +67,7 @@ def read_log(db_name, path, logname, connection=None):
 
     **Returns:** a list containing the Python objects in the log
     """
+    db_name, path, logname = hash_db_info(db_name, path, logname)
     conn = _connect() if connection is None else connection
     with conn:
         with conn.cursor() as c:
@@ -104,6 +105,7 @@ def most_recent(db_name, path, logname, default=None, connection=None):
     **Returns:** a single Python object representing the most recent entry in
     the log.
     """
+    db_name, path, logname = hash_db_info(db_name, path, logname)
     conn = _connect() if connection is None else connection
     with conn:
         with conn.cursor() as c:
@@ -135,6 +137,7 @@ def update_log(db_name, path, logname, new, connection=None):
     * `lock` (default `True`): whether the database should be locked during
         this update
     """
+    db_name, path, logname = hash_db_info(db_name, path, logname)
     conn = _connect() if connection is None else connection
     with conn:
         with conn.cursor() as c:
@@ -162,6 +165,7 @@ def overwrite_log(db_name, path, logname, new, connection=None):
     * `lock` (default `True`): whether the database should be locked during
         this update
     """
+    db_name, path, logname = hash_db_info(db_name, path, logname)
     conn = _connect() if connection is None else connection
     with conn:
         with conn.cursor() as c:
@@ -186,6 +190,7 @@ def modify_most_recent(
     method="update",
     connection=None,
 ):
+    db_name, path, logname = hash_db_info(db_name, path, logname)
     conn = _connect() if connection is None else connection
     path = "/".join(path)
     c = conn.cursor()
@@ -216,6 +221,7 @@ def modify_most_recent(
 
 
 def clear_old_logs(db_name, path, age, connection=None):
+    db_name, path, _ = hash_db_info(db_name, path, "")
     conn = _connect() if connection is None else connection
     with conn:
         with conn.cursor() as c:

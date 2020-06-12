@@ -266,6 +266,7 @@ def clear_old_logs(db_name, path, expire):
     """
     Clear logs older than the given value.  Primarily used for session handling
     """
+    db_name, path, _ = hash_db_info(db_name, path, "")
     directory = os.path.dirname(get_log_filename(db_name, path, "test"))
     try:
         logs = os.listdir(directory)
