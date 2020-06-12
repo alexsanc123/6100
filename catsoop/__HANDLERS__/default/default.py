@@ -26,6 +26,7 @@ import hashlib
 import binascii
 import traceback
 import collections
+import collections.abc
 
 from bs4 import BeautifulSoup
 
@@ -43,7 +44,6 @@ def new_entry(context, qname, action):
 
     Returns uuid for the new queue entry.
     """
-    id_ = str(uuid.uuid4())
     obj = {
         "path": context["cs_path_info"],
         "username": context.get("cs_username", "None"),
@@ -58,20 +58,9 @@ def new_entry(context, qname, action):
     if session.get("is_lti_user"):
         obj["lti_data"] = session.get("lti_data")
 
-    # safely save queue entry in database file (stage then mv)
-    loc = os.path.join(context["cs_data_root"], "_logs", "_checker", "staging", id_)
-    os.makedirs(os.path.dirname(loc), exist_ok=True)
-    with open(loc, "wb") as f:
-        f.write(context["csm_cslog"].prep(obj))
-    newloc = os.path.join(
-        context["cs_data_root"],
-        "_logs",
-        "_checker",
-        "queued",
-        "%s_%s" % (time.time(), id_),
+    return context["csm_cslog"].queue_push(
+        "checker", "queued", obj, **context["cs_logging_kwargs"]
     )
-    shutil.move(loc, newloc)
-    return id_
 
 
 def _n(n):
@@ -84,7 +73,7 @@ def _unknown_handler(action):
 
 def _get(context, key, default, cast=lambda x: x):
     v = context.get(key, default)
-    return cast(v(context) if isinstance(v, collections.Callable) else v)
+    return cast(v(context) if isinstance(v, collections.abc.Callable) else v)
 
 
 def handle(context):
@@ -174,8 +163,12 @@ def handle_copy_seed(context):
         uname = context[_n("real_uname")]
         path = context["cs_path_info"]
         logname = "random_seed"
-        stored = context["csm_cslog"].most_recent(impersonated, path, logname, None)
-        context["csm_cslog"].update_log(uname, path, logname, stored)
+        stored = context["csm_cslog"].most_recent(
+            impersonated, path, logname, None, **context["cs_logging_kwargs"]
+        )
+        context["csm_cslog"].update_log(
+            uname, path, logname, stored, **context["cs_logging_kwargs"]
+        )
     return handle_save(context)
 
 
@@ -189,7 +182,11 @@ def _new_random_seed(n=100):
 def handle_new_seed(context):
     uname = context[_n("uname")]
     context["csm_cslog"].update_log(
-        uname, context["cs_path_info"], "random_seed", _new_random_seed()
+        uname,
+        context["cs_path_info"],
+        "random_seed",
+        _new_random_seed(),
+        **context["cs_logging_kwargs"]
     )
 
     # Rerender the questions
@@ -209,7 +206,11 @@ def handle_activate(context):
 
         uname = context[_n("uname")]
         context["csm_cslog"].overwrite_log(
-            uname, context["cs_path_info"], "problemstate", newstate
+            uname,
+            context["cs_path_info"],
+            "problemstate",
+            newstate,
+            **context["cs_logging_kwargs"]
         )
         context[_n("last_log")] = newstate
     return handle_view(context)
@@ -219,7 +220,11 @@ def handle_copy(context):
     if context[_n("impersonating")]:
         context[_n("uname")] = context[_n("real_uname")]
         ll = context["csm_cslog"].most_recent(
-            context[_n("uname")], context["cs_path_info"], "problemstate", {}
+            context[_n("uname")],
+            context["cs_path_info"],
+            "problemstate",
+            {},
+            **context["cs_logging_kwargs"]
         )
         context[_n("last_log")] = ll
     return handle_save(context)
@@ -438,7 +443,9 @@ def handle_view(context):
 
 def get_manual_grading_entry(context, name):
     uname = context["cs_user_info"].get("username", "None")
-    log = context["csm_cslog"].read_log(uname, context["cs_path_info"], "problemgrades")
+    log = context["csm_cslog"].read_log(
+        uname, context["cs_path_info"], "problemgrades", **context["cs_logging_kwargs"]
+    )
     out = None
     for i in log:
         if i["qname"] == name:
@@ -484,7 +491,11 @@ def handle_clearanswer(context):
     # update problemstate log
     uname = context[_n("uname")]
     context["csm_cslog"].overwrite_log(
-        uname, context["cs_path_info"], "problemstate", newstate
+        uname,
+        context["cs_path_info"],
+        "problemstate",
+        newstate,
+        **context["cs_logging_kwargs"]
     )
 
     # log submission in problemactions
@@ -551,7 +562,11 @@ def handle_viewexplanation(context, outdict=None, skip_empty=False):
     # update problemstate log
     uname = context[_n("uname")]
     context["csm_cslog"].overwrite_log(
-        uname, context["cs_path_info"], "problemstate", newstate
+        uname,
+        context["cs_path_info"],
+        "problemstate",
+        newstate,
+        **context["cs_logging_kwargs"]
     )
 
     # log submission in problemactions
@@ -609,7 +624,11 @@ def handle_viewanswer(context):
     # update problemstate log
     uname = context[_n("uname")]
     context["csm_cslog"].overwrite_log(
-        uname, context["cs_path_info"], "problemstate", newstate
+        uname,
+        context["cs_path_info"],
+        "problemstate",
+        newstate,
+        **context["cs_logging_kwargs"]
     )
 
     # log submission in problemactions
@@ -671,7 +690,11 @@ def handle_lock(context):
     # update problemstate log
     uname = context[_n("uname")]
     context["csm_cslog"].overwrite_log(
-        uname, context["cs_path_info"], "problemstate", newstate
+        uname,
+        context["cs_path_info"],
+        "problemstate",
+        newstate,
+        **context["cs_logging_kwargs"]
     )
 
     # log submission in problemactions
@@ -738,7 +761,11 @@ def handle_grade(context):
     uname = context[_n("uname")]
     for i in newentries:
         context["csm_cslog"].update_log(
-            uname, context["cs_path_info"], "problemgrades", i
+            uname,
+            context["cs_path_info"],
+            "problemgrades",
+            i,
+            **context["cs_logging_kwargs"]
         )
 
     # log submission in problemactions
@@ -777,7 +804,11 @@ def handle_unlock(context):
     # update problemstate log
     uname = context[_n("uname")]
     context["csm_cslog"].overwrite_log(
-        uname, context["cs_path_info"], "problemstate", newstate
+        uname,
+        context["cs_path_info"],
+        "problemstate",
+        newstate,
+        **context["cs_logging_kwargs"]
     )
 
     # log submission in problemactions
@@ -854,7 +885,11 @@ def handle_save(context):
     if len(saved_names) > 0:
         uname = context[_n("uname")]
         context["csm_cslog"].overwrite_log(
-            uname, context["cs_path_info"], "problemstate", newstate
+            uname,
+            context["cs_path_info"],
+            "problemstate",
+            newstate,
+            **context["cs_logging_kwargs"]
         )
 
         # log submission in problemactions
@@ -975,7 +1010,11 @@ def handle_check(context):
     # update problemstate log
     uname = context[_n("uname")]
     context["csm_cslog"].overwrite_log(
-        uname, context["cs_path_info"], "problemstate", newstate
+        uname,
+        context["cs_path_info"],
+        "problemstate",
+        newstate,
+        **context["cs_logging_kwargs"]
     )
 
     # log submission in problemactions
@@ -1187,7 +1226,11 @@ def handle_submit(context):
 
     # update problemstate log
     context["csm_cslog"].overwrite_log(
-        uname, context["cs_path_info"], "problemstate", newstate
+        uname,
+        context["cs_path_info"],
+        "problemstate",
+        newstate,
+        **context["cs_logging_kwargs"]
     )
 
     # log submission in problemactions
@@ -1527,7 +1570,11 @@ def log_action(context, log_entry):
     }
     entry.update(log_entry)
     context["csm_cslog"].update_log(
-        uname, context["cs_path_info"], "problemactions", entry
+        uname,
+        context["cs_path_info"],
+        "problemactions",
+        entry,
+        **context["cs_logging_kwargs"]
     )
 
 
@@ -1625,19 +1672,13 @@ def render_question(elt, context, lastsubmit, wrap=True):
     gmode = _get(args, "csq_grading_mode", "auto", str)
     message = context[_n("last_log")].get("cached_responses", {}).get(name, "")
     magic = context[_n("last_log")].get("checker_ids", {}).get(name, None)
+
     if magic is not None:
-        checker_loc = os.path.join(
-            context["cs_data_root"],
-            "_logs",
-            "_checker",
-            "results",
-            magic[0],
-            magic[1],
-            magic,
+        checker_entry = cslog.queue_get(
+            "checker", magic, **context["cs_logging_kwargs"]
         )
-        if os.path.isfile(checker_loc):
-            with open(checker_loc, "rb") as f:
-                result = context["csm_cslog"].unprep(f.read())
+        if checker_entry["status"] == "results":
+            result = checker_entry["data"]
             message = (
                 '\n<script type="text/javascript">'
                 "\n// @license magnet:?xt=urn:btih:0b31508aeb0634b347b8270c7bee4d411b5d4109&dn=agpl-3.0.txt AGPL-v3"
@@ -1923,7 +1964,11 @@ def pre_handle(context):
     # determine the right log name to look up, and grab the most recent entry
     loghead = "___".join(context["cs_path_info"][1:])
     ll = context["csm_cslog"].most_recent(
-        uname, context["cs_path_info"], "problemstate", {}
+        uname,
+        context["cs_path_info"],
+        "problemstate",
+        {},
+        **context["cs_logging_kwargs"]
     )
     _cs_group_path = context.get("cs_groups_to_use", context["cs_path_info"])
     context[_n("all_groups")] = context["csm_groups"].list_groups(
@@ -1960,60 +2005,19 @@ def pre_handle(context):
         names = context["cs_form"].get("names", "[]")
         context[_n("question_names")] = json.loads(names)
         context[_n("form")] = json.loads(context["cs_form"].get("data", "{}"))
-        if context["cs_upload_management"] == "file":
-            for name, value in context[_n("form")].items():
-                if name == "__names__":
-                    continue
-                if isinstance(value, list):
-                    data = csm_thirdparty.data_uri.DataURI(value[1]).data
-                    if context["csm_cslog"].ENCRYPT_KEY is not None:
-                        seed = (
-                            context["cs_path_info"][0]
-                            if context["cs_path_info"]
-                            else context["cs_path_info"]
-                        )
-                        _path = [
-                            context["csm_cslog"]._e(i, repr(seed))
-                            for i in context["cs_path_info"]
-                        ]
-                    else:
-                        _path = context["cs_path_info"]
-                    dir_ = os.path.join(
-                        context["cs_data_root"], "_logs", "_uploads", *_path
-                    )
-                    os.makedirs(dir_, exist_ok=True)
-                    value[0] = (
-                        value[0]
-                        .replace("<", "")
-                        .replace(">", "")
-                        .replace('"', "")
-                        .replace('"', "")
-                    )
-                    hstring = hashlib.sha256(data).hexdigest()
-                    info = {
-                        "filename": value[0],
-                        "username": context["cs_username"],
-                        "time": context["csm_time"].detailed_timestamp(
-                            context["cs_now"]
-                        ),
-                        "question": name,
-                        "hash": hstring,
-                    }
+        for name, value in context[_n("form")].items():
+            if name == "__names__":
+                continue
+            if isinstance(value, list):
 
-                    disk_fname = "_csfile.%s%s" % (uuid.uuid4().hex, hstring)
-                    dirname = os.path.join(dir_, disk_fname)
-                    os.makedirs(dirname, exist_ok=True)
-                    with open(os.path.join(dirname, "content"), "wb") as f:
-                        f.write(context["csm_cslog"].compress_encrypt(data))
-                    with open(os.path.join(dirname, "info"), "wb") as f:
-                        f.write(context["csm_cslog"].prep(info))
-                    value[1] = dirname
-        elif context["cs_upload_management"] == "db":
-            pass
-        else:
-            raise Exception(
-                "unknown upload management style: %r" % context["cs_upload_management"]
-            )
+                upload = cslog.prepare_upload(
+                    context["cs_username"],
+                    csm_thirdparty.data_uri.DataURI(value[1]).data,
+                    value[0],
+                )
+
+                cslog.store_upload(*upload, **context["cs_logging_kwargs"])
+                value[1] = upload[0]
 
 
 def _get_auto_view(context):
@@ -2159,7 +2163,11 @@ def _get_scores(context):
         for student in students:
             username = student.get("username", "None")
             log = context["csm_cslog"].most_recent(
-                username, context["cs_path_info"], "problemstate", {}
+                username,
+                context["cs_path_info"],
+                "problemstate",
+                {},
+                **context["cs_logging_kwargs"]
             )
             log = context["csm_tutor"].compute_page_stats(
                 context, username, context["cs_path_info"], ["state"]
@@ -2267,7 +2275,10 @@ def handle_stats(context):
 
 def _real_name(context, username):
     return (
-        context["csm_cslog"].most_recent("_extra_info", [], username, None) or {}
+        context["csm_cslog"].most_recent(
+            "_extra_info", [], username, None, **context["cs_logging_kwargs"]
+        )
+        or {}
     ).get("name", None)
 
 

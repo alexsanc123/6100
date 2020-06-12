@@ -64,7 +64,7 @@ Once you have activated the virtual environment, you can install CAT-SOOP by
 navigating to your clone of the repository and running:
 
 ```
-$ python3 setup.py develop
+$ make develop
 ```
 
 Once it has been installed, you should configure it:
@@ -171,7 +171,7 @@ Before sending your changes, please:
 
 1. Make sure that new features are documented/tested as described above.
 1. Run `black` on the entire codebase, and make sure that no files change.
-1. Run `python3 setup.py test` and make sure that all tests pass (including new
+1. Run `make test` and make sure that all tests pass (including new
     tests you've written).
 1. Add an appropriate entry to `CHANGELOG.md`, and, if you wish, add your name to
     the `CONTRIBUTORS.md` file.

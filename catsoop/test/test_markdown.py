@@ -87,11 +87,11 @@ class TestMarkdownMath(CATSOOPTest):
                 dmath(r"x = \text{something like $2$}"),
             ),
             (
-                "\\begin{align}\n  x & \\text{if $y$} \\\\\n  y & \\text{else}\n\end{align}",
+                "\\begin{align}\n  x & \\text{if $y$} \\\\\n  y & \\text{else}\n\\end{align}",
                 dmath("\nx & \\text{if $y$} \\\\\ny & \\text{else}\n", "align"),
             ),
             (
-                "\\begin{align*}\n  x & \\text{if $y$} \\\\\n  y & \\text{else}\n\end{align*}",
+                "\\begin{align*}\n  x & \\text{if $y$} \\\\\n  y & \\text{else}\n\\end{align*}",
                 dmath("\nx & \\text{if $y$} \\\\\ny & \\text{else}\n", "align*"),
             ),
         ]

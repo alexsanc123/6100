@@ -311,7 +311,13 @@ cs_user_config = {
 Special: user information data configuration flags (e.g. used for groups)
 """
 
-# Log Encryption
+# Log Options
+
+cs_log_storage_backend = "fs"
+"""
+Special: where should catsoop store its logs?  (`fs` for filesystem, `postgres`
+for PostgreSQL database)
+"""
 
 cs_log_compression = False
 """
@@ -324,18 +330,6 @@ Special: Boolean indicating whether log entries should be encrypted.
 """
 
 # File Upload Type
-
-cs_upload_management = "file"
-"""
-Special: defines how CAT-SOOP should handle file uploads.  Must be `'file'` or
-`'db'`.
-
-In `'file'` mode, CAT-SOOP will store the uploaded files on disk, under
-`<cs_data_root>/_logs/_uploads`.
-
-In `'db'` mode, CAT-SOOP will store the contents of the files directly in the
-CAT-SOOP logs.
-"""
 
 cs_python_intepreter = "python3"
 """

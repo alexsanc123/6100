@@ -8,33 +8,48 @@ _Work toward next release. Currently under development._
     `cs-show-if` and `cs-hide-if` attributes (#56 and #67)
 
 * Added support for showing line numbers next to code snippets by adding
-    `-lines` to the end of the language specified for a code block (#62 and #68)
+    `-lines` to the end of the language specified for a code block (#62 and
+    #68)
 
 * Added ability to avoid running children's preloads into `cs_children`, by
     setting `cs_load_children = False`
 
-* Added support for using LTI with Canvas.
+* Added support for using LTI with Canvas, and added support for customizing
+    the username inferred from LTI data, via `"lti_username_function"` in
+    `cs_lti_config`
+
+* Added support for PostgreSQL as an alternative backend for storing logs
 
 **CHANGED:**
 
 * Auto-generated `csq_name` fields increment for every question, even those
-    that have names specified.
+    that have names specified
 
-* Switched to  [mistletoe](https://github.com/miyuchina/mistletoe) for handling
-    Markdown (CommonMark) instead of Python-Markdown.
+* Switched to [mistletoe](https://github.com/miyuchina/mistletoe) for handling
+    Markdown (CommonMark) instead of Python-Markdown
 
-* Upgraded [highlight.js](https://highlightjs.org/) to version 10.0.2.
+* Upgraded [highlight.js](https://highlightjs.org/) to version 10.0.2
 
-* Some small changes to the way code is displayed, to improve readability.
+* Some small changes to the way code is displayed on catsoop pages, to improve
+    readability
+
+* Logging, upload management, and queue management are now unified within the
+    `cslog` module.
 
 **DEPRECATED:**
 
 **REMOVED:**
 
 * Removed slow/broken code for logging in via e-mail instead of username when
-    using the `login` auth type.
+    using the `login` auth type
+
+* `cs_upload_management` is no longer relevant, as uploads are now handled via
+    a standard interface in `cslog` (#79)
 
 * Custom authentication types can no longer be specified at the course level.
+
+* Removed the choice of where file uploads are stored (`cs_upload_management`
+    is no longer recognized)
 
 **FIXED:**
 

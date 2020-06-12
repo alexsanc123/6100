@@ -38,7 +38,7 @@ $ pip3 install catsoop
 
 Or, from a clone of the repository, run:
 ```nohighlight
-$ python3 setup.py install
+$ make install
 ```
 
 To generate a config.py file, run:
@@ -57,7 +57,7 @@ $ catsoop start
 
 To run all the unit tests:
 ```nohighlight
-$ python3 setup.py test
+$ make test
 ```
 
 

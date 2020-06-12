@@ -15,6 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+import html
 import json
 import base64
 import mimetypes
@@ -40,11 +41,10 @@ def handle_submission(submissions, **info):
     name = info["csq_name"]
     ll = submissions.get(name, None)
     if ll is not None:
-        fname, _ = ll
         if info["csq_extract_data"]:
-            submissions[name] = info["csm_loader"].get_file_data(
-                info, submissions, name
-            )
+            submissions[name] = info["csm_cslog"].retrieve_upload(
+                ll[1], **info["cs_logging_kwargs"]
+            )[1]
         o.update(base["handle_submission"](submissions, **info))
     return o
 
@@ -75,31 +75,13 @@ def render_html(last_log, **info):
     if ll is not None:
         try:
             fname, loc = ll
-            loc = os.path.basename(loc)
-            if info["csm_cslog"].ENCRYPT_KEY is not None:
-                seed = (
-                    info["cs_path_info"][0]
-                    if info["cs_path_info"]
-                    else info["cs_path_info"]
-                )
-                _path = [
-                    info["csm_cslog"]._e(i, repr(seed)) for i in info["cs_path_info"]
-                ]
-            else:
-                _path = info["cs_path_info"]
-            qstring = urlencode({"path": json.dumps(_path), "fname": loc})
-            safe_fname = (
-                fname.replace("<", "")
-                .replace(">", "")
-                .replace('"', "")
-                .replace("'", "")
-            )
+            qstring = urlencode({"id": loc})
             out += "<br/>"
             out += (
                 '<a href="%s/_util/get_upload?%s" '
                 'download="%s">Download Most '
                 "Recent Submission</a>"
-            ) % (info["cs_url_root"], qstring, safe_fname)
+            ) % (info["cs_url_root"], qstring, html.escape(fname))
         except:
             pass
     return out

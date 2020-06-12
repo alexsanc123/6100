@@ -25,20 +25,11 @@ import threading
 
 from collections import defaultdict
 
-CATSOOP_LOC = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-if CATSOOP_LOC not in sys.path:
-    sys.path.append(CATSOOP_LOC)
-
-from catsoop.cslog import unprep
 import catsoop.base_context as base_context
+import catsoop.cslog as cslog
 import websockets
 
 DEBUG = True
-
-CHECKER_DB_LOC = os.path.join(base_context.cs_data_root, "_logs", "_checker")
-RUNNING = os.path.join(CHECKER_DB_LOC, "running")
-QUEUED = os.path.join(CHECKER_DB_LOC, "queued")
-RESULTS = os.path.join(CHECKER_DB_LOC, "results")
 
 CURRENT = {"queued": [], "running": set()}
 
@@ -49,24 +40,13 @@ WSLOGGER = logging.getLogger("websockets.server")
 WSLOGGER.setLevel(LOGGER.level)
 WSLOGGER.addHandler(logging.StreamHandler())
 
+LOGGING_KWARGS = cslog.setup_kwargs()
+
 
 def log(msg):
     dt = datetime.datetime.now()
     omsg = "[reporter:%s]: %s" % (dt, msg)
     LOGGER.info(omsg)
-
-
-def get_status(magic):
-    try:
-        s = CURRENT["queued"].index(magic) + 1
-    except:
-        if magic in CURRENT["running"]:
-            s = "running"
-        elif os.path.isfile(os.path.join(RESULTS, magic[0], magic[1], magic)):
-            s = "results"
-        else:
-            return
-    return s
 
 
 async def reporter(websocket, path):
@@ -96,13 +76,20 @@ async def reporter(websocket, path):
 
         # get our current status
         status = None
+        results = None
         try:
             status = CURRENT["queued"].index(magic) + 1
         except:
             if magic in CURRENT["running"]:
                 status = "running"
-            elif os.path.isfile(os.path.join(RESULTS, magic[0], magic[1], magic)):
-                status = "results"
+            else:
+                # try:
+                res = cslog.queue_get("checker", magic, **LOGGING_KWARGS)
+                if res["status"] == "results":
+                    status = "results"
+                    results = res["data"]
+                # except:
+                #    pass
 
         # if our status hasn't changed, or if we don't know yet, don't send
         # anything; just keep waiting.
@@ -115,16 +102,12 @@ async def reporter(websocket, path):
             msg = {"type": "inqueue", "position": status}
         elif status == "running":
             try:
-                start = os.stat(os.path.join(RUNNING, magic)).st_ctime
+                start = CURRENT["running"]["magic"]["updated"]
             except:
                 start = time.time()
             msg = {"type": "running", "started": start, "now": time.time()}
         elif status == "results":
-            try:
-                with open(os.path.join(RESULTS, magic[0], magic[1], magic), "rb") as f:
-                    m = unprep(f.read())
-            except:
-                return
+            m = results
             sb = m.get("score_box", "?")
             r = m.get("response", "?")
             msg = {"type": "newresult", "score_box": sb, "response": r}
@@ -142,8 +125,13 @@ async def reporter(websocket, path):
 
 
 def updater():
-    CURRENT["queued"] = [i.split("_")[1] for i in sorted(os.listdir(QUEUED))]
-    CURRENT["running"] = {i.name for i in os.scandir(RUNNING)}
+    CURRENT["queued"] = [
+        i["id"] for i in cslog.queue_all_entries("checker", "queued", **LOGGING_KWARGS)
+    ]
+    CURRENT["running"] = {
+        i["id"]: i
+        for i in cslog.queue_all_entries("checker", "running", **LOGGING_KWARGS)
+    }
     crun = CURRENT["running"]
     if DEBUG and crun:
         log("updater queued=%s" % crun)

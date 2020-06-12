@@ -23,9 +23,9 @@ import cgi
 import logging
 import unittest
 
-from catsoop import loader
-from catsoop import dispatch
-from catsoop import lti
+from .. import loader
+from .. import dispatch
+from .. import lti
 
 from ..test import CATSOOPTest
 

@@ -17,37 +17,24 @@
 import json
 import mimetypes
 
-path = cs_form.get("path", None)
-fname = cs_form.get("fname", None)
-
+id_ = cs_form.get("id", None)
 cs_handler = "raw_response"
 
 error = None
-if path is None or fname is None:
-    error = "Please specify a path and a filename"
+if id_ is None:
+    error = "Please specify an upload ID"
 
 if error is None:
     try:
-        fname = os.path.basename(fname)
-        path = json.loads(path)
+        info, response = cslog.retrieve_upload(id_)
     except:
-        error = "Could not interpret path and/or filename."
+        error = "Could not retrieve upload %r" % id_
 
 if error is None:
-    # try:
-    upload_dir = os.path.realpath(os.path.join(cs_data_root, "_logs", "_uploads"))
-    loc = os.path.realpath(os.path.join(upload_dir, *path, fname))
-    assert loc.startswith(upload_dir)
-    with open(os.path.join(loc, "info"), "rb") as f:
-        content_type = (
-            mimetypes.guess_type(csm_cslog.unprep(f.read())["filename"])[0]
-            or "text/plain"
-        )
-    with open(os.path.join(loc, "content"), "rb") as f:
-        response = csm_cslog.decompress_decrypt(f.read())
-
-# except:
-#    error = 'There was an error retrieving the file.'
+    try:
+        content_type = mimetypes.guess_type(info["filename"])[0] or "text/plain"
+    except:
+        error = "Could not determine appropriate MIME type"
 
 if error is not None:
     response = error

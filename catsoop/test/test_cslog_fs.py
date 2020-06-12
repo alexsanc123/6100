@@ -13,28 +13,27 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"""
+Small suite of tests for cslog using the filesystem
+"""
 
 import os
 import shutil
 
-# -----------------------------------------------------------------------------
+from .. import loader
+from ..test import CATSOOPTest
+from .test_cslog import CSLogBackend
+
+from ..cslog import fs as cslog_fs
 
 
-def setup_data_dir():
-    mydir = os.path.dirname(__file__)
-    test_course_dir = os.path.join(os.path.dirname(mydir), "__TEST_COURSE__")
-    tdir = "/tmp/catsoop_test"
-    shutil.rmtree(tdir, ignore_errors=True)
-    cdir = os.path.join(tdir, "courses")
-    os.makedirs(cdir, exist_ok=True)
+class TestFS(CATSOOPTest, CSLogBackend):
+    def setUp(self,):
+        CATSOOPTest.setUp(self)
 
-    tcdir = os.path.join(cdir, "test_course")
-    if not os.path.exists(tcdir):
-        os.symlink(test_course_dir, tcdir)
-    os.environ["CATSOOP_DATA_DIR"] = tdir
-    os.environ["CATSOOP_CONFIG"] = os.path.join(mydir, "test_config.py")
-    print("setup cs_data_dir -> %s" % os.environ["CATSOOP_DATA_DIR"])
-    print("setup cs config -> %s" % os.environ["CATSOOP_CONFIG"])
+        context = {}
+        loader.load_global_data(context)
+        self.cslog = cslog_fs
 
-
-setup_data_dir()
+        _logs_dir = os.path.join(context["cs_data_root"], "_logs")
+        shutil.rmtree(_logs_dir, ignore_errors=True)  # start with fresh logs each time

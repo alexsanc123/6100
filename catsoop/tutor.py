@@ -21,7 +21,7 @@ import os
 import random
 import string
 import importlib
-import collections
+import collections.abc
 
 from datetime import timedelta
 from collections import OrderedDict
@@ -39,7 +39,7 @@ _nodoc = {"timedelta", "OrderedDict"}
 
 def _get(context, key, default, cast=lambda x: x):
     v = context.get(key, default)
-    return cast(v(context) if isinstance(v, collections.Callable) else v)
+    return cast(v(context) if isinstance(v, collections.abc.Callable) else v)
 
 
 def get_manual_grading_entry(context, name):
@@ -68,7 +68,9 @@ def get_manual_grading_entry(context, name):
 
     """
     uname = context["cs_user_info"].get("username", "None")
-    log = context["csm_cslog"].read_log(uname, context["cs_path_info"], "problemgrades")
+    log = context["csm_cslog"].read_log(
+        uname, context["cs_path_info"], "problemgrades", **context["cs_logging_kwargs"]
+    )
     out = None
     for i in log:
         if i["qname"] == name:
@@ -252,15 +254,27 @@ def compute_page_stats(context, user, path, keys=None):
     out = {}
     if "state" in keys:
         keys.remove("state")
-        out["state"] = logging.most_recent(user, path, "problemstate", {})
+        out["state"] = logging.most_recent(
+            user, path, "problemstate", {}, **context["cs_logging_kwargs"]
+        )
     if "actions" in keys:
         keys.remove("actions")
-        out["actions"] = logging.read_log(user, path, "problemactions")
+        out["actions"] = logging.read_log(
+            user, path, "problemactions", **context["cs_logging_kwargs"]
+        )
     if "manual_grades" in keys:
         keys.remove("manual_grades")
-        out["manual_grades"] = logging.read_log(user, path, "problemgrades")
+        out["manual_grades"] = logging.read_log(
+            user, path, "problemgrades", **context["cs_logging_kwargs"]
+        )
     if "question_info" in keys and "context" not in keys:
-        qi_log = logging.most_recent("_question_info", path, "question_info", None)
+        qi_log = logging.most_recent(
+            "_question_info",
+            path,
+            "question_info",
+            None,
+            **context["cs_logging_kwargs"]
+        )
         if qi_log is not None:
             keys.remove("question_info")
             out["question_info"] = qi_log["questions"]
@@ -581,12 +595,20 @@ def _get_random_seed(context, n=100, force_new=False):
         stored = None
     else:
         stored = context["csm_cslog"].most_recent(
-            uname, context["cs_path_info"], "random_seed", None
+            uname,
+            context["cs_path_info"],
+            "random_seed",
+            None,
+            **context["cs_logging_kwargs"]
         )
     if stored is None:
         stored = _new_random_seed(n)
         context["csm_cslog"].update_log(
-            uname, context["cs_path_info"], "random_seed", stored
+            uname,
+            context["cs_path_info"],
+            "random_seed",
+            stored,
+            **context["cs_logging_kwargs"]
         )
     return stored
 

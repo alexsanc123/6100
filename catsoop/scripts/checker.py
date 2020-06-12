@@ -27,10 +27,6 @@ import multiprocessing
 
 from datetime import datetime
 
-CATSOOP_LOC = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-if CATSOOP_LOC not in sys.path:
-    sys.path.append(CATSOOP_LOC)
-
 import catsoop.base_context as base_context
 import catsoop.lti as lti
 import catsoop.auth as auth
@@ -41,17 +37,18 @@ import catsoop.dispatch as dispatch
 
 from catsoop.process import set_pdeathsig
 
-CHECKER_DB_LOC = os.path.join(base_context.cs_data_root, "_logs", "_checker")
-RUNNING = os.path.join(CHECKER_DB_LOC, "running")
-QUEUED = os.path.join(CHECKER_DB_LOC, "queued")
-RESULTS = os.path.join(CHECKER_DB_LOC, "results")
-STAGING = os.path.join(CHECKER_DB_LOC, "staging")
-
 REAL_TIMEOUT = base_context.cs_checker_global_timeout
 
 DEBUG = True
 
 LOGGER = logging.getLogger("cs")
+
+CHECKER = "checker"
+QUEUED = "queued"
+RUNNING = "running"
+RESULTS = "results"
+
+PROBLEMSTATE_QUEUE = multiprocessing.Queue
 
 
 def log(msg):
@@ -78,6 +75,7 @@ def do_check(row):
     set_pdeathsig()()  # but make it die if the parent dies.  will this work?
 
     context = loader.generate_context(row["path"])
+    context["cs_logging_kwargs"] = cslog.setup_kwargs()
     context["cs_course"] = row["path"][0]
     context["cs_path_info"] = row["path"]
     context["cs_username"] = row["username"]
@@ -188,39 +186,17 @@ def do_check(row):
         row["response"] = language.handle_custom_tags(context, msg)
         row["extra_data"] = extra
 
-        # make temporary file to write results to
-        magic = row["magic"]
-        temploc = os.path.join(STAGING, "results.%s" % magic)
-        with open(temploc, "wb") as f:
-            f.write(context["csm_cslog"].prep(row))
-        # move that file to results, close the handle to it.
-        newloc = os.path.join(RESULTS, magic[0], magic[1], magic)
-        os.makedirs(os.path.dirname(newloc), exist_ok=True)
-        shutil.move(temploc, newloc)
-        try:
-            os.close(_)
-        except:
-            pass
-        # then remove from running
-        os.unlink(os.path.join(RUNNING, row["magic"]))
-        # finally, update the appropriate log
-        cm = context["csm_cslog"].log_lock(
-            [row["username"], *row["path"], "problemstate"]
-        )
-        with cm as lock:
-            x = context["csm_cslog"].most_recent(
-                row["username"], row["path"], "problemstate", {}, lock=False
-            )
+        # store the results
+        cslog.queue_update(CHECKER, row["id"], row, RESULTS)
+
+        # now update the log appropriately
+        def log_mutator(x):
             if row["action"] == "submit":
                 x.setdefault("scores", {})[name] = row["score"]
             x.setdefault("score_displays", {})[name] = row["score_box"]
             x.setdefault("cached_responses", {})[name] = row["response"]
             x.setdefault("extra_data", {})[name] = row["extra_data"]
-            context["csm_cslog"].overwrite_log(
-                row["username"], row["path"], "problemstate", x, lock=False
-            )
 
-            # update LTI tool consumer with new aggregate score
             if have_lti and lti_handler.have_data and row["action"] == "submit":
                 aggregate_score = 0
                 cnt = 0
@@ -261,15 +237,32 @@ def do_check(row):
                             % str(err)
                         )
                         LOGGER.error("[checker] traceback=%s" % traceback.format_exc())
+            return x
 
+        cslog.modify_most_recent(
+            row["username"],
+            row["path"],
+            "problemstate",
+            default={},
+            transform_func=log_mutator,
+            method="overwrite",
+        )
+    cslog.teardown_kwargs(context["cs_logging_kwargs"])
+
+
+LOGGING_KWARGS = cslog.setup_kwargs()
 
 running = []
 
-# if anything is in the "running" dir when we start, that's an error.  turn
-# those back to queued to force them to run again (put them at the front of the
-# queue).
-for f in os.listdir(RUNNING):
-    shutil.move(os.path.join(RUNNING, f), os.path.join(QUEUED, "0_%s" % f))
+# if anything is in the "running" dir when we start, and it's owned by us,
+# that's an error.  turn those back to queued to force them to run again (put
+# them at the front of the queue).
+for entry in cslog.queue_all_entries(CHECKER, RUNNING, **LOGGING_KWARGS):
+    if entry["worker"] == cslog.WORKER_ID:
+        cslog.queue_update(
+            CHECKER, entry["id"], entry["data"], QUEUED, **LOGGING_KWARGS
+        )
+
 
 # and now actually start running
 if DEBUG:
@@ -285,30 +278,32 @@ while True:
         nrunning = len(running)
         log("have %d running (%s)" % (nrunning, running))
     for i in range(len(running)):
-        id_, row, p = running[i]
+        p = running[i]
         if not p.is_alive():
             log("    Process %s is dead" % p)
             if p.exitcode != 0:
-                row["score"] = 0.0
-                row["score_box"] = ""
+                p._entry["data"]["score"] = 0.0
+                p._entry["data"]["score_box"] = ""
                 if p.exitcode < 0:  # this probably only happens if we killed it
-                    row["response"] = (
+                    p._entry["data"]["response"] = (
                         "<font color='red'><b>Your submission could not be checked "
                         "because the checker ran for too long.</b></font>"
                     )
                 else:  # a python error or similar
-                    row["response"] = (
+                    p._entry["data"]["response"] = (
                         "<font color='red'><b>An unknown error occurred when "
                         "processing your submission</b></font>"
                     )
-                magic = row["magic"]
-                newloc = os.path.join(RESULTS, magic[0], magic[1], magic)
-                with open(newloc, "wb") as f:
-                    f.write(cslog.prep(row))
-                # then remove from running
-                os.unlink(os.path.join(RUNNING, row["magic"]))
+                cslog.queue_update(
+                    CHECKER,
+                    p._entry["data"]["id"],
+                    p._entry["data"],
+                    RESULTS,
+                    **LOGGING_KWARGS
+                )
             dead.add(i)
         elif time.time() - p._started > REAL_TIMEOUT:
+            # kill this now, next pass through the loop will clean it up
             try:
                 os.killpg(os.getpgid(p.pid), signal.SIGKILL)
             except:
@@ -320,32 +315,15 @@ while True:
 
     if base_context.cs_checker_parallel_checks - len(running) > 0:
         # otherwise, add an entry to running.
-        waiting = sorted(os.listdir(QUEUED))
-        if waiting:
-            # grab the first thing off the queue, move it to the "running" dir
-            first = waiting[0]
-            qfn = os.path.join(QUEUED, first)
-            with open(qfn, "rb") as f:
-                try:
-                    row = cslog.unprep(f.read())
-                except Exception as err:
-                    LOGGER.error(
-                        "[checker] failed to read queue log file %s, error=%s, traceback=%s"
-                        % (qfn, err, traceback.format_exc())
-                    )
-                    continue
-            _, magic = first.split("_")
-            row["magic"] = magic
-            shutil.move(os.path.join(QUEUED, first), os.path.join(RUNNING, magic))
-            log("Moving from queued to  running: %s " % first)
-
-            # start a worker for it
-            log("Starting checker with row=%s" % row)
-            p = multiprocessing.Process(target=do_check, args=(row,))
-            running.append((magic, row, p))
+        new_entry = cslog.queue_pop(CHECKER, QUEUED, RUNNING, **LOGGING_KWARGS)
+        if new_entry is not None:
+            new_entry["data"]["id"] = new_entry["id"]
+            log("Starting checker with row=%s" % new_entry["data"])
+            p = multiprocessing.Process(target=do_check, args=(new_entry["data"],))
+            running.append(p)
             p.start()
             p._started = time.time()
-            p._entry = row
+            p._entry = new_entry
             log("Process pid = %s" % p.pid)
 
     time.sleep(0.1)

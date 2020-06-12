@@ -1,11 +1,13 @@
 import sys
 import logging
-import catsoop
-import catsoop.loader as loader
-import catsoop.base_context as base_context
-from catsoop.check import evaled
+
+from .. import check
+from .. import loader
+from .. import base_context
 
 from ..test import CATSOOPTest
+
+evaled = check.evaled
 
 LOGGER = logging.getLogger("cs")
 
@@ -19,7 +21,7 @@ def gd_test(submission, solution):
         submission = submission.get("result")
     if isinstance(solution, dict):
         solution = solution.get("result")
-    print("submission=%s, solution=%s" % (submission, solution))
+    # print("submission=%s, solution=%s" % (submission, solution))
     return submission == solution
 
 
@@ -111,7 +113,7 @@ class Test_Pythoncode(CATSOOPTest):
         info = self.info
         form = {csq_name: test_good_sgd_function}
         ret = csq["handle_submission"](form, **info)
-        print("ret=", ret)
+        # print("ret=", ret)
 
         assert "Our solution did not produce a value for" not in str(ret)
         assert "FILE_CHECK_IMAGE" in str(ret)

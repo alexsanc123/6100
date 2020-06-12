@@ -16,6 +16,7 @@
 
 import os
 import ast
+import html
 import json
 import logging
 import traceback
@@ -156,15 +157,27 @@ def total_test_points(**info):
 checktext = "Run Code"
 
 
-def handle_check(submissions, **info):
+def get_code(sub, info):
     try:
-        code = info["csm_loader"].get_file_data(info, submissions, info["csq_name"])
-        code = code.decode().replace("\r\n", "\n")
+        try:
+            code = info["csm_cslog"].retrieve_upload(
+                sub[1], **info["cs_logging_kwargs"]
+            )[1]
+            code = code.decode("utf-8")
+        except:
+            code = sub
+        return code.replace("\r\n", "\n")
     except:
         return {
             "score": 0,
             "msg": '<div class="bs-callout bs-callout-danger"><span class="text-danger"><b>Error:</b> Unable to decode the specified file.  Is this the file you intended to upload?</span></div>',
         }
+
+
+def handle_check(submissions, **info):
+    code = get_code(submissions[info["csq_name"]], info)
+    if not isinstance(code, str):
+        return code
 
     code = "\n\n".join(["import os\nos.unlink(__file__)", info["csq_code_pre"], code])
 
@@ -220,18 +233,9 @@ def handle_check(submissions, **info):
 
 
 def handle_submission(submissions, **info):
-    try:
-        code = info["csm_loader"].get_file_data(info, submissions, info["csq_name"])
-        code = code.decode().replace("\r\n", "\n")
-    except Exception as err:
-        LOGGER.warn(
-            "[pythoncode] handle_submission error '%s', traceback=%s"
-            % (err, traceback.format_exc())
-        )
-        return {
-            "score": 0,
-            "msg": '<div class="bs-callout bs-callout-danger"><span class="text-danger"><b>Error:</b> Unable to decode the specified file.  Is this the file you intended to upload?</span></div>',
-        }
+    code = get_code(submissions[info["csq_name"]], info)
+    if not isinstance(code, str):
+        return code
     if info["csq_use_simple_checker"]:
         if info["csq_result_as_string"]:
             default_checker = _default_string_check_function
@@ -560,19 +564,13 @@ def render_html_upload(last_log, **info):
                 ]
             else:
                 _path = info["cs_path_info"]
-            qstring = urlencode({"path": json.dumps(_path), "fname": loc})
+            qstring = urlencode({"id": loc})
             out += "<br/>"
-            safe_fname = (
-                fname.replace("<", "")
-                .replace(">", "")
-                .replace('"', "")
-                .replace("'", "")
-            )
             out += (
                 '<a href="%s/_util/get_upload?%s" '
                 'download="%s">Download Most '
                 "Recent Submission</a><br/>"
-            ) % (info["cs_url_root"], qstring, safe_fname)
+            ) % (info["cs_url_root"], qstring, html.escape(fname))
         except:
             pass
     out += (
