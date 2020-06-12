@@ -34,6 +34,7 @@ import pickle
 import shutil
 import struct
 import hashlib
+import contextlib
 
 from collections import OrderedDict
 from datetime import datetime, timedelta
@@ -51,6 +52,11 @@ from . import (
     hash_db_info,
     WORKER_ID,
 )
+
+
+@contextlib.contextmanager
+def passthrough():
+    yield
 
 
 def setup_kwargs():
@@ -289,11 +295,14 @@ def retrieve_upload(id_):
     dir_ = os.path.join(
         base_context.cs_data_root, "_logs", "_uploads", id_[0], id_[1], id_
     )
-    with open(os.path.join(dir_, "info"), "rb") as f:
-        info = unprep(f.read())
-    with open(os.path.join(dir_, "content"), "rb") as f:
-        data = decompress_decrypt(f.read())
-    return info, data
+    try:
+        with open(os.path.join(dir_, "info"), "rb") as f:
+            info = unprep(f.read())
+        with open(os.path.join(dir_, "content"), "rb") as f:
+            data = decompress_decrypt(f.read())
+        return info, data
+    except FileNotFoundError:
+        return None
 
 
 def _queue_location(queuename):

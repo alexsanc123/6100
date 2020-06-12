@@ -36,13 +36,11 @@ import pickle
 import struct
 import hashlib
 import importlib
-import contextlib
 
 from collections import OrderedDict
 from datetime import datetime, timedelta
 
 _nodoc = {
-    "passthrough",
     "FileLock",
     "SEP_CHARS",
     "get_separator",
@@ -65,11 +63,6 @@ _nodoc = {
     "sep",
     "unprep",
 }
-
-
-@contextlib.contextmanager
-def passthrough():
-    yield
 
 
 from .. import time

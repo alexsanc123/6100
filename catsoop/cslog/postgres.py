@@ -71,7 +71,7 @@ def read_log(db_name, path, logname, connection=None):
     with conn:
         with conn.cursor() as c:
             c.execute(
-                "SELECT data FROM logs WHERE db_name=%s AND path=%s AND logname=%s ORDER BY created ASC",
+                "SELECT data FROM logs WHERE db_name=%s AND path=%s AND logname=%s ORDER BY updated ASC",
                 (db_name, "/".join(path), logname),
             )
             res = c.fetchall()
@@ -220,8 +220,8 @@ def clear_old_logs(db_name, path, age, connection=None):
     with conn:
         with conn.cursor() as c:
             c.execute(
-                "DELETE FROM logs WHERE updated < %s",
-                (datetime.now() - timedelta(seconds=age),),
+                "DELETE FROM logs WHERE db_name=%s AND path=%s AND updated < %s",
+                (db_name, "/".join(path), datetime.now() - timedelta(seconds=age),),
             )
     if connection is None:
         conn.close()
@@ -262,10 +262,12 @@ def retrieve_upload(upload_id, connection=None):
     with conn:
         with conn.cursor() as c:
             c.execute("SELECT info,content FROM uploads WHERE id=%s", (upload_id,))
-            info, content = c.fetchone()
+            result = c.fetchone()
     if connection is None:
         conn.close()
-    return unprep(bytes(info)), decompress_decrypt(bytes(content))
+    if result is None:
+        return None
+    return unprep(bytes(result[0])), decompress_decrypt(bytes(result[1]))
 
 
 def queue_push(queuename, initial_status, data, connection=None):

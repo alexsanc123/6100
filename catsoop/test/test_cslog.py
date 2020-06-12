@@ -18,12 +18,13 @@ Small suite of tests for cslog using the filesystem
 """
 
 import os
-import glob
-import shutil
 import math
 import time
+import glob
 import pickle
 import random
+import shutil
+import hashlib
 import unittest
 import subprocess
 import multiprocessing
@@ -32,12 +33,99 @@ from .. import base_context
 from .. import loader
 from ..test import CATSOOPTest
 
+from .. import cslog as cslog_base
+
 from ..cslog import fs as cslog_fs
 
 # -----------------------------------------------------------------------------
 
 
 class _Base:
+    def test_logging_basic_ops(self):
+        user = "testuser"
+        path1 = ["test_subject", "some", "page"]
+        name = "problemstate"
+        self.cslog.update_log(user, path1, name, "HEY")
+        self.assertEqual(self.cslog.most_recent(user, path1, name, {}), "HEY")
+
+        self.cslog.update_log(user, path1, name, "HELLO")
+        self.assertEqual(self.cslog.read_log(user, path1, name), ["HEY", "HELLO"])
+
+        for i in range(50):
+            self.cslog.update_log(user, path1, name, i)
+
+        self.assertEqual(
+            self.cslog.read_log(user, path1, name), ["HEY", "HELLO"] + list(range(50))
+        )
+        self.assertEqual(self.cslog.most_recent(user, path1, name), 49)
+
+        self.cslog.overwrite_log(user, path1, name, 42)
+        self.assertEqual(self.cslog.read_log(user, path1, name), [42])
+
+        self.cslog.modify_most_recent(user, path1, name, transform_func=lambda x: x + 9)
+        self.assertEqual(self.cslog.read_log(user, path1, name), [42, 51])
+
+        self.cslog.modify_most_recent(user, path1, name, transform_func=lambda x: x + 8)
+        self.assertEqual(self.cslog.read_log(user, path1, name), [42, 51, 59])
+
+        self.cslog.modify_most_recent(
+            user, path1, name, transform_func=lambda x: x + 7, method="overwrite"
+        )
+        self.assertEqual(self.cslog.most_recent(user, path1, name), 66)
+        self.assertTrue(len(self.cslog.read_log(user, path1, name)) < 4)
+
+        path2 = ["test_subject", "some", "page2"]
+
+        def _transform(x):
+            x["cat"] = "miau"
+            return x
+
+        self.cslog.modify_most_recent(
+            user, path2, name, transform_func=_transform, default={}
+        )
+        self.assertEqual(self.cslog.most_recent(user, path2, name), {"cat": "miau"})
+
+        # we'll leave it up to the logging backend whether they delete the
+        # _whole_ log if it hasn't been updated since the given time, or
+        # whether they only delete the old entries.
+        #
+        # because of this, this test is lame, as it tests only the (lame)
+        # guarantee we should have: that if _all_ entreis in a log are old
+        # enough, then the whole log should be deleted.
+        path3 = ["test_subject", "some", "page3"]
+        names = "test1", "test2", "test3"
+        for n in names:
+            for i in range(3):
+                self.cslog.update_log(user, path3, n, i)
+            self.assertEqual(self.cslog.read_log(user, path3, n), list(range(3)))
+
+        time.sleep(1)
+        self.cslog.clear_old_logs(user, path3, 1)
+        for n in names:
+            self.assertEqual(self.cslog.read_log(user, path3, n), [])
+
+    def test_logging_stress(self):
+        pass
+
+    def test_logging_uploads(self):
+        content = "hello 🐈".encode("utf-8")
+        h = hashlib.sha256(content).hexdigest()
+        id_, info, data = cslog_base.prepare_upload("testuser", content, "cat.txt")
+        self.cslog.store_upload(id_, info, data)
+
+        ret_info, ret_data = self.cslog.retrieve_upload(id_)
+        self.assertEqual(ret_info, self.cslog.unprep(info))
+        self.assertEqual(ret_data, content)
+
+        self.assertEqual(self.cslog.retrieve_upload(id_[::-1]), None)
+
+    def test_logging_encryption(self):
+        # TODO: write this.
+        # this will need to be overridden for each subclass, since the
+        # specifics of the encryption are going to depend on the details of how
+        # things are stored (though there will be some things in common)
+        assert False
+
     def test_queue_ops(self):
         # add a couple of queue entries
         vals = [4, 8, 15, 16, 23, 42]
