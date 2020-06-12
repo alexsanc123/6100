@@ -22,7 +22,7 @@ import shutil
 
 from .. import loader
 from ..test import CATSOOPTest
-from .test_cslog import CSLogBase
+from .test_cslog_backends import CSLogBase
 
 from ..cslog import fs as cslog_fs
 

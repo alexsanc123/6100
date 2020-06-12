@@ -24,7 +24,7 @@ import subprocess
 from .. import loader
 from .. import base_context
 from ..test import CATSOOPTest
-from .test_cslog import CSLogBase
+from .test_cslog_backends import CSLogBase
 
 initdb = shutil.which("initdb")
 postgres = shutil.which("postgres")
