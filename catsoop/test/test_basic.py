@@ -21,8 +21,8 @@ Requires config to be setup, including cs_unit_test_course
 
 import unittest
 
-from catsoop import loader
-from catsoop import dispatch
+from .. import loader
+from .. import dispatch
 
 from ..test import CATSOOPTest
 

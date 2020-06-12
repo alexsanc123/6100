@@ -1,11 +1,13 @@
 import sys
 import logging
-import catsoop
-import catsoop.loader as loader
-import catsoop.base_context as base_context
-from catsoop.check import evaled
+
+from .. import check
+from .. import loader
+from .. import base_context
 
 from ..test import CATSOOPTest
+
+evaled = check.evaled
 
 LOGGER = logging.getLogger("cs")
 
