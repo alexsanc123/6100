@@ -24,7 +24,7 @@ import subprocess
 from .. import loader
 from .. import base_context
 from ..test import CATSOOPTest
-from .test_cslog_backends import CSLogBase
+from .test_cslog import CSLogBackend
 
 initdb = shutil.which("initdb")
 postgres = shutil.which("postgres")
@@ -48,7 +48,7 @@ except:
     "skipping PostgreSQL tests: cannot create dummy database for testing",
 )
 @unittest.skipIf(psycopg2 is None, "skipping PostgreSQL tests: please install psycopg2")
-class Test_cslog_postgres(CATSOOPTest, CSLogBase):
+class TestPostgres(CATSOOPTest, CSLogBackend):
     db_loc = "/tmp/catsoop_psql"
     port = 60037
 

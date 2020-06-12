@@ -37,7 +37,7 @@ from .. import cslog as cslog_base
 # -----------------------------------------------------------------------------
 
 
-class CSLogBase:
+class CSLogBackend:
     def test_logging_basic_ops(self):
         user = "testuser"
         path1 = ["test_subject", "some", "page"]
@@ -369,7 +369,7 @@ class CSLogBase:
             with open("/tmp/catsoop_test_%s" % n, "wb") as f:
                 pickle.dump(out, f)
 
-        for i in range(200):
+        for i in range(100):
             p = multiprocessing.Process(target=update, args=(i, ids))
             p.start()
             procs.append(p)
@@ -378,7 +378,7 @@ class CSLogBase:
             p.join()
 
         allids = set()
-        for i in range(200):
+        for i in range(100):
             with open("/tmp/catsoop_test_%s" % i, "rb") as f:
                 new = pickle.load(f)
                 self.assertEqual(len(new), 100)

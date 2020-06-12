@@ -22,12 +22,12 @@ import shutil
 
 from .. import loader
 from ..test import CATSOOPTest
-from .test_cslog_backends import CSLogBase
+from .test_cslog import CSLogBackend
 
 from ..cslog import fs as cslog_fs
 
 
-class Test_cslog_fs(CATSOOPTest, CSLogBase):
+class TestFS(CATSOOPTest, CSLogBackend):
     def setUp(self,):
         CATSOOPTest.setUp(self)
 
