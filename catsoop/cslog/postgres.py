@@ -170,12 +170,13 @@ def overwrite_log(db_name, path, logname, new, connection=None):
     with conn:
         with conn.cursor() as c:
             c.execute(
-                "DELETE FROM logs WHERE id IN (SELECT id FROM logs WHERE db_name=%s AND path=%s AND logname=%s FOR UPDATE)",
-                (db_name, "/".join(path), logname),
-            )
-            c.execute(
-                "INSERT INTO logs (db_name, path, logname, updated, data) VALUES(%s, %s, %s, NOW(), %s)",
+                "INSERT INTO logs (db_name, path, logname, updated, data) VALUES(%s, %s, %s, NOW(), %s) RETURNING *",
                 (db_name, "/".join(path), logname, prep(new)),
+            )
+            id_ = c.fetchone()[0]
+            c.execute(
+                "DELETE FROM logs WHERE id IN (SELECT id FROM logs WHERE db_name=%s AND path=%s AND logname=%s AND id!=%s FOR UPDATE)",
+                (db_name, "/".join(path), logname, id_),
             )
     if connection is None:
         conn.close()
