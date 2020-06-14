@@ -434,14 +434,14 @@ def configure_production():
     # Web Stuff
     cs_url_root = ask(
         QUESTION("What is the root public-facing URL associated with this instance?"),
-        default="http://localhost:6010",
+        default="http://localhost:7667",
         transform=lambda x: x.rstrip("/"),
     )
     cs_checker_websocket = ask(
         QUESTION(
             "What is the public-facing URL associated with the checker's websocket connection?"
         ),
-        default="ws://localhost:6011",
+        default="ws://localhost:7668",
         transform=lambda x: x.rstrip("/"),
     )
 

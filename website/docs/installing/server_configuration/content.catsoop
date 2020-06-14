@@ -18,8 +18,8 @@ To start, double-check the following values in `config.py`:
 For example:
 
 ```
-cs_url_root = 'http://localhost:6010'
-cs_checker_websocket = 'ws://localhost:6011'
+cs_url_root = 'http://localhost:7667'
+cs_checker_websocket = 'ws://localhost:7668'
 ```
 
 Typically, on a public-facing server, `cs_url_root` will start with `https`,
@@ -34,8 +34,8 @@ the web server's user has read/write access.</p>
 </div>
 
 By default, running `catsoop start` will start several processes.  The most
-important are the UWSGI server (default port `6010`) and the websocket server
-(default port `6011`).  You can change these ports by setting additional
+important are the UWSGI server (default port `7667`) and the websocket server
+(default port `7668`).  You can change these ports by setting additional
 variables `cs_wsgi_server_port` and `cs_checker_server_port`, respectively, in
 your `config.py`.
 
@@ -109,7 +109,7 @@ server {
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_cache_bypass $http_upgrade;
-            proxy_pass http://localhost:6010/;
+            proxy_pass http://localhost:7667/;
     }
 
     # the following will route websocket requests to
@@ -122,7 +122,7 @@ server {
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_cache_bypass $http_upgrade;
-            proxy_pass http://localhost:6011/;
+            proxy_pass http://localhost:7668/;
     }
 }
 ```
@@ -130,7 +130,7 @@ server {
 <div class="callout callout-warning">
 <h4>Double Check</h4>
 <p>Note that your <code>cs_url_root</code> and <code>cs_checker_websocket</code> should match the nginx configuration.  In the example above, we should have <code>cs_url_root = 'https://your.server.com/cat-soop'</code> and <code>cs_checker_websocket = wss://your.server.com/reporter</code> in the <code>config.py</code> file.</p> <p>
-Also, make sure the ports (<code>6010</code> and <code>6011</code> in the example above) match the port numbers you set in <code>config.py</code>, if any.
+Also, make sure the ports (<code>7667</code> and <code>7668</code> in the example above) match the port numbers you set in <code>config.py</code>, if any.
 </p>
 </div>
 
