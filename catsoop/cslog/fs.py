@@ -282,9 +282,7 @@ def clear_old_logs(db_name, path, expire):
 
 
 def store_upload(id_, info, data):
-    dir_ = os.path.join(
-        base_context.cs_data_root, "_logs", "_uploads", id_[0], id_[1], id_
-    )
+    dir_ = os.path.join(base_context.cs_data_root, "_logs", "_uploads", id_)
     os.makedirs(dir_, exist_ok=True)
     with open(os.path.join(dir_, "info"), "wb") as f:
         f.write(info)
@@ -293,9 +291,7 @@ def store_upload(id_, info, data):
 
 
 def retrieve_upload(id_):
-    dir_ = os.path.join(
-        base_context.cs_data_root, "_logs", "_uploads", id_[0], id_[1], id_
-    )
+    dir_ = os.path.join(base_context.cs_data_root, "_logs", "_uploads", id_)
     try:
         with open(os.path.join(dir_, "info"), "rb") as f:
             info = unprep(f.read())
