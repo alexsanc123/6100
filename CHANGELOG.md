@@ -34,11 +34,11 @@ _Work toward next release. Currently under development._
     readability
 
 * Logging, upload management, and queue management are now unified within the
-    `cslog` module.
+    `cslog` module
 
 * Changed default ports from `6010` and `6011` to `7667` and `7668` to avoid
     a conflict with X11, and modified the `catsoop configure` command to ask
-    about the port numbers.
+    about the port numbers (#83 and #84)
 
 **DEPRECATED:**
 
