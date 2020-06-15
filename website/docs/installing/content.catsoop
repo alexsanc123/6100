@@ -112,8 +112,8 @@ To start the server, you should run:
 $ catsoop start
 ```
 
-This will start the server listening on port 6010.  You should then be able to
-directy your browser to `http://localhost:6010` to see the CAT-SOOP instance.
+This will start the server listening on port 7667.  You should then be able to
+directy your browser to `http://localhost:7667` to see the CAT-SOOP instance.
 
 
 <section>(Optional) Sign Up for Mailing List(s)</section>

@@ -66,7 +66,7 @@ cs_data_root = r"/home/catsoop/data"
 The directory where CAT-SOOP's data files are located (no trailing slash).
 """
 
-cs_url_root = "http://localhost:6010"
+cs_url_root = "http://localhost:7667"
 """
 The URL root (without trailing slash).  Going to this URL should lead the user
 to CAT-SOOP's information page.
@@ -243,13 +243,13 @@ default values to use for that question type.  These values are loaded in
 before the values in a &lt;question&gt; tag are evaluated.
 """
 
-cs_checker_websocket = "ws://localhost:6011"
+cs_checker_websocket = "ws://localhost:7668"
 """
 Special: The location to which the browser should connect to the checker's
 "reporter" process.
 """
 
-cs_checker_server_port = 6011
+cs_checker_server_port = 7668
 """
 Special: The local port on which the websocket server should run
 """
@@ -274,7 +274,7 @@ cs_wsgi_server = "cheroot"
 The WSGI server to use.  Currently, must be 'cheroot' or 'uwsgi'
 """
 
-cs_wsgi_server_port = 6010
+cs_wsgi_server_port = 7667
 """
 Special: The local port on which the WSGI server should run.
 """

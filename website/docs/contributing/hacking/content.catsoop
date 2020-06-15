@@ -79,7 +79,7 @@ and then you can start the server with:
 $ catsoop start
 ```
 
-and navigate your browser to `http://localhost:6010`.
+and navigate your browser to `http://localhost:7667`.
 
 In order for this page to be interesting, you will want to put a course in the
 CAT-SOOP data root (default: `~/.local/share/catsoop`).  You may wish to clone
