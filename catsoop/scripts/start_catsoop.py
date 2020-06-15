@@ -31,8 +31,6 @@ from datetime import datetime
 
 LOGGER = logging.getLogger("cs")
 
-os.setpgrp()
-
 scripts_dir = os.path.abspath(os.path.dirname(__file__))
 base_dir = os.path.abspath(os.path.join(scripts_dir, ".."))
 
