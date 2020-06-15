@@ -63,7 +63,7 @@ class Test_LTI(CATSOOPTest):
 
     def skip_test_lti_auth0(self):
         path = "/_lti/%s/structure" % self.cname
-        host = "localhost:6010"
+        host = "localhost:7667"
         url = "http://%s%s" % (host, path)
         ltic = lti.LTI_Consumer(lti_url=url, consumer_key=self.ckey, secret=self.secret)
         data = ltic.lti_context
@@ -83,7 +83,7 @@ class Test_LTI(CATSOOPTest):
         Test successful authentication with LTI protocol
         """
         path = "/_lti/foo"
-        host = "localhost:6010"
+        host = "localhost:7667"
         url = "http://%s%s" % (host, path)
         ltic = lti.LTI_Consumer(
             lti_url=url,
@@ -122,7 +122,7 @@ class Test_LTI(CATSOOPTest):
         Test LTI access to courseware
         """
         path = "/_lti/course/%s/structure" % self.cname
-        host = "localhost:6010"
+        host = "localhost:7667"
         url = "http://%s%s" % (host, path)
         ltic = lti.LTI_Consumer(lti_url=url, consumer_key=self.ckey, secret=self.secret)
 

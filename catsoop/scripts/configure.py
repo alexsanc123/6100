@@ -133,6 +133,21 @@ default_storage_location = os.environ.get(
 )
 
 
+def _transform_int(x):
+    try:
+        return int(x)
+    except:
+        return x
+
+
+def _check_int(x):
+    return (
+        None
+        if isinstance(x, int) and x > 0
+        else WARNING("Please enter a positive integer.")
+    )
+
+
 def main():
     # print welcome message
     print(cs_logo)
@@ -203,6 +218,28 @@ def configure_local():
         default=default_log_dir,
     )
 
+    # Double-check default port numbers
+
+    print(
+        "By default, CAT-SOOP will start its web server on port 7667.  If you would like to use a different port, please enter it:"
+    )
+    cs_wsgi_server_port = ask(
+        QUESTION("Which port should CAT-SOOP use for its web server?"),
+        default="7667",
+        transform=_transform_int,
+        check_ok=_check_int,
+    )
+
+    print(
+        "By default, CAT-SOOP will listen for connections to the grader on port 7668.  If you would like to use a different port, please enter it:"
+    )
+    cs_checker_server_port = ask(
+        QUESTION("Which port should CAT-SOOP use for connections to the grader?"),
+        default="7668",
+        transform=_transform_int,
+        check_ok=_check_int,
+    )
+
     # Authentication
     print(
         'Some courses set up local copies to use "dummy" authentication that always logs you in with a particular username.'
@@ -219,9 +256,19 @@ def configure_local():
     config_file_content = """cs_data_root = %r
 
 cs_dummy_username = %r
-    """ % (
+
+cs_wsgi_server_port = %r
+cs_url_root = 'http://localhost:%s'
+
+cs_checker_server_port = %r
+cs_checker_websocket = 'ws://localhost:%s'
+""" % (
         cs_data_root,
         cs_dummy_username,
+        cs_wsgi_server_port,
+        cs_wsgi_server_port,
+        cs_checker_server_port,
+        cs_checker_server_port,
     )
 
     while True:
@@ -432,16 +479,37 @@ def configure_production():
     )
 
     # Web Stuff
+
+    print(
+        "By default, CAT-SOOP will start its web server on port 7667.  If you would like to use a different port, please enter it:"
+    )
+    cs_wsgi_server_port = ask(
+        QUESTION("Which port should CAT-SOOP use for its web server?"),
+        default="7667",
+        transform=_transform_int,
+        check_ok=_check_int,
+    )
     cs_url_root = ask(
         QUESTION("What is the root public-facing URL associated with this instance?"),
-        default="http://localhost:6010",
+        default="http://localhost:%s" % cs_wsgi_server_port,
         transform=lambda x: x.rstrip("/"),
     )
+
+    print(
+        "By default, CAT-SOOP will listen for connections to the grader on port 7668.  If you would like to use a different port, please enter it:"
+    )
+    cs_checker_server_port = ask(
+        QUESTION("Which port should CAT-SOOP use for connections to the grader?"),
+        default="7668",
+        transform=_transform_int,
+        check_ok=_check_int,
+    )
+
     cs_checker_websocket = ask(
         QUESTION(
             "What is the public-facing URL associated with the checker's websocket connection?"
         ),
-        default="ws://localhost:6011",
+        default="ws://localhost:%s" % cs_checker_server_port,
         transform=lambda x: x.rstrip("/"),
     )
 
@@ -449,19 +517,6 @@ def configure_production():
     guess_proc_min = math.ceil(ncpus / 2)
     guess_proc_max = max(guess_proc_min, math.floor(ncpus * 3 / 4))
     guess_nchecks = math.floor(max((ncpus - guess_proc_max) / 2, 1))
-
-    def _transform_int(x):
-        try:
-            return int(x)
-        except:
-            return x
-
-    def _check_int(x):
-        return (
-            None
-            if isinstance(x, int) and x > 0
-            else WARNING("Please enter a positive integer.")
-        )
 
     cs_wsgi_server_min_processes = ask(
         QUESTION(
@@ -492,22 +547,26 @@ def configure_production():
 cs_log_compression = %r
 cs_log_encryption = %r
 
-cs_url_root = %r
-cs_checker_websocket = %r
 
+cs_url_root = %r
+cs_wsgi_server_port = %r
 cs_wsgi_server = "uwsgi"
 cs_wsgi_server_min_processes = %d
 cs_wsgi_server_max_processes = %d
 
+cs_checker_websocket = %r
+cs_checker_server_port = %r
 cs_checker_parallel_checks = %d
-    """ % (
+""" % (
         cs_data_root,
         should_compress,
         should_encrypt,
         cs_url_root,
-        cs_checker_websocket,
+        cs_wsgi_server_port,
         cs_wsgi_server_min_processes,
         cs_wsgi_server_max_processes,
+        cs_checker_websocket,
+        cs_checker_server_port,
         cs_checker_parallel_checks,
     )
 
