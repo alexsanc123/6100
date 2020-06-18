@@ -794,15 +794,6 @@ def handle_custom_tags(context, text):
 
     text = re.sub(section_star, _section_star_matcher, text)
 
-    # hints (<showhide>)
-    def _showhide_replacer(match):
-        body = source_transform_string(context, match.groupdict()["body"])
-        out = """<div class="response"><button class="btn btn-catsoop" onclick="if(this.parentElement.children[1].style.display === 'none'){this.parentElement.children[1].style.display = 'block';}else{this.parentElement.children[1].style.display = 'none';}">Show/Hide</button>\n"""
-        out += '<div style="display:none;">%s</div>' % (body,)
-        return out + "</div>"
-
-    text = re.sub(_environment_matcher("showhide"), _showhide_replacer, text)
-
     tree = BeautifulSoup(text, "html.parser")
 
     for t in tree.find_all(attrs={"cs-show-if": re.compile(".*")}):
