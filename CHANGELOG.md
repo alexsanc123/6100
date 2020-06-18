@@ -55,6 +55,8 @@ _Work toward next release. Currently under development._
 * Removed the choice of where file uploads are stored (`cs_upload_management`
     is no longer recognized)
 
+* Removed the `<showhide>` tag (use `<details>` instead)
+
 **FIXED:**
 
 * Show an error message when two questions would have the same name (#53)
