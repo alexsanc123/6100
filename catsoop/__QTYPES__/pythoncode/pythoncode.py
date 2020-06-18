@@ -268,19 +268,12 @@ def handle_submission(submissions, **info):
     get_sandbox(info)
 
     score = 0
-    if info["csq_always_show_tests"]:
-        msg = ""
-    else:
-        msg = (
-            """\n<br/><button onclick="if(this.nextSibling.style.display === 'none'){this.nextSibling.style.display = 'block';}else{this.nextSibling.style.display = 'none';}" class="btn btn-catsoop">"""
-            "Show/Hide Detailed Results</button>"
-        )
-    msg += (
-        '<div class="response" id="%s_result_showhide" %s>' "<h2>Test Results:</h2>"
-    ) % (
-        info["csq_name"],
-        'style="display:none"' if not info["csq_always_show_tests"] else "",
+    msg = "\n<br/><details%s><summary>Show/Hide Detailed Results</summary>" % (
+        " open" if info["csq_always_show_tests"] else ""
     )
+    msg += (
+        '<div class="response" id="%s_result_showhide">' "<h2>Test Results:</h2>"
+    ) % (info["csq_name"],)
     test_results = []
     count = 1
     for test in info["csq_tests"]:
@@ -460,7 +453,7 @@ def handle_submission(submissions, **info):
 
         count += 1
 
-    msg += "\n</div>"
+    msg += "\n</div></details>"
     tp = total_test_points(**info)
     overall = float(score) / tp if tp != 0 else 0
     hint_func = info.get("csq_hint")
