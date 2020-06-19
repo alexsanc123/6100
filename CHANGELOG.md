@@ -96,6 +96,8 @@ _Work toward next release. Currently under development._
 
 # Version 2019.9.6
 
+**FIXED:**
+
 * Fixed an issue whereby submitting a multiplechoice question using the
     `'radio'` renderer would cause an error if no option was selected (courtesy
     of Kade Phillips)
