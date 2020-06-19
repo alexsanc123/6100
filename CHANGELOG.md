@@ -20,6 +20,9 @@ _Work toward next release. Currently under development._
 
 * Added support for PostgreSQL as an alternative backend for storing logs
 
+* Added the ability to customize the text shown on the button in `<showhide>`
+    tags, via the summary attribute
+
 **CHANGED:**
 
 * Auto-generated `csq_name` fields increment for every question, even those
@@ -54,8 +57,6 @@ _Work toward next release. Currently under development._
 
 * Removed the choice of where file uploads are stored (`cs_upload_management`
     is no longer recognized)
-
-* Removed the `<showhide>` tag (use `<details>` instead)
 
 **FIXED:**
 

@@ -367,9 +367,7 @@ def _md_format_string(context, s, xml=True):
         return splitter
 
     tags_to_replace = context.get("cs_markdown_ignore_tags", tuple())
-    tags = ("pre", "question", "(?:display)?math", "script", "showhide") + tuple(
-        tags_to_replace
-    )
+    tags = ("pre", "question", "(?:display)?math", "script") + tuple(tags_to_replace)
     checker = re.compile(
         r"<(%s)(.*?)>(.*?)</\1>" % "|".join(tags), re.MULTILINE | re.DOTALL
     )
@@ -803,6 +801,22 @@ def handle_custom_tags(context, text):
     for t in tree.find_all(attrs={"cs-hide-if": re.compile(".*")}):
         if eval(t.attrs["cs-hide-if"], context):
             t.extract()
+
+    # handle <showhide>
+
+    for i in tree.find_all("showhide"):
+        i.name = "details"
+
+        summ = tree.new_tag("summary")
+        summ.string = i.attrs.get("summary", "Show/Hide")
+        summ["class"] = ["btn", "btn-catsoop"]
+
+        i.insert(0, summ)
+
+        wrapdiv = tree.new_tag("div")
+        wrapdiv["class"] = "response"
+
+        i.wrap(wrapdiv)
 
     # handle sections, etc.
 

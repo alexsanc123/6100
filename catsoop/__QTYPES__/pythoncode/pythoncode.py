@@ -268,8 +268,9 @@ def handle_submission(submissions, **info):
     get_sandbox(info)
 
     score = 0
-    msg = "\n<br/><details%s><summary>Show/Hide Detailed Results</summary>" % (
-        " open" if info["csq_always_show_tests"] else ""
+    msg = (
+        '\n<br/><details%s><summary class="btn btn-catsoop">Show/Hide Detailed Results</summary>'
+        % (" open" if info["csq_always_show_tests"] else "")
     )
     msg += (
         '<div class="response" id="%s_result_showhide">' "<h2>Test Results:</h2>"
