@@ -14,9 +14,8 @@
 
 * Web Site: <https://catsoop.mit.edu>
 * IRC: `#catsoop` on OFTC (`irc.oftc.net`)
-* Forum: <https://catsoop.mit.edu/forum>
-* Mailing List: [catsoop-users@mit.edu](mailto:catsoop-users@mit.edu)
-  (subscribe at <http://mailman.mit.edu/mailman/listinfo/catsoop-users>)
+* Community Forum: <https://catsoop.mit.edu/community>
+* Development Portal: <https://catsoop.mit.edu/git>
 
 
 CAT-SOOP is a flexible, programmable learning management system originally
