@@ -23,8 +23,9 @@ _Work toward next release. Currently under development._
 * Added the ability to customize the text shown on the button in `<showhide>`
     tags, via the summary attribute
 
-* Added support for Markdown "adminitions" (like [those from
-    Markdeep](https://casual-effects.com/markdeep/features.md.html#basicformatting/admonitions))
+* Added support for Markdown "callouts", similar to [Markdeep's
+    "admonitions"](https://casual-effects.com/markdeep/features.md.html#basicformatting/admonitions)
+    (#90)
 
 **CHANGED:**
 

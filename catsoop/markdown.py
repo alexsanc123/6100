@@ -60,10 +60,10 @@ class EscapedDollar(SpanToken):
     pattern = re.compile(r"(?<!\\)\\(\$)")
 
 
-# Admonitions
+# Callouts
 
 
-class Admonition(BlockToken):
+class Callout(BlockToken):
     classes = ["note", "tip", "info", "warning", "error"]
     start_regex = re.compile(r"!!!(?P<header>.*)")
 
@@ -133,18 +133,18 @@ class Admonition(BlockToken):
 class CatsoopRenderer(HTMLRenderer):
     def __init__(self):
         HTMLRenderer.__init__(
-            self, Admonition, DisplayMathEnv, DisplayMath, Math, EscapedDollar
+            self, Callout, DisplayMathEnv, DisplayMath, Math, EscapedDollar
         )
 
-    def render_admonition(self, token):
+    def render_callout(self, token):
         if token.title:
-            rendered_title = '<div class="admonition-title">%s</div>' % "".join(
+            rendered_title = '<div class="callout-title">%s</div>' % "".join(
                 self.render_inner(i) for i in token.title
             )
         else:
             rendered_title = ""
         rendered_body = "".join(self.render(i) for i in token.children)
-        return f'<div class="admonition admonition-{token.type}">{rendered_title}\n\n{rendered_body}\n</div>'
+        return f'<div class="callout callout-{token.type}">{rendered_title}\n\n{rendered_body}\n</div>'
 
     def render_math(self, token):
         return f"<math>{token.body}</math>"

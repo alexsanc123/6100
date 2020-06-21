@@ -19,10 +19,10 @@
 :root{
   --cs-base-bg-color: #000080;
   --cs-max-page-width: 1100px;
-  --admonition-color-note: #428bca;
-  --admonition-color-tip: #5cb85c;
-  --admonition-color-error: #d9534f;
-  --admonition-color-warning: #f0ad4e;
+  --callout-color-note: #428bca;
+  --callout-color-tip: #5cb85c;
+  --callout-color-error: #d9534f;
+  --callout-color-warning: #f0ad4e;
 }
 html {
   height: 100%;
@@ -362,51 +362,51 @@ table, th, td {
   padding: 0.25rem;
 }
 
-/* Admonitions */
+/* Callouts */
 
-.admonition {
+.callout {
   margin:1em;
   border:1px solid #ccc;
   border-left-width:0.3rem;
   border-radius:5px;
   padding: 0.5rem 1rem;
 }
-.admonition > p {
+.callout > p {
   margin-bottom: 0.2rem;
   margin-top: 0.2rem;
 }
-.admonition-title {
+.callout-title {
   display: inline-block;
   font-weight: bold;
   margin-bottom: 0.6rem;
 }
 
-.admonition-note {
-  border-left-color: var(--admonition-color-note);
+.callout-note {
+  border-left-color: var(--callout-color-note);
 }
-.admonition-note > .admonition-title {
-  border-bottom: 2px solid var(--admonition-color-note);
-}
-
-.admonition-tip {
-  border-left-color: var(--admonition-color-tip);
-}
-.admonition-tip > .admonition-title {
-  border-bottom: 2px solid var(--admonition-color-tip);
+.callout-note > .callout-title {
+  border-bottom: 2px solid var(--callout-color-note);
 }
 
-.admonition-warning {
-  border-left-color: var(--admonition-color-warning);
+.callout-tip {
+  border-left-color: var(--callout-color-tip);
 }
-.admonition-warning > .admonition-title {
-  border-bottom: 2px solid var(--admonition-color-warning);
+.callout-tip > .callout-title {
+  border-bottom: 2px solid var(--callout-color-tip);
 }
 
-.admonition-error {
-  border-left-color: var(--admonition-color-error);
+.callout-warning {
+  border-left-color: var(--callout-color-warning);
 }
-.admonition-error > .admonition-title {
-  border-bottom: 2px solid var(--admonition-color-error);
+.callout-warning > .callout-title {
+  border-bottom: 2px solid var(--callout-color-warning);
+}
+
+.callout-error {
+  border-left-color: var(--callout-color-error);
+}
+.callout-error > .callout-title {
+  border-bottom: 2px solid var(--callout-color-error);
 }
 
 
@@ -678,12 +678,6 @@ td.hljs-ln-numbers {
 td.hljs-ln-code {
   padding-left: 10px !important;
 }
-
-
-/*
-   Admonitions, with styles based on:
-   https://casual-effects.com/markdeep/features.md.html#basicformatting/admonitions
-*/
 
 
 /* Small Screens */
