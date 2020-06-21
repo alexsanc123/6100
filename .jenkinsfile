@@ -21,7 +21,7 @@ pipeline {
         }
         stage('Style') {
             steps {
-                sh 'black --check --exclude catsoop/__QTYPES__/pythoncode/__SANDBOXES__/_template.py .'
+                sh 'black --check .'
             }
         }
     }

@@ -54,7 +54,7 @@ def run_code(
             "__QTYPES__",
             "pythoncode",
             "__SANDBOXES__",
-            "_template.py",
+            "_template",
         )
     ) as f:
         template = f.read()
