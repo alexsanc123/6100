@@ -141,6 +141,7 @@ def update_log(db_name, path, logname, new, connection=None):
     conn = _connect() if connection is None else connection
     with conn:
         with conn.cursor() as c:
+            c.execute("SELECT pg_advisory_xact_lock(%s)", (hash((db_name, tuple(path), logname)),))
             c.execute(
                 "INSERT INTO logs (db_name, path, logname, updated, data) VALUES(%s, %s, %s, NOW(), %s)",
                 (db_name, "/".join(path), logname, prep(new)),
@@ -169,14 +170,14 @@ def overwrite_log(db_name, path, logname, new, connection=None):
     conn = _connect() if connection is None else connection
     with conn:
         with conn.cursor() as c:
+            c.execute("SELECT pg_advisory_xact_lock(%s)", (hash((db_name, tuple(path), logname)),))
             c.execute(
-                "INSERT INTO logs (db_name, path, logname, updated, data) VALUES(%s, %s, %s, NOW(), %s) RETURNING *",
-                (db_name, "/".join(path), logname, prep(new)),
+                "DELETE FROM logs WHERE db_name=%s AND path=%s AND logname=%s",
+                (db_name, "/".join(path), logname),
             )
-            id_ = c.fetchone()[0]
             c.execute(
-                "DELETE FROM logs WHERE id IN (SELECT id FROM logs WHERE db_name=%s AND path=%s AND logname=%s AND id!=%s FOR UPDATE)",
-                (db_name, "/".join(path), logname, id_),
+                "INSERT INTO logs (db_name, path, logname, updated, data) VALUES(%s, %s, %s, NOW(), %s)",
+                (db_name, "/".join(path), logname, prep(new)),
             )
     if connection is None:
         conn.close()
@@ -194,29 +195,30 @@ def modify_most_recent(
     db_name, path, logname = hash_db_info(db_name, path, logname)
     conn = _connect() if connection is None else connection
     path = "/".join(path)
-    c = conn.cursor()
-    c.execute(
-        "SELECT * FROM logs WHERE db_name=%s AND path=%s AND logname=%s ORDER BY updated DESC FOR UPDATE LIMIT 1",
-        (db_name, path, logname),
-    )
-    res = c.fetchone()
-    if res:
-        old_val = unprep(bytes(res[-1]))
-        id_ = res[0]
-    else:
-        method = "update"
-        old_val = default
-    new_val = prep(transform_func(old_val))
-    if method == "update":
-        c.execute(
-            "INSERT INTO logs(db_name, path, logname, updated, data) VALUES(%s, %s, %s, NOW(), %s)",
-            (db_name, path, logname, new_val),
-        )
-    else:  # overwrite
-        c.execute(
-            "UPDATE logs SET data=%s,updated=NOW() WHERE id=%s", (new_val, id_),
-        )
-    conn.commit()
+    with conn:
+        with conn.cursor() as c:
+            c.execute("SELECT pg_advisory_xact_lock(%s)", (hash((db_name, tuple(path), logname)),))
+            c.execute(
+                "SELECT * FROM logs WHERE db_name=%s AND path=%s AND logname=%s ORDER BY updated DESC FOR UPDATE LIMIT 1",
+                (db_name, path, logname),
+            )
+            res = c.fetchone()
+            if res:
+                old_val = unprep(bytes(res[-1]))
+                id_ = res[0]
+            else:
+                method = "update"
+                old_val = default
+            new_val = prep(transform_func(old_val))
+            if method == "update":
+                c.execute(
+                    "INSERT INTO logs(db_name, path, logname, updated, data) VALUES(%s, %s, %s, NOW(), %s)",
+                    (db_name, path, logname, new_val),
+                )
+            else:  # overwrite
+                c.execute(
+                    "UPDATE logs SET data=%s,updated=NOW() WHERE id=%s", (new_val, id_),
+                )
     if connection is None:
         conn.close()
 
