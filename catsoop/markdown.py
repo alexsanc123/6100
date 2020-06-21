@@ -71,7 +71,6 @@ class Admonition(BlockToken):
         self.type, title, raw_lines = match
         self.title = tokenize([title])
         self.children = tokenize(raw_lines)
-        print(self.title, self.children)
 
     @classmethod
     def start(cls, line):
@@ -104,7 +103,6 @@ class Admonition(BlockToken):
         next(lines)  # consume the starting line (with !!!)
         line = lines.peek()
         while line is not None:
-            print(repr(line))
             if cls.indent is None:
                 try:
                     cls.indent = re.match("^\s*", line).group(0)
@@ -139,7 +137,6 @@ class CatsoopRenderer(HTMLRenderer):
         )
 
     def render_admonition(self, token):
-        print("WTF", repr(token))
         if token.title:
             rendered_title = '<div class="admonition-title">%s</div>' % "".join(
                 self.render_inner(i) for i in token.title
