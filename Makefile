@@ -1,8 +1,8 @@
 install:
 	pip3 install .
 
-develop: uninstall
-	python3 setup.py develop
+develop:
+	pip3 install -e .
 
 uninstall:
 	pip3 uninstall -y catsoop
