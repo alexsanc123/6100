@@ -141,7 +141,10 @@ def update_log(db_name, path, logname, new, connection=None):
     conn = _connect() if connection is None else connection
     with conn:
         with conn.cursor() as c:
-            c.execute("SELECT pg_advisory_xact_lock(%s)", (hash((db_name, tuple(path), logname)),))
+            c.execute(
+                "SELECT pg_advisory_xact_lock(%s)",
+                (hash((db_name, tuple(path), logname)),),
+            )
             c.execute(
                 "INSERT INTO logs (db_name, path, logname, updated, data) VALUES(%s, %s, %s, NOW(), %s)",
                 (db_name, "/".join(path), logname, prep(new)),
@@ -170,7 +173,10 @@ def overwrite_log(db_name, path, logname, new, connection=None):
     conn = _connect() if connection is None else connection
     with conn:
         with conn.cursor() as c:
-            c.execute("SELECT pg_advisory_xact_lock(%s)", (hash((db_name, tuple(path), logname)),))
+            c.execute(
+                "SELECT pg_advisory_xact_lock(%s)",
+                (hash((db_name, tuple(path), logname)),),
+            )
             c.execute(
                 "DELETE FROM logs WHERE db_name=%s AND path=%s AND logname=%s",
                 (db_name, "/".join(path), logname),
@@ -197,7 +203,10 @@ def modify_most_recent(
     path = "/".join(path)
     with conn:
         with conn.cursor() as c:
-            c.execute("SELECT pg_advisory_xact_lock(%s)", (hash((db_name, tuple(path), logname)),))
+            c.execute(
+                "SELECT pg_advisory_xact_lock(%s)",
+                (hash((db_name, tuple(path), logname)),),
+            )
             c.execute(
                 "SELECT * FROM logs WHERE db_name=%s AND path=%s AND logname=%s ORDER BY updated DESC FOR UPDATE LIMIT 1",
                 (db_name, path, logname),
