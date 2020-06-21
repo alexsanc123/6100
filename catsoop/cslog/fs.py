@@ -382,7 +382,7 @@ def queue_pop(queuename, old_status, new_status=None):
 
 
 def queue_update(queuename, id, new_data, new_status=None):
-    for i in range(300):
+    for i in range(100):
         try:
             cur_name = glob.glob(
                 os.path.join(_queue_location(queuename), "*", f"*_{id}")
