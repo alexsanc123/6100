@@ -42,7 +42,7 @@ from collections import OrderedDict
 
 from . import tutor
 from . import dispatch
-from . import markdown_math
+from . import markdown
 from .errors import html_format, clear_info
 
 from bs4 import BeautifulSoup
@@ -192,7 +192,7 @@ def xml_pre_handle(context):
 
 
 def _md(x):
-    return markdown_math.markdown(x)
+    return markdown.markdown(x)
 
 
 def md_pre_handle(context, xml=True):
