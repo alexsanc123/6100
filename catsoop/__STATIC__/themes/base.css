@@ -541,6 +541,152 @@
      padding:2px;
      margin-top: 5px;
 }
+/* highlight.js styles */
+/* Based on default colors in Python's IDLE */
+
+.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 0.5em;
+  color: black;
+}
+
+.hljs-comment,
+.hljs-quote {
+  color: #dd0000;
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-literal {
+  color: #ff7700;
+}
+
+.hljs-name {
+  color: #008;
+}
+
+.hljs-variable,
+.hljs-template-variable {
+  color: #660;
+}
+
+.hljs-string {
+  color: #00aa00;
+}
+
+.hljs-regexp,
+.hljs-link {
+  color: #080;
+}
+
+.hljs-title,
+.hljs-tag,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-meta {
+  color: #1c00cf;
+}
+
+.hljs-section,
+.hljs-type,
+.hljs-attr,
+.hljs-number,
+.hljs-params {
+  color: inherit;
+}
+
+.hljs-built_in,
+.hljs-builtin-name {
+  color: #900090;
+}
+
+.hljs-class .hljs-title {
+  color: #0000ff;
+}
+
+.hljs-attribute,
+.hljs-subst {
+  color: #000;
+}
+
+.hljs-formula {
+  background-color: #eee;
+  font-style: italic;
+}
+
+.hljs-addition {
+  background-color: #baeeba;
+}
+
+.hljs-deletion {
+  background-color: #ffc8bd;
+}
+
+.hljs-selector-id,
+.hljs-selector-class {
+  color: #9b703f;
+}
+
+.hljs-doctag,
+.hljs-strong {
+  font-weight: bold;
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+td.hljs-ln-numbers {
+  border-right: 2px solid #aaa;
+  text-align: right;
+  padding-left: 5px !important;
+  padding-right: 5px !important;
+  background-color: #e0e0e0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", Helvetica, sans-serif;
+}
+td.hljs-ln-code {
+  padding-left: 10px !important;
+}
+
+
+/*
+   Admonitions, with styles based on:
+   https://casual-effects.com/markdeep/features.md.html#basicformatting/admonitions
+*/
+.admonition {
+  position: relative;
+  margin: 1em 2em;
+  border-left: 0.3rem solid;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+}
+.admonition-title {
+  font-weight: bold;
+  margin-bottom: 0.6rem;
+}
+.admonition > p {
+  margin-bottom: 0.2rem;
+  margin-top: 0.2rem;
+}
+.admonition-note {
+    background-color: rgba(37,114,245,.1);
+    border-color: rgba(37,114,245,.5);
+}
+.admonition-tip {
+    background-color: rgba(18,183,18,.1);
+    border-color: rgba(18,183,18,.5);
+}
+.admonition-warning {
+    background-color: rgba(238,171,0,.1);
+    border-color: rgba(238,171,0,.5);
+}
+.admonition-error {
+    background-color: rgba(205,0,0,.1);
+    border-color: rgba(205,0,0,.5);
+}
+
+
 /* Small Screens */
  @media screen and (max-width: 900px) {
     main {
@@ -672,111 +818,4 @@
      [name="cs_footnotes"]{
          page-break-before: always;
     }
-}
-/* highlight.js styles */
-/* Based on default colors in Python's IDLE */
-
-.hljs {
-  display: block;
-  overflow-x: auto;
-  padding: 0.5em;
-  color: black;
-}
-
-.hljs-comment,
-.hljs-quote {
-  color: #dd0000;
-}
-
-.hljs-keyword,
-.hljs-selector-tag,
-.hljs-literal {
-  color: #ff7700;
-}
-
-.hljs-name {
-  color: #008;
-}
-
-.hljs-variable,
-.hljs-template-variable {
-  color: #660;
-}
-
-.hljs-string {
-  color: #00aa00;
-}
-
-.hljs-regexp,
-.hljs-link {
-  color: #080;
-}
-
-.hljs-title,
-.hljs-tag,
-.hljs-symbol,
-.hljs-bullet,
-.hljs-meta {
-  color: #1c00cf;
-}
-
-.hljs-section,
-.hljs-type,
-.hljs-attr,
-.hljs-number,
-.hljs-params {
-  color: inherit;
-}
-
-.hljs-built_in,
-.hljs-builtin-name {
-  color: #900090;
-}
-
-.hljs-class .hljs-title {
-  color: #0000ff;
-}
-
-.hljs-attribute,
-.hljs-subst {
-  color: #000;
-}
-
-.hljs-formula {
-  background-color: #eee;
-  font-style: italic;
-}
-
-.hljs-addition {
-  background-color: #baeeba;
-}
-
-.hljs-deletion {
-  background-color: #ffc8bd;
-}
-
-.hljs-selector-id,
-.hljs-selector-class {
-  color: #9b703f;
-}
-
-.hljs-doctag,
-.hljs-strong {
-  font-weight: bold;
-}
-
-.hljs-emphasis {
-  font-style: italic;
-}
-
-td.hljs-ln-numbers {
-  border-right: 2px solid #aaa;
-  text-align: right;
-  padding-left: 5px !important;
-  padding-right: 5px !important;
-  background-color: #e0e0e0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", Helvetica, sans-serif;
-}
-td.hljs-ln-code {
-  padding-left: 10px !important;
 }
