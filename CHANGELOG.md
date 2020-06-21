@@ -23,6 +23,9 @@ _Work toward next release. Currently under development._
 * Added the ability to customize the text shown on the button in `<showhide>`
     tags, via the summary attribute
 
+* Added support for Markdown "adminitions" (like [those from
+    Markdeep](https://casual-effects.com/markdeep/features.md.html#basicformatting/admonitions))
+
 **CHANGED:**
 
 * Auto-generated `csq_name` fields increment for every question, even those
