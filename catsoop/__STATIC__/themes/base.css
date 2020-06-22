@@ -371,10 +371,6 @@ table, th, td {
   border-radius:5px;
   padding: 0.5rem 1rem;
 }
-.callout > p {
-  margin-bottom: 0.2rem;
-  margin-top: 0.2rem;
-}
 .callout-title {
   display: inline-block;
   font-weight: bold;
