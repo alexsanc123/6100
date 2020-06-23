@@ -21,10 +21,13 @@ LTI Tool Provider interface
 import re
 import uuid
 import urllib
+import traceback
 import pylti.common
 
 from lxml import etree
 from lxml.builder import ElementMaker
+
+from datetime import datetime
 
 from oauthlib.oauth1 import Client
 
@@ -33,6 +36,17 @@ from . import session
 from . import debug_log
 
 LOGGER = debug_log.LOGGER
+
+DEBUG = True
+
+
+def log(msg):
+    if not DEBUG:
+        return
+    dt = datetime.now()
+    omsg = "[checker:%s]: %s" % (dt, msg)
+    LOGGER.info(omsg)
+
 
 _nodoc = {"Client", "ElementMaker", "etree", "LOGGER"}
 
@@ -157,6 +171,7 @@ class lti4cs_response(object):
         result_sourcedid = self.lti_data.get("lis_result_sourcedid", None)
         consumer_key = self.lti_data.get("oauth_consumer_key")
         xml_body = self.generate_result_xml(result_sourcedid, data)
+        print(xml_body)
         LOGGER.info(
             "[lti.lti4cs_response.send_outcome] sending grade=%s to %s" % (data, url)
         )
@@ -410,3 +425,42 @@ def serve_lti(context, path_info, environment, params, dispatch_main, return_con
         {"Content-type": "text/plain", "Content-length": str(len(msg))},
         msg,
     )
+
+
+def update_lti_score(lti_handler, problemstate, name_map):
+    total_possible_npoints = 0.0
+    aggregate_score = 0.0
+    cnt = 0
+    try:
+        for qname, (qtype, info) in name_map.items():
+            score = problemstate["scores"].get(qname, 0.0)
+            npoints = qtype["total_points"](**info)
+            total_possible_npoints += npoints
+            aggregate_score += score * npoints
+        if total_possible_npoints == 0:
+            total_possible_npoints = 1.0
+            LOGGER.error("[checker] total_possible_npoints=0 ????")
+        aggregate_score_fract = (
+            aggregate_score * 1.0 / total_possible_npoints
+        )  # LTI wants score in [0, 1.0]
+        log(
+            "Computed aggregate score from %d questions, aggregate_score=%s (fraction=%s)"
+            % (cnt, aggregate_score, aggregate_score_fract)
+        )
+        score_ok = True
+    except Exception as err:
+        LOGGER.error(
+            "[checker] failed to compute score for problem %s, err=%s"
+            % (problemstate, err)
+        )
+        score_ok = False
+
+    if score_ok:
+        try:
+            lti_handler.send_outcome(max(0.0, min(1.0, aggregate_score_fract)))
+        except Exception as err:
+            LOGGER.error(
+                "[checker] failed to send outcome to LTI consumer, err=%s" % str(err)
+            )
+            LOGGER.error("[checker] traceback=%s" % traceback.format_exc())
+    return problemstate
