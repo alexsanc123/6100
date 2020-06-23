@@ -99,6 +99,9 @@
      border-radius: 5px;
      background-color: #eee;
 }
+ pre code {
+     padding: 0px;
+}
  .catsooplogo {
      text-align: center;
      overflow: hidden;

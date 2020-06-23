@@ -1,12 +1,21 @@
 ####################
+# Version 2019.9.7 #
+####################
+
+FIXED:
+
+  * BACKPORT: Fixed alignment of first line within `<pre><code>` tags.
+
+
+####################
 # Version 2019.9.6 #
 ####################
 
 FIXED:
 
-  * Fixed an issue whereby submitting a multiplechoice question using the
-    'radio' renderer would cause an error if no option was selected (courtesy
-    of Kade Phillips)
+  * BACKPORT: Fixed an issue whereby submitting a multiplechoice question using
+    the 'radio' renderer would cause an error if no option was selected
+    (courtesy of Kade Phillips)
 
 
 ####################
@@ -15,8 +24,8 @@ FIXED:
 
 FIXED:
 
-  * Fixed long-standing issue whereby certain students could not log in due to
-    cookies being parsed incorrectly by SimpleCookie.
+  * BACKPORT: Fixed long-standing issue whereby certain students could not log
+    in due to cookies being parsed incorrectly by SimpleCookie.
 
 
 ####################
