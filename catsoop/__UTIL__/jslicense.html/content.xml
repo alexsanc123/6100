@@ -60,11 +60,11 @@ that are loaded by CAT-SOOP, including licensing information.
                   <td><a href="BASE/scripts/highlightjs-line-numbers.js">highlightjs-line-numbers.js</a></td>
               </tr>
 <python>
-for i in ace_files:
+for i in codemirror_files:
     print("""\
               <tr>
                   <td><a href="BASE/scripts/%s">%s</a></td>
-                  <td><a href="http://opensource.org/licenses/BSD-3-Clause">BSD 3-Clause</a></td>
+                  <td><a href="http://www.jclark.com/xml/copying.txt">Expat</a></td>
                   <td><a href="BASE/scripts/%s">%s</a></td>
               </tr>""" % (i, i, i, i))
 </python>
