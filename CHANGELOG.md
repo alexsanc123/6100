@@ -52,7 +52,7 @@ _Work toward next release. Currently under development._
     only Javascript files but also stylesheets)
 
 * Removed Ace editor in favor of [CodeMirror](https://codemirror.net/) as the
-    default web-based code editor (#96)
+    default web-based code editor (#71 and #96)
 
 **DEPRECATED:**
 
