@@ -171,7 +171,6 @@ class lti4cs_response(object):
         result_sourcedid = self.lti_data.get("lis_result_sourcedid", None)
         consumer_key = self.lti_data.get("oauth_consumer_key")
         xml_body = self.generate_result_xml(result_sourcedid, data)
-        print(xml_body)
         LOGGER.info(
             "[lti.lti4cs_response.send_outcome] sending grade=%s to %s" % (data, url)
         )
