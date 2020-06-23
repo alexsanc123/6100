@@ -412,7 +412,7 @@ def handle_view(context):
             "<br/>&nbsp;<br/></center></tutoronly>"
         ) % duetime
 
-    js_loads = []
+    extra_headers = set()
     for elt in context["cs_problem_spec"]:
         if isinstance(elt, str):
             page += elt
@@ -421,20 +421,13 @@ def handle_view(context):
             page += render_question(elt, context, lastsubmit)
 
             # handle javascript if necessary
-            if "js_files" in elt[0]:
+            if "extra_headers" in elt[0]:
                 a = elt[0].get("defaults", {})
                 a.update(elt[1])
-                js_loads.extend(elt[0]["js_files"](a))
+                extra_headers.add(elt[0]["extra_headers"](a))
 
-    if js_loads:
-        context["cs_scripts"] += (
-            "\n\n    <!--JS for questions-->\n    "
-            + "\n    ".join(
-                '<script type="text/javascript" src="%s"></script>'
-                % context["csm_dispatch"].get_real_url(context, i)
-                for i in js_loads
-            )
-        )
+    if extra_headers:
+        context["cs_scripts"] += "\n".join(extra_headers)
 
     page += default_javascript(context)
     page += default_timer(context)

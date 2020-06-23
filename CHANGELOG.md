@@ -23,8 +23,8 @@ _Work toward next release. Currently under development._
 * Added the ability to customize the text shown on the button in `<showhide>`
     tags, via the summary attribute
 
-* Added support for Markdown "callouts", similar to [Markdeep's
-    "admonitions"](https://casual-effects.com/markdeep/features.md.html#basicformatting/admonitions)
+* Added support for Markdown "callouts", similar to Markdeep's
+    ["admonitions"](https://casual-effects.com/markdeep/features.md.html#basicformatting/admonitions)
     (#90)
 
 **CHANGED:**
@@ -46,6 +46,13 @@ _Work toward next release. Currently under development._
 * Changed default ports from `6010` and `6011` to `7667` and `7668` to avoid
     a conflict with X11, and modified the `catsoop configure` command to ask
     about the port numbers (#83 and #84)
+
+* Replaced `js_files` in question types with `extra_headers`, which allows
+    injecting arbitrary strings into the header (which allows specifying not
+    only Javascript files but also stylesheets)
+
+* Removed Ace editor in favor of [CodeMirror](https://codemirror.net/) as the
+    default web-based code editor (#96)
 
 **DEPRECATED:**
 

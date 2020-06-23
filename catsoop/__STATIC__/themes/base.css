@@ -548,25 +548,7 @@ a.btn:visited {
   border-width: 1px;
   border-radius: 10px;
 }
-/* Ace Editor */
-.embedded_ace_code {
-  left: 0px;
-  top: 0px;
-  bottom: 1px;
-  right: 1px;
-  border-radius: 5px;
-  border-bottom-right-radius: 0px;
-  background: transparent;
-}
-.ace_editor_wrapper {
-  height: 275px;
-  position: relative;
-  border: 1px solid #DDD;
-  border-radius: 5px;
-  border-bottom-right-radius: 0px;
-  padding:2px;
-  margin-top: 5px;
-}
+
 /* highlight.js styles */
 /* Based on default colors in Python's IDLE */
 

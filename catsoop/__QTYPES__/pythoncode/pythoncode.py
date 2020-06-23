@@ -43,11 +43,19 @@ def get_sandbox(context):
     _execfile(base, context)
 
 
-def js_files(info):
-    if info["csq_interface"] == "ace":
-        return ["BASE/scripts/ace/ace.js"]
+SCRIPTS = """<!-- CodeMirror -->
+<script type="text/javascript" src="BASE/scripts/codemirror/codemirror.js"></script>
+<script type="text/javascript" src="BASE/scripts/codemirror/mode/python/python.js"></script>
+<link rel="stylesheet" href="BASE/scripts/codemirror/codemirror.css" />
+
+"""
+
+
+def extra_headers(info):
+    if info["csq_interface"] == "codemirror":
+        return SCRIPTS
     else:
-        return []
+        return None
 
 
 def html_format(string):
@@ -82,7 +90,7 @@ defaults = {
     "csq_cpu_limit": 2,
     "csq_nproc_limit": 0,
     "csq_memory_limit": 32e6,
-    "csq_interface": "ace",
+    "csq_interface": "codemirror",
     "csq_rows": 14,
     "csq_font_size": 16,
     "csq_always_show_tests": False,
@@ -591,57 +599,29 @@ def render_html_upload(last_log, **info):
     return out
 
 
-def render_html_ace(last_log, **info):
+def render_html_codemirror(last_log, **info):
     name = info["csq_name"]
     init = last_log.get(name, None)
     if init is None:
         init = make_initial_display(info)
     init = str(init)
-    fontsize = info["csq_font_size"]
-    params = {
-        "name": name,
-        "init": init,
-        "safeinit": init.replace("<", "&lt;"),
-        "height": info["csq_rows"] * (fontsize + 4),
-        "fontsize": fontsize,
-    }
-
     return (
-        """
-<div class="ace_editor_wrapper" id="container%(name)s">
-<div id="editor%(name)s" name="editor%(name)s" class="embedded_ace_code">%(safeinit)s</div></div>
-<input type="hidden" name="%(name)s" id="%(name)s" />
-<input type="hidden" name="%(name)s_log" id="%(name)s_log" />
-<script type="text/javascript">
-    // @license magnet:?xt=urn:btih:0b31508aeb0634b347b8270c7bee4d411b5d4109&dn=agpl-3.0.txt AGPL-v3
-    var log%(name)s = new Array();
-    var editor%(name)s = ace.edit("editor%(name)s");
-    editor%(name)s.setTheme("ace/theme/textmate");
-    editor%(name)s.getSession().setMode("ace/mode/python");
-    editor%(name)s.setShowFoldWidgets(false);
-    editor%(name)s.setValue(%(init)r)
-    document.getElementById("%(name)s").value = editor%(name)s.getValue();
-    editor%(name)s.on("change",function(e){
-        editor%(name)s.getSession().setUseSoftTabs(true);
-        document.getElementById("%(name)s").value = editor%(name)s.getValue();
-    });
-    editor%(name)s.clearSelection()
-    editor%(name)s.getSession().setUseSoftTabs(true);
-    editor%(name)s.on("paste",function(txt){editor%(name)s.getSession().setUseSoftTabs(false);});
-    editor%(name)s.getSession().setTabSize(4);
-    editor%(name)s.setFontSize("%(fontsize)spx");
-    document.getElementById("container%(name)s").style.height = "%(height)spx";
-    document.getElementById("editor%(name)s").style.height = "%(height)spx";
-    editor%(name)s.resize(true);
-    // @license-end
-</script>"""
-        % params
+        f'\n<textarea name="{name}" id="{name}">{init}</textarea>'
+        '\n<script type="text/javascript">'
+        f"\nvar cs_codemirror_{name} = CodeMirror.fromTextArea(document.getElementById('{name}'), {{"
+        "\n  lineNumbers: true,"
+        "\n  indentUnit: 4,"
+        "\n});"
+        f"\ncs_codemirror_{name}.on('change', function(){{"
+        f"\n  cs_codemirror_{name}.save();"
+        "\n});"
+        "\n</script>"
     )
 
 
 RENDERERS = {
     "textarea": render_html_textarea,
-    "ace": render_html_ace,
+    "codemirror": render_html_codemirror,
     "upload": render_html_upload,
 }
 
