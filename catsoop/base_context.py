@@ -407,6 +407,7 @@ cs_all_pieces = [
     "groups",
     "language",
     "loader",
+    "lti",
     "mail",
     "process",
     "session",

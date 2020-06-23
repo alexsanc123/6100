@@ -109,30 +109,9 @@ def do_check(row):
     )
 
     namemap = collections.OrderedDict()
-    cnt = 0
-    total_possible_npoints = 0
     for elt in context["cs_problem_spec"]:
         if isinstance(elt, tuple):  # each elt is (problem_context, problem_kwargs)
-            m = elt[1]
-            namemap[m["csq_name"]] = elt
-            csq_npoints = m.get("csq_npoints", 0)
-            total_possible_npoints += (
-                csq_npoints
-            )  # used to compute total aggregate score pct
-            if DEBUG:
-                question = elt[0]["handle_submission"]
-                dn = m.get("csq_display_name")
-                log("Map: %s (%s) -> %s" % (m["csq_name"], dn, question))
-                log(
-                    "%s csq_npoints=%s, total_points=%s"
-                    % (dn, csq_npoints, elt[0]["total_points"]())
-                )
-            cnt += 1
-    if DEBUG:
-        log(
-            "Loaded %d procedures into question namemap (total_possible_npoints=%s)"
-            % (cnt, total_possible_npoints)
-        )
+            namemap[elt[1]["csq_name"]] = elt
 
     # now, depending on the action we want, take the appropriate steps
 
@@ -222,45 +201,7 @@ def do_check(row):
 
             # update LTI tool consumer with new aggregate score
             if have_lti and lti_handler.have_data and row["action"] == "submit":
-                aggregate_score = 0
-                cnt = 0
-                try:
-                    for k, v in x[
-                        "scores"
-                    ].items():  # e.g. 'scores': {'q000000': 1.0, 'q000001': True, 'q000002': 1.0}
-                        aggregate_score += float(v)
-                        cnt += 1
-                    if total_possible_npoints == 0:
-                        total_possible_npoints = 1.0
-                        LOGGER.error("[checker] total_possible_npoints=0 ????")
-                    aggregate_score_fract = (
-                        aggregate_score * 1.0 / total_possible_npoints
-                    )  # LTI wants score in [0, 1.0]
-                    log(
-                        "Computed aggregate score from %d questions, aggregate_score=%s (fraction=%s)"
-                        % (cnt, aggregate_score, aggregate_score_fract)
-                    )
-                    log(
-                        "magic=%s sending aggregate_score_fract=%s to LTI tool consumer"
-                        % (row["magic"], aggregate_score_fract)
-                    )
-                    score_ok = True
-                except Exception as err:
-                    LOGGER.error(
-                        "[checker] failed to compute score for problem %s, err=%s"
-                        % (x, err)
-                    )
-                    score_ok = False
-
-                if score_ok:
-                    try:
-                        lti_handler.send_outcome(aggregate_score_fract)
-                    except Exception as err:
-                        LOGGER.error(
-                            "[checker] failed to send outcome to LTI consumer, err=%s"
-                            % str(err)
-                        )
-                        LOGGER.error("[checker] traceback=%s" % traceback.format_exc())
+                lti.update_lti_score(lti_handler, x, namemap)
 
 
 running = []

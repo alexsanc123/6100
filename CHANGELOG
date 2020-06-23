@@ -9,6 +9,8 @@ FIXED:
   * BACKPORT: Fixed issue with `csq_rerender` ignoring prompts (courtesy of
     Valerie Richmond).
 
+  * BACKPORT: Fixed issues with incorrect scores being sent to LTI consumers.
+
 ####################
 # Version 2019.9.6 #
 ####################
