@@ -102,7 +102,7 @@ Special: Text to be added to the main (information) page when no course is
 chosen.
 """
 
-cs_base_color = "#0000CC"
+cs_base_color = "#2572F5"
 """
 Special: The base color to use to customize the main theme, hexadecimal format.
 """

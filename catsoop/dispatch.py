@@ -563,7 +563,7 @@ def _clip(x, lo=0, hi=1):
 
 def _compute_light_color(base):
     base_hsv = _rgb_to_hsv(_hex_to_rgb(base))
-    light_hsv = (base_hsv[0], _clip(base_hsv[1] - 0.2), _clip(base_hsv[2] + 0.2))
+    light_hsv = (base_hsv[0], _clip(base_hsv[1] - 0.4), _clip(base_hsv[2] + 0.2))
     return _rgb_to_hex(_hsv_to_rgb(light_hsv))
 
 
