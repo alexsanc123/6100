@@ -46,7 +46,11 @@ def get_sandbox(context):
 SCRIPTS = """<!-- CodeMirror -->
 <script type="text/javascript" src="BASE/scripts/codemirror/codemirror.js"></script>
 <script type="text/javascript" src="BASE/scripts/codemirror/mode/python/python.js"></script>
+<script type="text/javascript" src="BASE/scripts/codemirror/addon/fold/foldcode.js"></script>
+<script type="text/javascript" src="BASE/scripts/codemirror/addon/fold/foldgutter.js"></script>
+<script type="text/javascript" src="BASE/scripts/codemirror/addon/fold/indent-fold.js"></script>
 <link rel="stylesheet" href="BASE/scripts/codemirror/codemirror.css" />
+<link rel="stylesheet" href="BASE/scripts/codemirror/addon/fold/foldgutter.css" />
 
 """
 
@@ -608,13 +612,32 @@ def render_html_codemirror(last_log, **info):
     return (
         f'\n<textarea name="{name}" id="{name}">{init}</textarea>'
         '\n<script type="text/javascript">'
+        "\n// @license magnet:?xt=urn:btih:0b31508aeb0634b347b8270c7bee4d411b5d4109&dn=agpl-3.0.txt AGPL-v3"
         f"\nvar cs_codemirror_{name} = CodeMirror.fromTextArea(document.getElementById('{name}'), {{"
         "\n  lineNumbers: true,"
         "\n  indentUnit: 4,"
+        "\n  mode: 'python',"
+        "\n  foldGutter: true,"
+        "\n  gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],"
+        "\n  extraKeys: {"
+        "\n    Tab: (cm) => {"
+        "\n      if (cm.getMode().name === 'null') {"
+        "\n        cm.execCommand('insertTab');"
+        "\n      } else {"
+        "\n        if (cm.somethingSelected()) {"
+        "\n          cm.execCommand('indentMore');"
+        "\n        } else {"
+        "\n          cm.execCommand('insertSoftTab');"
+        "\n        }"
+        "\n      }"
+        "\n    },"
+        "\n    'Shift-Tab': (cm) => cm.execCommand('indentLess'),"
+        "\n  },"
         "\n});"
         f"\ncs_codemirror_{name}.on('change', function(){{"
         f"\n  cs_codemirror_{name}.save();"
         "\n});"
+        "\n// @license-end"
         "\n</script>"
     )
 
