@@ -1226,6 +1226,19 @@ def handle_submit(context):
         **context["cs_logging_kwargs"]
     )
 
+    # if this was using the "legacy" grading mode and we're using LTI, send the
+    # result to the LTI consumer
+    if grading_mode == "legacy":
+        session = context["cs_session_data"]
+        if "cs_lti_config" in context and session.get("is_lti_user"):
+            lti_handler = context["csm_lti"].lti4cs_response(
+                context, session.get("lti_data")
+            )
+            if lti_handler.have_data:
+                context["csm_lti"].update_lti_score(
+                    lti_handler, newstate, context[_n("name_map")]
+                )
+
     # log submission in problemactions
     duetime = context["csm_time"].detailed_timestamp(due)
     subbed = {n: context[_n("form")].get(n, "") for n in names}
