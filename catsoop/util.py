@@ -31,19 +31,57 @@ from nacl.bindings import (
 
 from . import base_context
 
+_nodoc = {
+    'OrderedDict',
+    'crypto_secretbox',
+    'crypto_secretbox_open',
+    'datetime',
+    'timedelta',
+}
 
 def simple_encrypt(key, msg):
+    """
+    Encrypt the given plaintext string with the given key using `libsodium`'s
+    `secretbox` construct
+
+    **Parameters:**
+
+    * `key` (`bytes`): a length-32 bytestring containing the encryption key
+    * `msg` (`bytes`): a bytestring of arbitrary length, containing the message
+        to be encrypted
+
+    **Returns:** a bytestring containing the resulting ciphertext, with the
+    24-byte nonce preprended
+    """
     nonce = os.urandom(24)
     cipher = crypto_secretbox(msg, nonce, key)
     return b"%s%s" % (nonce, cipher)
 
 
 def simple_decrypt(key, cipher):
+    """
+    Decrypt the given ciphertext with the given key, using `libsodium`'s
+    `secretbox` construct
+
+    **Parameters:**
+
+    * `key` (`bytes`): a length-32 bytestring containing the encryption key
+    * `cipher` (`bytes`): a bytestring containing the ciphertext (with 24-byte
+        nonce prepended), of the form returned by `simple_encrypt`
+
+    **Returns:** a bytestring containing the plaintext result of decrypting the
+    given input
+    """
     nonce = cipher[:24]
     return crypto_secretbox_open(cipher[24:], nonce, key)
 
 
 def catsoop_loc_hash():
+    """
+    Function to generate a hash representative of this catsoop instance (by
+    hashing `cs_url_root`).  Used to generate names for the session ID, to be
+    used when setting cookies.
+    """
     return hashlib.md5(base_context.cs_url_root.encode("utf-8")).hexdigest()
 
 

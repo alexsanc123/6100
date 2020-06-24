@@ -54,11 +54,13 @@ _nodoc = {
     "StringIO",
     "clear_info",
     "html_format",
+    "indent_code",
     "PYTHON_REGEX",
     "PYVAR_REGEX",
     "remove_common_leading_whitespace",
     "source_formats",
     "source_format_string",
+    "unidecode",
 }
 
 _malformed_question = "<font color='red'>malformed <tt>question</tt></font>"

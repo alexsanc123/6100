@@ -25,13 +25,12 @@ cs_checker_websocket = 'ws://localhost:7668'
 Typically, on a public-facing server, `cs_url_root` will start with `https`,
 and `cs_checker_websocket` will start with `wss`.
 
-<div class="callout callout-warning">
-<h4>Double Check</h4>
-<p>Make sure that the <code>cs_fs_root</code> directory can be read from and written to by
-the web server's user.</p>
-<p>Make sure that the <code>cs_data_root</code> directory is <b>not</b> web-accessible, and that
-the web server's user has read/write access.</p>
-</div>
+!!! warning: Double Check
+    Make sure that the `cs_fs_root` directory can be read from and written to
+    by the user that will be running the web server.
+
+    Also make sure that the `cs_data_root` directory is **not web-accessible**,
+    and that the user that will be running the web serv has read/write access.
 
 By default, running `catsoop start` will start several processes.  The most
 important are the UWSGI server (default port `7667`) and the websocket server
@@ -52,19 +51,17 @@ You can, of course, customize the endpoints (`/cat-soop` and `/reporter` in the
 example below) to change the base URL for both the WSGI server and the
 websocket server.
 
-<div class="callout callout-info">
-<h4>Note</h4>
-If you do not already have one and you are planning to make a public-facing
-server, you should acquire an SSL certificate.  If your server is running at
-MIT, you can follow the instructions <a
-href="http://kb.mit.edu/confluence/display/istcontrib/Obtaining+an+SSL+certificate+for+a+web+server"
-target="_blank">on this page</a>.  Otherwise, SSL/TLS Certificates are
-available gratis from <a href="https://letsencrypt.org/" target="_blank">Let's
-Encrypt</a>.
-</div>
+!!! note: Note
+    If you do not already have one and you are planning to make a public-facing
+    server, you should acquire an SSL certificate.  If your server is running
+    at MIT, you can follow the instructions <a
+    href="http://kb.mit.edu/confluence/display/istcontrib/Obtaining+an+SSL+certificate+for+a+web+server"
+    target="_blank">on this page</a>.  Otherwise, SSL/TLS Certificates are
+    available gratis from <a href="https://letsencrypt.org/"
+    target="_blank">Let's Encrypt</a>.
 
 
-```
+```nginx
 # redirect all HTTP traffic to HTTPS
 server {
 	listen 80;
@@ -127,49 +124,38 @@ server {
 }
 ```
 
-<div class="callout callout-warning">
-<h4>Double Check</h4>
-<p>Note that your <code>cs_url_root</code> and <code>cs_checker_websocket</code> should match the nginx configuration.  In the example above, we should have <code>cs_url_root = 'https://your.server.com/cat-soop'</code> and <code>cs_checker_websocket = wss://your.server.com/reporter</code> in the <code>config.py</code> file.</p> <p>
-Also, make sure the ports (<code>7667</code> and <code>7668</code> in the example above) match the port numbers you set in <code>config.py</code>, if any.
-</p>
-</div>
+!!! warning: Double Check
+    Note that your `cs_url_root` and `cs_checker_websocket` should match the
+    nginx configuration.  In the example above, we should have `cs_url_root =
+    'https://your.server.com/cat-soop'` and `cs_checker_websocket =
+    wss://your.server.com/reporter` in the `config.py` file.
+
+    Also, make sure the ports (`7667` and `7668` in the example above) match
+    the port numbers you set in `config.py`, if any.
 
 
-<div class="callout callout-info">
-<h4>Note</h4>
-If you want the root of the webserver to point to the CAT-SOOP instance, you
-can remove the block labeled <code>location /</code> from the example above,
-change <code>location /cat-soop</code> to be <code>location /</code>, and
-comment out the <code>rewrite</code> line within that block.
-</div>
-
-<subsection>(Optional) Client Certificate Authentication</subsection>
-
-If you would like to enable authentication based on client certificates (instead of username/password), add the following line beneath the other `ssl_` configuration variables in the NGINX configuration file:
-
-```
-	ssl_client_certificate /path/to/client_ca.pem;
-	ssl_verify_client on;
-```
-
-where `/path/to/client_ca.pem` is the location on fisk of the CA with which client certificates are signed.
+!!! note: Note
+    If you want the root of the webserver to point to the CAT-SOOP instance,
+    you can remove the block labeled `location /` from the example above,
+    change `location /cat-soop` to be `location /`, and comment out the
+    `rewrite` line within that block.
 
 <section>(Optional) Configure Workers</section>
 
 <subsection>Web Server</subsection>
 
-By default, CAT-SOOP uses [cheroot](https://github.com/cherrypy/cheroot) as its
-WSGI server.  However, for public-facing instances, we recommend using [uWSGI](https://uwsgi-docs.readthedocs.io/en/latest/) instead of cheroot.  To
-do so, set `cs_wsgi_server = 'uwsgi'` in your `config.py` file.  To make uWSGI
-spawn multiple worker processes, set the `cs_wsgi_server_min_processes` and
-`cs_wsgi_server_max_processes` variables.  When using uWSGI, you do not need to
-do any special NGINX configuration for load balancing.
+By default, public-facing CAT-SOOP instances use
+[uWSGI](https://uwsgi-docs.readthedocs.io/en/latest/) to serve content.  To
+make uWSGI spawn multiple worker processes, set the
+`cs_wsgi_server_min_processes` and `cs_wsgi_server_max_processes` variables.
+When using uWSGI, you do not need to do any special NGINX configuration for
+load balancing.
 
-Alternatively, if you prefer to use `cheroot`, you can cause CAT-SOOP to launch
-more than one worker by setting `cs_wsgi_server_port` to a _list_ of integers
-instead of a single integer.  In this case, you will also likely want to
-configure NGINX to balance the load between the different processes by
-following the instructions [on this
+Alternatively, if you prefer to use `cheroot` instead of uWSGI, you can cause
+CAT-SOOP to launch more than one worker by setting `cs_wsgi_server_port` to a
+_list_ of integers instead of a single integer.  In this case, you will also
+likely want to configure NGINX to balance the load between the different
+processes by following the instructions [on this
 page](http://nginx.org/en/docs/http/load_balancing.html) (and, importantly,
 including the `ip_hash;` directive so users' sessions are not lost).
 
@@ -190,7 +176,7 @@ command to start CAT-SOOP:
 $ catsoop start
 ```
 
-On a typical webserver, it is a good idea to run the command in a screen so
+On a typical webserver, it is a good idea to run the command in a GNU screen so
 that the process does not die when you hang up.  Alternatively, you can use
 `nohup`.  For example,
 
@@ -416,22 +402,23 @@ with open('/tmp/test', 'w') as f:
 This should produce an error, since this interpreter is not allowed to write
 that much data to disk.
 
-<div class="callout callout-info">
-<h4>Note</h4>
-If you did use AppArmor to place additional restrictions on filesystem access,
-and if you later wish to install other Python packages for the sandboxed
-interpreter, you will first need to disable the AppArmor protections by
-running:
-<pre>
-$ sudo aa-disable /etc/apparmor.d/py3sandbox
-</pre>
-Then you can install the packages using the `pip` executable within the virtual
-environment, and re-enable the AppArmor protections afterwards by running:
-<pre>
-$ sudo aa-enforce /etc/apparmor.d/py3sandbox
-</pre>
-</div>
-</abstractions></abstractions></tunables>
+!!! note: Note
+    If you did use AppArmor to place additional restrictions on filesystem
+    access, and if you later wish to install other Python packages for the
+    sandboxed interpreter, you will first need to disable the AppArmor
+    protections by running:
+
+    ```nohighlight
+    $ sudo aa-disable /etc/apparmor.d/py3sandbox
+    ```
+
+    Then you can install the packages using the `pip` executable within the
+    virtual environment, and re-enable the AppArmor protections afterwards by
+    running:
+
+    ```nohighlight
+    $ sudo aa-enforce /etc/apparmor.d/py3sandbox
+    ```
 
 <subsection>CAT-SOOP Configuration</subsection>
 

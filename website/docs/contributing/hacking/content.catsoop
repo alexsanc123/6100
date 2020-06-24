@@ -136,11 +136,12 @@ TODO
     difficult to test, but it should still be tested where it's feasible to do
     so.
 
-1. Functions and dictionaries are preferable to classes.
+1. Unless there is a really good reason for doing it, please avoid using
+    classes (functions and dictionaries are generally preferable).
 
 1. To ensure consistency across the codebase, CAT-SOOP uses the
-    [black](https://black.readthedocs.io/en/stable/) code formatting tool.
-    Please run your changes through `black`.
+    <a href="https://black.readthedocs.io/en/stable/" target="_blank">black</a>
+    code formatting tool.  Please run your changes through `black`.
 
 1. Logically separate changes should have separate commits in the repository.
 
@@ -158,12 +159,16 @@ provides some guidance on doing just that.
 
 <subsection>Licensing</subsection>
 
-CAT-SOOP (including its documentation) is available under the terms of the [GNU
+CAT-SOOP (including its documentation) is licensed under the terms of the [GNU
 Affero General Public License, version
 3+](https://www.gnu.org/licenses/agpl-3.0.html).  By sending your contributions
 as described below, you are licensing them to us under those same terms, and
 you are asserting that you have the right to license your contributions under
 those terms.
+
+Unless you specify otherwise, by sending us your contributions as described
+below, you are also asserting that it is OK for us to attribute those changes
+under the general heading of "The CAT-SOOP Developers" in the copyright notice.
 
 <subsection>Checklist</subsection>
 
@@ -171,29 +176,30 @@ Before sending your changes, please:
 
 1. Make sure that new features are documented/tested as described above.
 1. Run `black` on the entire codebase, and make sure that no files change.
-1. Run `make test` and make sure that all tests pass (including new
+1. Run `make test` and make sure that all tests pass (including any new
     tests you've written).
 1. Add an appropriate entry to `CHANGELOG.md`, and, if you wish, add your name to
     the `CONTRIBUTORS.md` file.
 
 <subsection>Sending</subsection>
 
-We prefer using Gitea's "pull request" feature for managing contributed changes
-to catsoop.  In order to start the process, you should push your changes to a
-new branch on your fork of the main repository.  When pushing, you should see a
-link for creating a new pull request.  You can follow this link, fill out a
-little bit of information about the changes, and submit your pull request.
+In general, we prefer using Gitea's "pull request" feature for managing
+contributed changes to catsoop.  In order to start the process, you should push
+your changes to a new branch on your fork of the main repository.  When
+pushing, you should see a link for creating a new pull request.  You can follow
+this link, fill out a little bit of information about the changes, and submit
+your pull request.
 
-Alternatively, if you prefer it, feel free to send patches via e-mail to
-`catsoop-dev@mit.edu` using `git format-patch` or `git send-email`.
+Alternatively, if you prefer it, feel free to attach patches (created using
+`git format-patch` to a message on the [community forum](/community).
 
 <subsection>Feedback</subsection>
 
-After you've sent your changes, you should receive a response (hopefully in a
-day or two) in one of the following flavors:
+After you've sent your changes, you should receive a response (hopefully within
+a day or two) in one of the following flavors:
 
 1. Thanks!  We'll add these to CAT-SOOP!
-1. Thanks!  I'm hosed right now but will take a detailed look when I get a chance.
+1. Thanks!  We're hosed right now but will take a detailed look when we get a chance.
 1. Thanks!  Here are some questions / thoughts / suggested changes.
 
 If you don't hear back right away, feel free to send a follow-up message.  And
@@ -222,10 +228,10 @@ tagged as **long-term support** (LTS) releases and will continue to be
 supported for two full years.  These versions will receive no
 backwards-incompatible changes during that time (except in the case where such
 a change is necessary for security reasons).  Each LTS version will have a
-separate branch in the repository, named like `lts-20YY.M`, where bugfixes
-will be backported from the `default` branch.
+separate branch in the repository, named like `20YY.M-lts`, where bugfixes
+will be backported from the `dev` branch.
 
-Each new release (including minor releases) will be accompanied by an e-mail to
-`catsoop-users@mit.edu`.  These e-mails will include information about what
-changed from the previous version, as well as an indication of steps that need
-to be taken when upgrading.
+Each new release (including minor releases) will be accompanied by a post to
+the community forum, which will include information about what changed from the
+previous version, as well as an indication of steps that need to be taken when
+upgrading.

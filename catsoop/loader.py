@@ -39,6 +39,9 @@ from . import base_context
 
 importlib.reload(base_context)
 
+_nodoc = {
+    'OrderedDict',
+}
 
 def clean_builtins(d):
     """

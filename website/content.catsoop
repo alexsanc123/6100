@@ -11,9 +11,8 @@
 
 <center>
 <a class="btn btn-catsoop" href="COURSE/docs">Documentation</a>
-<a class="btn btn-catsoop" href="/forum/">Forum</a>
-<a class="btn btn-catsoop" target="_blank" href="/git/catsoop/catsoop">Code</a>
-<a class="btn btn-catsoop" target="_blank" href="/git/catsoop/catsoop/issues">Issue Tracker</a>
+<a class="btn btn-catsoop" href="/community/">Community</a>
+<a class="btn btn-catsoop" target="_blank" href="/git/catsoop/catsoop">Development</a>
 </center>
 
 
@@ -31,21 +30,18 @@ about CAT-SOOP at [this page](COURSE/docs/about).
     * <https://catsoop.mit.edu>
     * Tor onion service: <http://wjglyvalrulqaelaptda3pni6lcap46exxsnbiijocrk2guz3nr7dxqd.onion>
 
-* Repository:
+* Community Forum:
+    * <https://catsoop.mit.edu/community>
+
+* Git Repository / Issue Tracker:
     * <@{cs_url_root.split(':',1)[0]}://@{cs_url_root.split('/',2)[-1]}/git/catsoop/catsoop>
     * `@{TOR_STRING('git')} clone @{cs_url_root.split(':',1)[0]}://@{cs_url_root.split('/',2)[-1]}/git/catsoop/catsoop.git`
 
-* IRC: `#catsoop` on OFTC (`irc.oftc.net`)
-
-* Mailing lists:
-
-    * `catsoop-users@mit.edu`, low-volume list for announcements and discussion (subscribe [here](http://mailman.mit.edu/mailman/listinfo/catsoop-users))
-    * `catsoop-dev@mit.edu` for development-related discussion (subscribe [here](http://mailman.mit.edu/mailman/listinfo/catsoop-dev))
 
 ## CAN I USE IT FOR MY COURSE?
 
 Of course!  CAT-SOOP is [free/libre
-software](https://www.gnu.org/philosophy/free-sw.html), available under the
+software](https://www.fsf.org/about/what-is-free-software), available under the
 terms of the [GNU Affero General Public License, version 3+](BASE/cs_util/license).
 Please note that the terms of this license apply to the CAT-SOOP system itself,
 but not to any course material hosted on a CAT-SOOP instance, unless explicitly
@@ -53,6 +49,7 @@ stated otherwise.
 
 Although the [documentation](COURSE/docs) is a bit sparse, I am working on
 it!
+
 
 ## IS IT ANY GOOD?
 

@@ -13,7 +13,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-"""CAT-SOOP Extensions for Mistletoe"""
+"""CAT-SOOP Extensions for [Mistletoe](https://github.com/miyuchina/mistletoe)"""
 
 import re
 import html
@@ -151,8 +151,15 @@ class SyntaxHighlightedCodeSpan(SpanToken):
 
 # Math
 
+_nodoc = {
+    'Document',
+    'SpanToken', 'tokenize_inner', 'BlockToken', 'tokenize', 'HTMLRenderer'
+}
 
 class Math(SpanToken):
+    """
+    Mistletoe extension for handling inline math (`$...$`)
+    """
     pattern = re.compile(r"(?:^|(?<!\\))\$(?P<body>(?:\\\$|[^$])*)\$")
     parse_inner = False
 
@@ -161,6 +168,9 @@ class Math(SpanToken):
 
 
 class DisplayMath(SpanToken):
+    """
+    Mistletoe extension for handling display math (`$$...$$`)
+    """
     pattern = re.compile(r"\$\$(?P<body>.*?)\$\$", re.MULTILINE | re.DOTALL)
     parse_inner = False
     precedence = SpanToken.precedence + 2
@@ -170,6 +180,10 @@ class DisplayMath(SpanToken):
 
 
 class DisplayMathEnv(SpanToken):
+    """
+    Mistletoe extension for handling various math environments, e.g.
+    `\\begin{equation}...\\end{equation}`
+    """
     pattern = re.compile(
         r"\\begin\s*{(?P<env>(?:equation|eqnarray|align)\*?)}(?P<body>(?s).*?)\\end\s*{(?P=env)}",
         re.MULTILINE | re.DOTALL,
@@ -183,6 +197,9 @@ class DisplayMathEnv(SpanToken):
 
 
 class EscapedDollar(SpanToken):
+    """
+    Mistletoe extension for handling escaped dollar signs (`\\$`)
+    """
     pattern = re.compile(r"(?<!\\)\\(\$)")
 
 
@@ -190,6 +207,9 @@ class EscapedDollar(SpanToken):
 
 
 class Callout(BlockToken):
+    """
+    Mistletoe extension for handling "callout" dialog boxes
+    """
     classes = ["note", "tip", "info", "warning", "error"]
     start_regex = re.compile(r"!!!(?P<header>.*)")
 
@@ -257,6 +277,9 @@ class Callout(BlockToken):
 
 
 class CatsoopRenderer(HTMLRenderer):
+    """
+    Mistletoe renderer incorporating the various extensions
+    """
     def __init__(self):
         HTMLRenderer.__init__(
             self,
@@ -295,5 +318,10 @@ class CatsoopRenderer(HTMLRenderer):
 
 
 def markdown(x):
+    """
+    Main entrypoint, takes in a Markdown-formatted string, parses it using
+    Mistletoe (with the extensions above loaded in), and returns an HTML-string
+    as a result.
+    """
     with CatsoopRenderer() as renderer:
         return renderer.render(Document(x))

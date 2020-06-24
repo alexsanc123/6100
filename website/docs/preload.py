@@ -19,7 +19,7 @@ cs_top_menu = [
             {"link": "COURSE/docs/authoring", "text": "Authoring"},
             {"link": "COURSE/docs/extending", "text": "Extending"},
             {"link": "COURSE/docs/contributing", "text": "Contributing"},
-            {"link": "COURSE/docs/api/catsoop", "text": "API"},
+            {"link": "COURSE/docs/api?p=catsoop", "text": "API"},
         ],
     }
 ]
@@ -56,13 +56,9 @@ def aside(x):
     return ""
 
 
-todo = """<div class="callout callout-danger">
-<p>
-  <b>This Page Needs Attention</b>
-</p>
-<p>
-  Contributions to documentation are more than welcome!
-  You can e-mail contributions (or questions) to
-  <code>catsoop-dev@mit.edu</code>.
-</p>
-</div>"""
+todo = """!!! warning: This Page Needs Attention
+    Contributions to documentation are more than welcome!
+    You can post suggestions, questions, or other feedback to the <a
+    href="/community" target="_blank">community forum</a>.  If you don't want
+    to create an account there, you can post by sending e-mail to
+    `community@catsoop.mit.edu`."""
