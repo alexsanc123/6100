@@ -27,6 +27,8 @@ _Work toward next release. Currently under development._
     ["admonitions"](https://casual-effects.com/markdeep/features.md.html#basicformatting/admonitions)
     (#90)
 
+* Added support for syntax highlighting of inline code elements (#93 and #101)
+
 **CHANGED:**
 
 * Auto-generated `csq_name` fields increment for every question, even those

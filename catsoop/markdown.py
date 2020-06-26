@@ -16,11 +16,137 @@
 """CAT-SOOP Extensions for Mistletoe"""
 
 import re
+import html
 
 from mistletoe import Document
 from mistletoe.span_token import SpanToken, tokenize_inner
 from mistletoe.block_token import BlockToken, tokenize
 from mistletoe.html_renderer import HTMLRenderer
+
+# Syntax Highlighting for Code Spans
+
+# auto-generated list of languages for syntax highlighting, from highlight.js
+LANGS = [
+    "apache",
+    "apacheconf",
+    "bash",
+    "sh",
+    "zsh",
+    "c",
+    "c",
+    "h",
+    "coffeescript",
+    "coffee",
+    "cson",
+    "iced",
+    "cpp",
+    "cc",
+    "c\\+\\+",
+    "h\\+\\+",
+    "hpp",
+    "hh",
+    "hxx",
+    "cxx",
+    "csharp",
+    "cs",
+    "c#",
+    "css",
+    "diff",
+    "patch",
+    "go",
+    "golang",
+    "http",
+    "https",
+    "ini",
+    "toml",
+    "java",
+    "jsp",
+    "javascript",
+    "js",
+    "jsx",
+    "mjs",
+    "cjs",
+    "json",
+    "kotlin",
+    "kt",
+    "less",
+    "lua",
+    "makefile",
+    "mk",
+    "mak",
+    "xml",
+    "html",
+    "xhtml",
+    "rss",
+    "atom",
+    "xjb",
+    "xsd",
+    "xsl",
+    "plist",
+    "wsf",
+    "svg",
+    "markdown",
+    "md",
+    "mkdown",
+    "mkd",
+    "nginx",
+    "nginxconf",
+    "objectivec",
+    "mm",
+    "objc",
+    "obj-c",
+    "perl",
+    "pl",
+    "pm",
+    "php",
+    "php",
+    "php3",
+    "php4",
+    "php5",
+    "php6",
+    "php7",
+    "php-template",
+    "plaintext",
+    "text",
+    "txt",
+    "properties",
+    "python",
+    "py",
+    "gyp",
+    "ipython",
+    "python-repl",
+    "pycon",
+    "ruby",
+    "rb",
+    "gemspec",
+    "podspec",
+    "thor",
+    "irb",
+    "rust",
+    "rs",
+    "scss",
+    "shell",
+    "console",
+    "sql",
+    "swift",
+    "typescript",
+    "ts",
+    "yaml",
+    "yml",
+    "YAML",
+]
+
+
+class SyntaxHighlightedCodeSpan(SpanToken):
+    pattern = re.compile(
+        r"(?P<lang>%s)(?P<open>`+)(?P<body>.*?)(?P=open)" % "|".join(LANGS)
+    )
+    parse_inner = False
+    precedence = SpanToken.precedence + 2
+
+    def __init__(self, match):
+        self.language = match.group("lang")
+        self.body = match.group("body")
 
 
 # Math
@@ -133,8 +259,29 @@ class Callout(BlockToken):
 class CatsoopRenderer(HTMLRenderer):
     def __init__(self):
         HTMLRenderer.__init__(
-            self, Callout, DisplayMathEnv, DisplayMath, Math, EscapedDollar
+            self,
+            Callout,
+            DisplayMathEnv,
+            DisplayMath,
+            Math,
+            EscapedDollar,
+            SyntaxHighlightedCodeSpan,
         )
+
+    def render_syntax_highlighted_code_span(self, token):
+        return '<span class="hl"><code class="lang-%s">%s</code></span>' % (
+            token.language,
+            html.escape(token.body),
+        )
+
+    def render_math(self, token):
+        return f"<math>{token.body}</math>"
+
+    def render_display_math(self, token):
+        return f"<displaymath>{token.body}</displaymath>"
+
+    def render_display_math_env(self, token):
+        return f'<displaymath env="{token.env}">{token.body}</displaymath>'
 
     def render_callout(self, token):
         if token.title:
@@ -145,15 +292,6 @@ class CatsoopRenderer(HTMLRenderer):
             rendered_title = ""
         rendered_body = "".join(self.render(i) for i in token.children)
         return f'<div class="callout callout-{token.type}">{rendered_title}\n\n{rendered_body}\n</div>'
-
-    def render_math(self, token):
-        return f"<math>{token.body}</math>"
-
-    def render_display_math(self, token):
-        return f"<displaymath>{token.body}</displaymath>"
-
-    def render_display_math_env(self, token):
-        return f'<displaymath env="{token.env}">{token.body}</displaymath>'
 
 
 def markdown(x):

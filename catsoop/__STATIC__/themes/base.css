@@ -552,6 +552,12 @@ a.btn:visited {
 /* highlight.js styles */
 /* Based on default colors in Python's IDLE */
 
+span.hl code {
+  display: inline !important;
+  overflow-x: auto;
+  padding: 2px;
+}
+
 .hljs {
   display: block;
   overflow-x: auto;
