@@ -255,6 +255,7 @@ def generate_context(path):
     ctx = {}
     load_global_data(ctx)
     ctx["cs_path_info"] = path
+    ctx["cs_logging_kwargs"] = {}
     if path:
         ctx["cs_course"] = path[0]
         cfile = ctx["csm_dispatch"].content_file_location(ctx, path)
