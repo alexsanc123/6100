@@ -30,6 +30,9 @@ _Work toward next release. Currently under development._
 
 * Added the `ldap3` authentication type for login using an LDAPv3 server (#104).
 
+* Added the `sso` authentication type for authentication using an arbitrary
+    third-party single-sign-on provider (#103)
+
 **CHANGED:**
 
 * Auto-generated `csq_name` fields increment for every question, even those
