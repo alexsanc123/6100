@@ -32,7 +32,7 @@ if stored_state is None:
 elif state is None:
     error = "No state provided by server."
 elif stored_state != state:
-    error = "Suspected tampering! " "State from server does not match local state."
+    error = "Suspected tampering! State from server does not match local state."
 
 
 if error is None:
