@@ -186,7 +186,7 @@ def setup_login_boxes(context):
 
             context["cs_content"] = login_box + context["cs_content"]
 
-        context["post_load"] = new_post_load
+        context["cs_post_load"] = new_post_load
         return {}
     else:
         # Replace pages that require authentication with a message
@@ -203,7 +203,7 @@ LOGIN_PAGE = """
 <div id="catsoop_login_box">
     <b><center>You are not logged in.</center></b> <br/>
     Access to this page requires logging in. Please <a
-    href="%s?loginaction=login">Log In</a> to continue.
+    href="{}?loginaction=login">Log In</a> to continue.
 </div>
 """
 
@@ -212,7 +212,7 @@ LOGIN_PAGE = """
 LOGIN_BOX = """
 <div class="response" id="catsoop_login_box">
     <b><center>You are not logged in.</center></b><br/>
-    If you are a current student, please <a href="%s?loginaction=login">Log In
+    If you are a current student, please <a href="{}?loginaction=login">Log In
     </a> for full access to the web site.
 </div>
 """
