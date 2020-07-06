@@ -114,6 +114,6 @@ cs_ldap3 = {
     },
 }
 
-cs_ldap3_login_message = "<i>Use the company</i>"
+cs_ldap3_login_message = "<i>Use the university supplied username/password</i>"
 ```
 
