@@ -15,6 +15,7 @@
 * Joe Steinmeyer
 * Rodrigo Toste Gomes
 * Jeremy Wright
+* Halvard Hummel
 
 
 ### Security Reports

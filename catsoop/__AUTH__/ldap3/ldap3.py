@@ -96,15 +96,13 @@ def login(context):
             server = ldap3.Server(**ldap3_config["server"])
             conn = ldap3.Connection(server, auto_bind=True)
         except LDAPException as exception:
-            LOGGER.error("[ldap] Could not create LDAP connection to the server"
-                         " with the given configuration. The following "
-                         "exception was thrown:")
+            LOGGER.error(
+                "[ldap] Could not create LDAP connection to the server with the"
+                " given configuration. The following exception was thrown:"
+            )
             LOGGER.exception(exception)
             return login_render(
-                context,
-                username,
-                "Could not connect to login server",
-                login_message,
+                context, username, "Could not connect to login server", login_message
             )
 
         request = ldap3_config["search"]["filter"].format(username)
@@ -118,13 +116,12 @@ def login(context):
 
         # The LDAP may return several users.
         for user_data in conn.response:
-            if conn.rebind(user_data['dn'], password=password):
+            if conn.rebind(user_data["dn"], password=password):
                 try:
                     info = {
                         "username": username,
                         "name": user_data["attributes"][name_attribute_name][0],
-                        "email":
-                            user_data["attributes"][email_attribute_name][0],
+                        "email": user_data["attributes"][email_attribute_name][0],
                     }
                     context["cs_session_data"].update(info)
                     info["cs_reload"] = True
@@ -152,9 +149,7 @@ def login_render(context, username, error_message="", login_message=""):
     :return:
     """
     context["cs_content"] = LOGIN_FORM.format(
-        username=username,
-        error_message=error_message,
-        login_message=login_message,
+        username=username, error_message=error_message, login_message=login_message
     )
     context["cs_content_header"] = "Please Log In To Continue"
     return {"cs_render_now": True}
@@ -187,9 +182,7 @@ def setup_login_boxes(context):
             if "cs_login_box" in context:
                 login_box = context["cs_login_box"](context)
             else:
-                login_box = LOGIN_BOX.format(
-                    _get_base_url(context),
-                )
+                login_box = LOGIN_BOX.format(_get_base_url(context))
 
             context["cs_content"] = login_box + context["cs_content"]
 
@@ -200,9 +193,7 @@ def setup_login_boxes(context):
         # telling them to log in to see the content of the page.
         context["cs_handler"] = "passthrough"
         context["cs_content_header"] = "Please Log In"
-        context["cs_content"] = LOGIN_PAGE.format(
-            _get_base_url(context),
-        )
+        context["cs_content"] = LOGIN_PAGE.format(_get_base_url(context))
         return {"cs_render_now": True}
 
 
