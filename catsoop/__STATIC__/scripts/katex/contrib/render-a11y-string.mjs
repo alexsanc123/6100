@@ -1,113 +1,5 @@
-(function webpackUniversalModuleDefinition(root, factory) {
-	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory(require("katex"));
-	else if(typeof define === 'function' && define.amd)
-		define(["katex"], factory);
-	else {
-		var a = typeof exports === 'object' ? factory(require("katex")) : factory(root["katex"]);
-		for(var i in a) (typeof exports === 'object' ? exports : root)[i] = a[i];
-	}
-})((typeof self !== 'undefined' ? self : this), function(__WEBPACK_EXTERNAL_MODULE__0__) {
-return /******/ (function(modules) { // webpackBootstrap
-/******/ 	// The module cache
-/******/ 	var installedModules = {};
-/******/
-/******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
-/******/
-/******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId]) {
-/******/ 			return installedModules[moduleId].exports;
-/******/ 		}
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = installedModules[moduleId] = {
-/******/ 			i: moduleId,
-/******/ 			l: false,
-/******/ 			exports: {}
-/******/ 		};
-/******/
-/******/ 		// Execute the module function
-/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-/******/
-/******/ 		// Flag the module as loaded
-/******/ 		module.l = true;
-/******/
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
-/******/ 	}
-/******/
-/******/
-/******/ 	// expose the modules object (__webpack_modules__)
-/******/ 	__webpack_require__.m = modules;
-/******/
-/******/ 	// expose the module cache
-/******/ 	__webpack_require__.c = installedModules;
-/******/
-/******/ 	// define getter function for harmony exports
-/******/ 	__webpack_require__.d = function(exports, name, getter) {
-/******/ 		if(!__webpack_require__.o(exports, name)) {
-/******/ 			Object.defineProperty(exports, name, { enumerable: true, get: getter });
-/******/ 		}
-/******/ 	};
-/******/
-/******/ 	// define __esModule on exports
-/******/ 	__webpack_require__.r = function(exports) {
-/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
-/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-/******/ 		}
-/******/ 		Object.defineProperty(exports, '__esModule', { value: true });
-/******/ 	};
-/******/
-/******/ 	// create a fake namespace object
-/******/ 	// mode & 1: value is a module id, require it
-/******/ 	// mode & 2: merge all properties of value into the ns
-/******/ 	// mode & 4: return value when already ns object
-/******/ 	// mode & 8|1: behave like require
-/******/ 	__webpack_require__.t = function(value, mode) {
-/******/ 		if(mode & 1) value = __webpack_require__(value);
-/******/ 		if(mode & 8) return value;
-/******/ 		if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
-/******/ 		var ns = Object.create(null);
-/******/ 		__webpack_require__.r(ns);
-/******/ 		Object.defineProperty(ns, 'default', { enumerable: true, value: value });
-/******/ 		if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
-/******/ 		return ns;
-/******/ 	};
-/******/
-/******/ 	// getDefaultExport function for compatibility with non-harmony modules
-/******/ 	__webpack_require__.n = function(module) {
-/******/ 		var getter = module && module.__esModule ?
-/******/ 			function getDefault() { return module['default']; } :
-/******/ 			function getModuleExports() { return module; };
-/******/ 		__webpack_require__.d(getter, 'a', getter);
-/******/ 		return getter;
-/******/ 	};
-/******/
-/******/ 	// Object.prototype.hasOwnProperty.call
-/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
-/******/
-/******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "";
-/******/
-/******/
-/******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 1);
-/******/ })
-/************************************************************************/
-/******/ ([
-/* 0 */
-/***/ (function(module, exports) {
+import katex from '../katex.mjs';
 
-module.exports = __WEBPACK_EXTERNAL_MODULE__0__;
-
-/***/ }),
-/* 1 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var katex__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(0);
-/* harmony import */ var katex__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(katex__WEBPACK_IMPORTED_MODULE_0__);
 /**
  * renderA11yString returns a readable string.
  *
@@ -123,11 +15,7 @@ __webpack_require__.r(__webpack_exports__);
  * The commas in the string aim to increase ease of understanding
  * when read by a screenreader.
  */
-// NOTE: since we're importing types here these files won't actually be
-// included in the build.
-// $FlowIgnore: we import the types directly anyways
-
-var stringMap = {
+const stringMap = {
   "(": "left parenthesis",
   ")": "right parenthesis",
   "[": "open bracket",
@@ -200,22 +88,22 @@ var stringMap = {
   "\\hat": "hat",
   "\\acute": "acute"
 };
-var powerMap = {
+const powerMap = {
   "prime": "prime",
   "degree": "degrees",
   "circle": "degrees",
   "2": "squared",
   "3": "cubed"
 };
-var openMap = {
+const openMap = {
   "|": "open vertical bar",
   ".": ""
 };
-var closeMap = {
+const closeMap = {
   "|": "close vertical bar",
   ".": ""
 };
-var binMap = {
+const binMap = {
   "+": "plus",
   "-": "minus",
   "\\pm": "plus minus",
@@ -227,7 +115,7 @@ var binMap = {
   "\\circ": "circle",
   "\\bullet": "bullet"
 };
-var relMap = {
+const relMap = {
   "=": "equals",
   "\\approx": "approximately equals",
   "≠": "does not equal",
@@ -243,7 +131,7 @@ var relMap = {
   "\\Rightarrow": "right arrow",
   ":": "colon"
 };
-var accentUnderMap = {
+const accentUnderMap = {
   "\\underleftarrow": "left arrow",
   "\\underrightarrow": "right arrow",
   "\\underleftrightarrow": "left-right arrow",
@@ -252,12 +140,12 @@ var accentUnderMap = {
   "\\utilde": "tilde"
 };
 
-var buildString = function buildString(str, type, a11yStrings) {
+const buildString = (str, type, a11yStrings) => {
   if (!str) {
     return;
   }
 
-  var ret;
+  let ret;
 
   if (type === "open") {
     ret = str in openMap ? openMap[str] : stringMap[str] || str;
@@ -284,18 +172,18 @@ var buildString = function buildString(str, type, a11yStrings) {
   }
 };
 
-var buildRegion = function buildRegion(a11yStrings, callback) {
-  var regionStrings = [];
+const buildRegion = (a11yStrings, callback) => {
+  const regionStrings = [];
   a11yStrings.push(regionStrings);
   callback(regionStrings);
 };
 
-var handleObject = function handleObject(tree, a11yStrings, atomType) {
+const handleObject = (tree, a11yStrings, atomType) => {
   // Everything else is assumed to be an object...
   switch (tree.type) {
     case "accent":
       {
-        buildRegion(a11yStrings, function (a11yStrings) {
+        buildRegion(a11yStrings, a11yStrings => {
           buildA11yStrings(tree.base, a11yStrings, atomType);
           a11yStrings.push("with");
           buildString(tree.label, "normal", a11yStrings);
@@ -306,7 +194,7 @@ var handleObject = function handleObject(tree, a11yStrings, atomType) {
 
     case "accentUnder":
       {
-        buildRegion(a11yStrings, function (a11yStrings) {
+        buildRegion(a11yStrings, a11yStrings => {
           buildA11yStrings(tree.base, a11yStrings, atomType);
           a11yStrings.push("with");
           buildString(accentUnderMap[tree.label], "normal", a11yStrings);
@@ -323,7 +211,7 @@ var handleObject = function handleObject(tree, a11yStrings, atomType) {
 
     case "atom":
       {
-        var text = tree.text;
+        const text = tree.text;
 
         switch (tree.family) {
           case "bin":
@@ -366,7 +254,7 @@ var handleObject = function handleObject(tree, a11yStrings, atomType) {
           default:
             {
               tree.family;
-              throw new Error("\"" + tree.family + "\" is not a valid atom type");
+              throw new Error(`"${tree.family}" is not a valid atom type`);
             }
         }
 
@@ -375,8 +263,8 @@ var handleObject = function handleObject(tree, a11yStrings, atomType) {
 
     case "color":
       {
-        var color = tree.color.replace(/katex-/, "");
-        buildRegion(a11yStrings, function (regionStrings) {
+        const color = tree.color.replace(/katex-/, "");
+        buildRegion(a11yStrings, regionStrings => {
           regionStrings.push("start color " + color);
           buildA11yStrings(tree.body, regionStrings, atomType);
           regionStrings.push("end color " + color);
@@ -402,10 +290,10 @@ var handleObject = function handleObject(tree, a11yStrings, atomType) {
 
     case "genfrac":
       {
-        buildRegion(a11yStrings, function (regionStrings) {
+        buildRegion(a11yStrings, regionStrings => {
           // genfrac can have unbalanced delimiters
-          var leftDelim = tree.leftDelim,
-              rightDelim = tree.rightDelim; // NOTE: Not sure if this is a safe assumption
+          const leftDelim = tree.leftDelim,
+                rightDelim = tree.rightDelim; // NOTE: Not sure if this is a safe assumption
           // hasBarLine true -> fraction, false -> binomial
 
           if (tree.hasBarLine) {
@@ -438,7 +326,7 @@ var handleObject = function handleObject(tree, a11yStrings, atomType) {
 
     case "leftright":
       {
-        buildRegion(a11yStrings, function (regionStrings) {
+        buildRegion(a11yStrings, regionStrings => {
           buildString(tree.left, "open", regionStrings);
           buildA11yStrings(tree.body, regionStrings, atomType);
           buildString(tree.right, "close", regionStrings);
@@ -466,8 +354,8 @@ var handleObject = function handleObject(tree, a11yStrings, atomType) {
 
     case "op":
       {
-        var body = tree.body,
-            name = tree.name;
+        const body = tree.body,
+              name = tree.name;
 
         if (body) {
           buildA11yStrings(body, a11yStrings, atomType);
@@ -540,12 +428,12 @@ var handleObject = function handleObject(tree, a11yStrings, atomType) {
 
     case "sqrt":
       {
-        buildRegion(a11yStrings, function (regionStrings) {
-          var body = tree.body,
-              index = tree.index;
+        buildRegion(a11yStrings, regionStrings => {
+          const body = tree.body,
+                index = tree.index;
 
           if (index) {
-            var indexString = flatten(buildA11yStrings(index, [], atomType)).join(",");
+            const indexString = flatten(buildA11yStrings(index, [], atomType)).join(",");
 
             if (indexString === "3") {
               regionStrings.push("cube root of");
@@ -570,10 +458,10 @@ var handleObject = function handleObject(tree, a11yStrings, atomType) {
 
     case "supsub":
       {
-        var base = tree.base,
-            sub = tree.sub,
-            sup = tree.sup;
-        var isLog = false;
+        const base = tree.base,
+              sub = tree.sub,
+              sup = tree.sup;
+        let isLog = false;
 
         if (base) {
           buildA11yStrings(base, a11yStrings, atomType);
@@ -581,17 +469,17 @@ var handleObject = function handleObject(tree, a11yStrings, atomType) {
         }
 
         if (sub) {
-          var regionName = isLog ? "base" : "subscript";
+          const regionName = isLog ? "base" : "subscript";
           buildRegion(a11yStrings, function (regionStrings) {
-            regionStrings.push("start " + regionName);
+            regionStrings.push(`start ${regionName}`);
             buildA11yStrings(sub, regionStrings, atomType);
-            regionStrings.push("end " + regionName);
+            regionStrings.push(`end ${regionName}`);
           });
         }
 
         if (sup) {
           buildRegion(a11yStrings, function (regionStrings) {
-            var supString = flatten(buildA11yStrings(sup, [], atomType)).join(",");
+            const supString = flatten(buildA11yStrings(sup, [], atomType)).join(",");
 
             if (supString in powerMap) {
               regionStrings.push(powerMap[supString]);
@@ -667,7 +555,7 @@ var handleObject = function handleObject(tree, a11yStrings, atomType) {
           break;
         }
 
-        throw new Error("KaTeX-a11y: enclose node with " + tree.label + " not supported yet");
+        throw new Error(`KaTeX-a11y: enclose node with ${tree.label} not supported yet`);
       }
 
     case "vphantom":
@@ -715,9 +603,9 @@ var handleObject = function handleObject(tree, a11yStrings, atomType) {
 
     case "verb":
       {
-        buildString("start verbatim", "normal", a11yStrings);
+        buildString(`start verbatim`, "normal", a11yStrings);
         buildString(tree.body, "normal", a11yStrings);
-        buildString("end verbatim", "normal", a11yStrings);
+        buildString(`end verbatim`, "normal", a11yStrings);
         break;
       }
 
@@ -728,9 +616,9 @@ var handleObject = function handleObject(tree, a11yStrings, atomType) {
 
     case "horizBrace":
       {
-        buildString("start " + tree.label.slice(1), "normal", a11yStrings);
+        buildString(`start ${tree.label.slice(1)}`, "normal", a11yStrings);
         buildA11yStrings(tree.base, a11yStrings, atomType);
-        buildString("end " + tree.label.slice(1), "normal", a11yStrings);
+        buildString(`end ${tree.label.slice(1)}`, "normal", a11yStrings);
         break;
       }
 
@@ -783,10 +671,9 @@ var handleObject = function handleObject(tree, a11yStrings, atomType) {
       {
         // \neq and \ne are macros so we let "htmlmathml" render the mathmal
         // side of things and extract the text from that.
-        var _atomType = tree.mclass.slice(1); // $FlowFixMe: drop the leading "m" from the values in mclass
+        const atomType = tree.mclass.slice(1); // $FlowFixMe: drop the leading "m" from the values in mclass
 
-
-        buildA11yStrings(tree.body, a11yStrings, _atomType);
+        buildA11yStrings(tree.body, a11yStrings, atomType);
         break;
       }
 
@@ -828,13 +715,13 @@ var handleObject = function handleObject(tree, a11yStrings, atomType) {
   }
 };
 
-var buildA11yStrings = function buildA11yStrings(tree, a11yStrings, atomType) {
+const buildA11yStrings = function buildA11yStrings(tree, a11yStrings, atomType) {
   if (a11yStrings === void 0) {
     a11yStrings = [];
   }
 
   if (tree instanceof Array) {
-    for (var i = 0; i < tree.length; i++) {
+    for (let i = 0; i < tree.length; i++) {
       buildA11yStrings(tree[i], a11yStrings, atomType);
     }
   } else {
@@ -844,8 +731,8 @@ var buildA11yStrings = function buildA11yStrings(tree, a11yStrings, atomType) {
   return a11yStrings;
 };
 
-var flatten = function flatten(array) {
-  var result = [];
+const flatten = function flatten(array) {
+  let result = [];
   array.forEach(function (item) {
     if (item instanceof Array) {
       result = result.concat(flatten(item));
@@ -856,15 +743,11 @@ var flatten = function flatten(array) {
   return result;
 };
 
-var renderA11yString = function renderA11yString(text, settings) {
-  var tree = katex__WEBPACK_IMPORTED_MODULE_0___default.a.__parse(text, settings);
+const renderA11yString = function renderA11yString(text, settings) {
+  const tree = katex.__parse(text, settings);
 
-  var a11yStrings = buildA11yStrings(tree, [], "normal");
+  const a11yStrings = buildA11yStrings(tree, [], "normal");
   return flatten(a11yStrings).join(", ");
 };
 
-/* harmony default export */ __webpack_exports__["default"] = (renderA11yString);
-
-/***/ })
-/******/ ])["default"];
-});
+export default renderA11yString;
