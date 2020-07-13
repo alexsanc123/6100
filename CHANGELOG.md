@@ -33,6 +33,8 @@ _Work toward next release. Currently under development._
 * Added the `sso` authentication type for authentication using an arbitrary
     third-party single-sign-on provider (#103)
 
+* Added support for sharing KaTeX macros across calls to `catsoop.render_math`
+
 **CHANGED:**
 
 * Auto-generated `csq_name` fields increment for every question, even those
