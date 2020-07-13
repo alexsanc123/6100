@@ -28,7 +28,7 @@ _Work toward next release. Currently under development._
 
 * Added support for syntax highlighting of inline code elements (#93, #101)
 
-* Added the `ldap3` authentication type for login using an LDAPv3 server.
+* Added the `ldap3` authentication type for login using an LDAPv3 server (#104).
 
 **CHANGED:**
 
