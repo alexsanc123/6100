@@ -5,11 +5,10 @@ _Work toward next release. Currently under development._
 **ADDED:**
 
 * Added ability to conditionally show or hide HTML elements via the
-    `cs-show-if` and `cs-hide-if` attributes (#56 and #67)
+    `cs-show-if` and `cs-hide-if` attributes (#56, #67)
 
 * Added support for showing line numbers next to code snippets by adding
-    `-lines` to the end of the language specified for a code block (#62 and
-    #68)
+    `-lines` to the end of the language specified for a code block (#62, #68)
 
 * Added ability to avoid running children's preloads into `cs_children`, by
     setting `cs_load_children = False`
@@ -27,7 +26,7 @@ _Work toward next release. Currently under development._
     ["admonitions"](https://casual-effects.com/markdeep/features.md.html#basicformatting/admonitions)
     (#90)
 
-* Added support for syntax highlighting of inline code elements (#93 and #101)
+* Added support for syntax highlighting of inline code elements (#93, #101)
 
 * Added the `ldap3` authentication type for login using an LDAPv3 server.
 
@@ -49,14 +48,16 @@ _Work toward next release. Currently under development._
 
 * Changed default ports from `6010` and `6011` to `7667` and `7668` to avoid
     a conflict with X11, and modified the `catsoop configure` command to ask
-    about the port numbers (#83 and #84)
+    about the port numbers (#83, #84)
 
 * Replaced `js_files` in question types with `extra_headers`, which allows
     injecting arbitrary strings into the header (which allows specifying not
     only Javascript files but also stylesheets)
 
 * Removed Ace editor in favor of [CodeMirror](https://codemirror.net/) as the
-    default web-based code editor (#71 and #96)
+    default web-based code editor (#71, #96)
+
+* Upgraded KaTeX to v0.12.0 (#105)
 
 **DEPRECATED:**
 
@@ -72,6 +73,8 @@ _Work toward next release. Currently under development._
 
 * Removed the choice of where file uploads are stored (`cs_upload_management`
     is no longer recognized)
+
+* Removed MathJax from the distribution (#69, #73)
 
 **FIXED:**
 
