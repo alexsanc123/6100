@@ -99,7 +99,7 @@ def prep(x):
     """
     Helper function to serialize a Python object.
     """
-    return compress_encrypt(pickle.dumps(x, -1))
+    return compress_encrypt(pickle.dumps(x, 4))
 
 
 def decompress_decrypt(x):

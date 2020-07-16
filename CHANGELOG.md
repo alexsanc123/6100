@@ -64,6 +64,10 @@ _Work toward next release. Currently under development._
 
 * Upgraded KaTeX to v0.12.0 (#105)
 
+* `cslog` uses pickle protocol 4 by default (rather than the highest possible
+    protocol), to make sure that all supported Python versions can read logs
+    produced by any other supported version.
+
 **DEPRECATED:**
 
 **REMOVED:**
