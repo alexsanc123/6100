@@ -96,6 +96,8 @@ _Work toward next release. Currently under development._
 
 **SECURITY:**
 
+* Closed an XSS vulnerability by escaping the URL on 404 error pages
+
 **DOCUMENTATION:**
 
 # Version 2020.2.0
