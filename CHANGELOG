@@ -11,9 +11,13 @@ FIXED:
 
   * BACKPORT: Fixed issues with incorrect scores being sent to LTI consumers.
 
+  * BACKPORT: Fixed Python version compatibility issues by pinning pickle
+    protocol version to 4.
+
 SECURITY:
 
-  * BACKPORT: Closed XSS vulnerability by escaping URLs in 404 error messages.
+  * BACKPORT: Closed XSS vulnerability by escaping URLs in 404 error
+    messages.
 
 ####################
 # Version 2019.9.6 #
