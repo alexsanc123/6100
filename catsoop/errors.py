@@ -20,6 +20,7 @@ Utilities for generating error messages and displaying error pages
 import os
 import ast
 import sys
+import html
 import traceback
 
 from . import loader
@@ -194,7 +195,7 @@ def do_404_message(context):
         del new["cs_handler"]
     new["cs_content"] = (
         "<pre>CAT-SOOP could not find the specified file or resource:\n" "%r</pre>"
-    ) % (new["cs_original_path"])
+    ) % (html.escape(new["cs_original_path"]))
     new["cs_original_path"] = ""
     e = ': <font color="red">404</font>'
     new["cs_header"] = new.get("cs_header", "") + e

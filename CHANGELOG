@@ -11,6 +11,10 @@ FIXED:
 
   * BACKPORT: Fixed issues with incorrect scores being sent to LTI consumers.
 
+SECURITY:
+
+  * BACKPORT: Closed XSS vulnerability by escaping URLs in 404 error messages.
+
 ####################
 # Version 2019.9.6 #
 ####################
