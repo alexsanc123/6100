@@ -32,12 +32,13 @@ from nacl.bindings import (
 from . import base_context
 
 _nodoc = {
-    'OrderedDict',
-    'crypto_secretbox',
-    'crypto_secretbox_open',
-    'datetime',
-    'timedelta',
+    "OrderedDict",
+    "crypto_secretbox",
+    "crypto_secretbox_open",
+    "datetime",
+    "timedelta",
 }
+
 
 def simple_encrypt(key, msg):
     """

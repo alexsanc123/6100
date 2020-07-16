@@ -40,8 +40,9 @@ from . import base_context
 importlib.reload(base_context)
 
 _nodoc = {
-    'OrderedDict',
+    "OrderedDict",
 }
+
 
 def clean_builtins(d):
     """

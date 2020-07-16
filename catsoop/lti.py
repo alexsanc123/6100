@@ -48,7 +48,7 @@ def log(msg):
     LOGGER.info(omsg)
 
 
-_nodoc = {"Client", "ElementMaker", "etree", "LOGGER", 'DEBUG', 'datetime', 'log'}
+_nodoc = {"Client", "ElementMaker", "etree", "LOGGER", "DEBUG", "datetime", "log"}
 
 
 class lti4cs(pylti.common.LTIBase):

@@ -152,14 +152,20 @@ class SyntaxHighlightedCodeSpan(SpanToken):
 # Math
 
 _nodoc = {
-    'Document',
-    'SpanToken', 'tokenize_inner', 'BlockToken', 'tokenize', 'HTMLRenderer'
+    "Document",
+    "SpanToken",
+    "tokenize_inner",
+    "BlockToken",
+    "tokenize",
+    "HTMLRenderer",
 }
+
 
 class Math(SpanToken):
     """
     Mistletoe extension for handling inline math (`$...$`)
     """
+
     pattern = re.compile(r"(?:^|(?<!\\))\$(?P<body>(?:\\\$|[^$])*)\$")
     parse_inner = False
 
@@ -171,6 +177,7 @@ class DisplayMath(SpanToken):
     """
     Mistletoe extension for handling display math (`$$...$$`)
     """
+
     pattern = re.compile(r"\$\$(?P<body>.*?)\$\$", re.MULTILINE | re.DOTALL)
     parse_inner = False
     precedence = SpanToken.precedence + 2
@@ -184,6 +191,7 @@ class DisplayMathEnv(SpanToken):
     Mistletoe extension for handling various math environments, e.g.
     `\\begin{equation}...\\end{equation}`
     """
+
     pattern = re.compile(
         r"\\begin\s*{(?P<env>(?:equation|eqnarray|align)\*?)}(?P<body>(?s).*?)\\end\s*{(?P=env)}",
         re.MULTILINE | re.DOTALL,
@@ -200,6 +208,7 @@ class EscapedDollar(SpanToken):
     """
     Mistletoe extension for handling escaped dollar signs (`\\$`)
     """
+
     pattern = re.compile(r"(?<!\\)\\(\$)")
 
 
@@ -210,6 +219,7 @@ class Callout(BlockToken):
     """
     Mistletoe extension for handling "callout" dialog boxes
     """
+
     classes = ["note", "tip", "info", "warning", "error"]
     start_regex = re.compile(r"!!!(?P<header>.*)")
 
@@ -280,6 +290,7 @@ class CatsoopRenderer(HTMLRenderer):
     """
     Mistletoe renderer incorporating the various extensions
     """
+
     def __init__(self):
         HTMLRenderer.__init__(
             self,
