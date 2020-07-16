@@ -168,6 +168,9 @@ header {
 span.line {
   display: inline-block;
 }
+span.line > a > p{
+  margin: 0px;
+}
 .cs_nav_wrapper {
 }
 
