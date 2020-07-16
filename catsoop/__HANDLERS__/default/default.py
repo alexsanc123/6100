@@ -487,19 +487,6 @@ def handle_clearanswer(context):
         uname, context["cs_path_info"], "problemstate", newstate
     )
 
-    # if this was using the "legacy" grading mode and we're using LTI, send the
-    # result to the LTI consumer
-    if grading_mode == "legacy":
-        session = context["cs_session_data"]
-        if "cs_lti_config" in context and session.get("is_lti_user"):
-            lti_handler = context["csm_lti"].lti4cs_response(
-                context, session.get("lti_data")
-            )
-            if lti_handler.have_data:
-                context["csm_lti"].update_lti_score(
-                    lti_handler, newstate, context[_n("name_map")]
-                )
-
     # log submission in problemactions
     duetime = context["csm_time"].detailed_timestamp(due)
     log_action(
@@ -948,6 +935,15 @@ def handle_check(context):
 
             newstate["cached_responses"][name] = out["message"]
             newstate["score_displays"][name] = ""
+            session = context["cs_session_data"]
+            if "cs_lti_config" in context and session.get("is_lti_user"):
+                lti_handler = context["csm_lti"].lti4cs_response(
+                    context, session.get("lti_data")
+                )
+                if lti_handler.have_data:
+                    context["csm_lti"].update_lti_score(
+                        lti_handler, newstate, context[_n("name_map")]
+                    )
         else:
             magic = new_entry(context, name, "check")
 
