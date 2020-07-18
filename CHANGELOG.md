@@ -1,3 +1,9 @@
+# Version 2020.2.1
+
+**SECURITY:**
+
+* BACKPORT: Closed XSS vulnerability by escaping URLs in 404 error messages.
+
 # Version 2020.2.0
 
 **ADDED:**
