@@ -424,7 +424,9 @@ def handle_view(context):
             if "extra_headers" in elt[0]:
                 a = elt[0].get("defaults", {})
                 a.update(elt[1])
-                extra_headers.add(elt[0]["extra_headers"](a))
+                new = elt[0]["extra_headers"](a)
+                if new:
+                    extra_headers.add(new)
 
     if extra_headers:
         context["cs_scripts"] += "\n".join(extra_headers)
