@@ -94,6 +94,8 @@ _Work toward next release. Currently under development._
 
 * Fixed issues with incorrect scores being sent to LTI consumers (#85)
 
+* OpenID Connect auth type now properly checks JWT issuer.
+
 **SECURITY:**
 
 * Closed an XSS vulnerability by escaping the URL on 404 error pages

@@ -161,7 +161,9 @@ if error is None:
 
         if error is None:
             now = time.time.time()
-            if body["iss"].rstrip("/") != ctx.get("cs_openid_server", None):
+            if body["iss"].rstrip("/") != cs_session_data["_openid_config"].get(
+                "issuer", ctx.get("cs_openid_server", None)
+            ):
                 error = "Invalid ID Token issuer."
             elif body["nonce"] != stored_nonce:
                 error = (
