@@ -261,7 +261,7 @@ class Callout(BlockToken):
         while line is not None:
             if cls.indent is None:
                 try:
-                    cls.indent = re.match("^\s*", line).group(0)
+                    cls.indent = re.match(r"^\s*", line).group(0)
                 except AttributeError:
                     # None as return type from match?  no indent, move on
                     break
