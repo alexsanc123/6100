@@ -139,13 +139,13 @@ LANGS = [
 
 class SyntaxHighlightedCodeSpan(SpanToken):
     pattern = re.compile(
-        r"(?P<lang>%s)(?P<open>`+)(?P<body>.*?)(?P=open)" % "|".join(LANGS)
+        r"(?P<lang>(?:%s)?)(?P<open>`+)(?P<body>.*?)(?P=open)" % "|".join(LANGS)
     )
     parse_inner = False
     precedence = SpanToken.precedence + 2
 
     def __init__(self, match):
-        self.language = match.group("lang")
+        self.language = match.group("lang").strip()
         self.body = match.group("body")
 
 
@@ -303,10 +303,12 @@ class CatsoopRenderer(HTMLRenderer):
         )
 
     def render_syntax_highlighted_code_span(self, token):
-        return '<span class="hl"><code class="lang-%s">%s</code></span>' % (
-            token.language,
-            html.escape(token.body),
-        )
+        if token.language:
+            return '<span class="hl"><code class="lang-%s">%s</code></span>' % (
+                token.language,
+                html.escape(token.body),
+            )
+        return "<code>%s</code>" % html.escape(token.body)
 
     def render_math(self, token):
         return f"<math>{token.body}</math>"
