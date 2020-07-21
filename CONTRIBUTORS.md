@@ -6,6 +6,7 @@
 ### Code Contributions
 
 * Ike Chuang
+* Halvard Hummel
 * Jeremy Kaplan
 * Katrina LaCurts
 * Tomas Lozano-Perez
@@ -15,7 +16,6 @@
 * Joe Steinmeyer
 * Rodrigo Toste Gomes
 * Jeremy Wright
-* Halvard Hummel
 
 
 ### Security Reports
