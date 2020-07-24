@@ -41,7 +41,7 @@ VERSION_FNAME = os.path.join(os.path.dirname(__file__), "catsoop", "__init__.py"
 ORIGINAL_VERSION = None
 
 
-def dev_number():
+def dev_number_git():
     try:
         last_version = subprocess.check_output(
             ["git", "describe", "--tags", "--match", "v*"]
@@ -65,6 +65,37 @@ def dev_number():
         _date = ""
         print("failed to get git commit date", file=sys.stderr)
     return ("Git", sha, N, _date)
+
+
+def _version_sort(x):
+    return tuple(map(int, x[1:].split("."))) if x.startswith("v") else (float("-inf"),)
+
+
+def dev_number_hg():
+    try:
+        tags = subprocess.check_output(["hg", "tags"]).decode("ascii")
+        tags = dict(i.strip().split() for i in tags.splitlines())
+        tags = {k: v.split(":") for k, v in tags.items()}
+    except Exception:
+        print("failed to find hg tags", file=sys.stderr)
+        return
+    sha = tags["tip"][1]
+    N = int(tags["tip"][0]) - int(tags[max(tags, key=_version_sort)][0])
+    if N <= 1:
+        return
+    try:
+        _cmd = ["hg", "log", "-r", "tip"]
+        _info = subprocess.check_output(_cmd).decode("ascii")
+        _info = dict(i.strip().split(" ", 1) for i in _info.strip().splitlines())
+        _date = _info["date:"].strip()
+    except Exception:
+        _date = ""
+        print("failed to get hg commit date", file=sys.stderr)
+    return ("Mercurial", sha, N, _date)
+
+
+def dev_number():
+    return dev_number_hg() or dev_number_git()
 
 
 def dirty_version():
@@ -93,8 +124,8 @@ def dirty_version():
 
 
 def main():
-    if sys.version_info[:2] < (3, 5):
-        sys.exit("catsoop currently requires Python 3.5+")
+    if sys.version_info[:2] < (3, 6):
+        sys.exit("catsoop currently requires Python 3.6+")
 
     if "--name" not in sys.argv:
         print(logo)
@@ -102,7 +133,7 @@ def main():
     with open(os.path.join(os.path.dirname(__file__), "requirements.txt"), "r") as f:
         requirements = f.read().split("\n")
 
-    with open(os.path.join(os.path.dirname(__file__), "README.md"), "r") as f:
+    with open(os.path.join(os.path.dirname(__file__), "README"), "r") as f:
         readme = f.read()
 
     try:
@@ -124,7 +155,6 @@ def main():
             license="AGPLv3+",
             description="CAT-SOOP is a tool for automatic collection and assessment of online exercises.",
             long_description=readme,
-            long_description_content_type="text/markdown",
             include_package_data=True,
             entry_points={
                 "console_scripts": ["catsoop = catsoop.main:command_line_interface"]

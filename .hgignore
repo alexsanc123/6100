@@ -1,3 +1,5 @@
+syntax: glob
+
 # Git hash from installing
 catsoop/dev.hash
 
@@ -9,10 +11,6 @@ __pycache__/
 *.pycs*
 catsoop/config.py
 .encryption_*
-
-
-# BugsEverywhere cache
-.be/id-cache
 
 # NOHUP
 nohup.out
@@ -80,3 +78,6 @@ target/
 *.sw[po]
 *~
 \#*\#
+
+# pytest
+.pytest_cache/**
