@@ -20,7 +20,7 @@ CAT-SOOP instance, unless explicitly stated otherwise.
 CONTACT
 -------
 
-Web Site: https://catsoop.org
+Web Site: https://catsoop.mit.edu
 
 Mailing List: catsoop-users@mit.edu
   (subscribe at http://mailman.mit.edu/mailman/listinfo/catsoop-users)
@@ -43,7 +43,7 @@ To generate a config.py file, run:
 
 If you are setting up a public-facing copy of CAT-SOOP (as opposed to a local
 copy for debugging purposes), see the instructions at:
-    https://catsoop.org/website/docs/installing/server_configuration
+    https://catsoop.mit.edu/website/docs/installing/server_configuration
 
 To start the server, run:
   $ catsoop start
@@ -55,7 +55,7 @@ To run all the unit tests:
 HACKING
 --------
 
-See https://catsoop.org/website/docs/contributing/hacking
+See https://catsoop.mit.edu/website/docs/contributing/hacking
 
 
 INCLUDED SOFTWARE
