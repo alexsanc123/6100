@@ -1016,8 +1016,8 @@ def handle_custom_tags(context, text):
                 if m in EMOJI_MAP:
                     fname = "-".join(hex(ord(i))[2:].zfill(4) for i in EMOJI_MAP[m])
                     return (
-                        '<img class="emoji" alt="%s" src="%s/%s.%s" draggable="false" aria-label="%s"/>'
-                        % (EMOJI_MAP[m], base_url, fname, extension, m)
+                        '<img class="emoji" alt="%s" src="%s/%s.%s" draggable="false" aria-label="%s" title="%s"/>'
+                        % (EMOJI_MAP[m], base_url, fname, extension, m, m)
                     )
                 else:
                     return x.group(0)
