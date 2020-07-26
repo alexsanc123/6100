@@ -36,6 +36,10 @@ ADDED:
 
   * Added support for sharing KaTeX macros across calls to catsoop.render_math
 
+  * Added support for using :short_name: syntax to reference emoji, which can
+    be included as images or as unicode characters; and added emoji images from
+    Twemoji (https://twemoji.twitter.com/) as the default images
+
 CHANGED:
 
   * Auto-generated csq_name fields increment for every question, even those
