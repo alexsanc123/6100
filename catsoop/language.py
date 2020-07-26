@@ -1005,19 +1005,37 @@ def handle_custom_tags(context, text):
 
         emoji_regex = re.compile(r":([a-zA-Z0-9\+\-_&.ô’Åéãíç()!#*]+?):")
 
-        if emoji == "image":
-            base_url = context.get(
-                "cs_emoji_base_url", "%s/_static/_base/emoji" % context["cs_url_root"]
-            )
-            extension = context.get("cs_emoji_extension", "svg")
+        if emoji in {"external", "image"}:
+            if emoji == "external":
+                base_url = context.get(
+                    "cs_emoji_base_url",
+                    "%s/_static/_base/emoji" % context["cs_url_root"],
+                )
+                extension = context.get("cs_emoji_extension", "svg")
+                src = lambda fname: "%s/%s.%s" % (base_url, fname, extension)
+            else:
+
+                def src(fname):
+                    with open(
+                        os.path.join(
+                            context["cs_fs_root"],
+                            "__STATIC__",
+                            "emoji",
+                            "%s.svg" % fname,
+                        ),
+                        "rb",
+                    ) as f:
+                        return context["csm_thirdparty"].data_uri.DataURI.make(
+                            "image/svg+xml", None, True, f.read()
+                        )
 
             def replacer(x):
                 m = x.group(1)
                 if m in EMOJI_MAP:
                     fname = "-".join(hex(ord(i))[2:].zfill(4) for i in EMOJI_MAP[m])
                     return (
-                        '<img class="emoji" alt="%s" src="%s/%s.%s" draggable="false" aria-label="%s" title="%s"/>'
-                        % (EMOJI_MAP[m], base_url, fname, extension, m, m)
+                        '<img class="emoji" alt="%s" src="%s" draggable="false" aria-label="%s" title="%s"/>'
+                        % (EMOJI_MAP[m], src(fname), m, m)
                     )
                 else:
                     return x.group(0)
