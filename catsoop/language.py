@@ -1006,17 +1006,18 @@ def handle_custom_tags(context, text):
         emoji_regex = re.compile(r":([a-zA-Z0-9\+\-_&.ô’Åéãíç()!#*]+?):")
 
         if emoji == "image":
+            base_url = context.get(
+                "cs_emoji_base_url", "%s/_static/_base/emoji" % context["cs_url_root"]
+            )
+            extension = context.get("cs_emoji_extension", "svg")
 
             def replacer(x):
                 m = x.group(1)
                 if m in EMOJI_MAP:
                     fname = "-".join(hex(ord(i))[2:].zfill(4) for i in EMOJI_MAP[m])
-                    context["cs_attributions"].add(
-                        'This page contains emoji images from <a href="https://twemoji.twitter.com/" target="_blank">Twemoji.</a>'
-                    )
                     return (
-                        '<img class="emoji" alt="%s" src="%s/_static/_base/emoji/%s.svg" draggable="false" aria-label="%s"/>'
-                        % (EMOJI_MAP[m], context["cs_url_root"], fname, m)
+                        '<img class="emoji" alt="%s" src="%s/%s.%s" draggable="false" aria-label="%s"/>'
+                        % (EMOJI_MAP[m], base_url, fname, extension, m)
                     )
                 else:
                     return x.group(0)
