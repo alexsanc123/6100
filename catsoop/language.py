@@ -1011,6 +1011,9 @@ def handle_custom_tags(context, text):
                 m = x.group(1)
                 if m in EMOJI_MAP:
                     fname = "-".join(hex(ord(i))[2:].zfill(4) for i in EMOJI_MAP[m])
+                    context["cs_attributions"].add(
+                        'This page contains emoji images from <a href="https://twemoji.twitter.com/" target="_blank">Twemoji.</a>'
+                    )
                     return (
                         '<img class="emoji" alt="%s" src="%s/_static/_base/emoji/%s.svg" draggable="false" aria-label="%s"/>'
                         % (EMOJI_MAP[m], context["cs_url_root"], fname, m)

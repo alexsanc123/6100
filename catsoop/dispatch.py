@@ -422,6 +422,9 @@ def display_page(context):
     f = open(default)
     template = f.read()
     f.close()
+    context["cs_footer"] = "<br/>".join(
+        [*context["cs_attributions"], context["cs_footer"]]
+    )
     out = (
         language.handle_custom_tags(context, CSFormatter().format(template, **context))
         + "\n"
