@@ -365,6 +365,13 @@ table, th, td {
   padding: 0.25rem;
 }
 
+/* Emoji */
+
+img.emoji {
+    height: 1em;
+    vertical-align: baseline;
+}
+
 /* Callouts */
 
 .callout {

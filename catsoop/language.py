@@ -999,6 +999,45 @@ def handle_custom_tags(context, text):
                     classes[j] = classes[j][:-6]
                     classes.append("highlight-lines")
 
+    emoji = context.get("cs_replace_emoji", False)
+    if emoji:
+        from .emoji import EMOJI_MAP
+
+        emoji_regex = re.compile(r":([a-zA-Z0-9\+\-_&.ô’Åéãíç()!#*]+?):")
+
+        if emoji == "image":
+
+            def replacer(x):
+                m = x.group(1)
+                if m in EMOJI_MAP:
+                    fname = "-".join(hex(ord(i))[2:].zfill(4) for i in EMOJI_MAP[m])
+                    return (
+                        '<img class="emoji" alt="%s" src="%s/_static/_base/emoji/%s.svg" draggable="false" aria-label="%s"/>'
+                        % (EMOJI_MAP[m], context["cs_url_root"], fname, m)
+                    )
+                else:
+                    return x.group(0)
+
+        else:
+
+            def replacer(x):
+                m = x.group(1)
+                if m in EMOJI_MAP:
+                    return '<span role="img" aria-label="%s">%s</span>' % (
+                        m,
+                        EMOJI_MAP[m],
+                    )
+                else:
+                    return x.group(0)
+
+        for elt in tree.find_all(text=True):
+            if elt.parent.name not in {"code", "pre", "script"}:
+                elt.replaceWith(
+                    BeautifulSoup(
+                        re.sub(emoji_regex, replacer, str(elt)), "html.parser"
+                    )
+                )
+
     return str(tree)
 
 
