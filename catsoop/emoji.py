@@ -17,9 +17,7 @@
 """
 Mapping from emoji names to unicode code points
 
-Auto-generated from a mapping from [Zulip](https://github.com/zulip/zulip),
-specifically
-<https://github.com/zulip/zulip/blob/master/tools/setup/emoji/emoji_names.py>
+Auto-generated from a mapping from [Zulip](https://github.com/zulip/zulip).
 """
 
 EMOJI_MAP = {
