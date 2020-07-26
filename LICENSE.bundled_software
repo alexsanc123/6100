@@ -108,3 +108,11 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+
+########
+
+
+The CAT-SOOP distribution contains a verbatim copy of the SVG images from
+Twemoji (https://twemoji.twitter.com/), which are licensed under a CC-BY 4.0
+License (https://creativecommons.org/licenses/by/4.0/).
