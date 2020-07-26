@@ -45,7 +45,7 @@ from . import dispatch
 from . import markdown
 from .errors import html_format, clear_info
 
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Comment, Doctype
 from unidecode import unidecode
 
 _nodoc = {
@@ -1034,7 +1034,13 @@ def handle_custom_tags(context, text):
                     return x.group(0)
 
         for elt in tree.find_all(text=True):
-            if elt.parent.name not in {"code", "pre", "script"}:
+            if elt.parent.name not in {
+                "code",
+                "pre",
+                "script",
+                "[document]",
+                "head",
+            } and not isinstance(elt, (Comment, Doctype)):
                 elt.replaceWith(
                     BeautifulSoup(
                         re.sub(emoji_regex, replacer, str(elt)), "html.parser"
