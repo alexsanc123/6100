@@ -369,7 +369,10 @@ table, th, td {
 
 img.emoji {
     height: 1em;
-    vertical-align: baseline;
+    position: relative;
+    vertical-align: middle;
+    top: -0.1rem;
+    margin: 0;
 }
 
 /* Callouts */
