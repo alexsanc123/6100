@@ -1021,7 +1021,7 @@ def handle_custom_tags(context, text):
                 else:
                     return x.group(0)
 
-        else:
+        elif emoji:
 
             def replacer(x):
                 m = x.group(1)
@@ -1033,19 +1033,20 @@ def handle_custom_tags(context, text):
                 else:
                     return x.group(0)
 
-        for elt in tree.find_all(text=True):
-            if elt.parent.name not in {
-                "code",
-                "pre",
-                "script",
-                "[document]",
-                "head",
-            } and not isinstance(elt, (Comment, Doctype)):
-                elt.replaceWith(
-                    BeautifulSoup(
-                        re.sub(emoji_regex, replacer, str(elt)), "html.parser"
+        if emoji:
+            for elt in tree.find_all(text=True):
+                if elt.parent.name not in {
+                    "code",
+                    "pre",
+                    "script",
+                    "[document]",
+                    "head",
+                } and not isinstance(elt, (Comment, Doctype)):
+                    elt.replaceWith(
+                        BeautifulSoup(
+                            re.sub(emoji_regex, replacer, str(elt)), "html.parser"
+                        )
                     )
-                )
 
     return str(tree)
 
