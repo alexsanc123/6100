@@ -87,7 +87,7 @@ def get_logged_in_user(context):
                         _get_base_url(context),
                         context["cs_cas_server"],
                     )
-                context["cs_content"] = lbox + context["cs_content"]
+                context["cs_content"] = "%s\n\n%s" % (lbox, context["cs_content"])
 
             context["cs_post_load"] = new_postload
             return {}

@@ -184,7 +184,7 @@ def setup_login_boxes(context):
             else:
                 login_box = LOGIN_BOX.format(_get_base_url(context))
 
-            context["cs_content"] = login_box + context["cs_content"]
+            context["cs_content"] = "%s\n\n%s" % (login_box, context["cs_content"])
 
         context["cs_post_load"] = new_post_load
         return {}

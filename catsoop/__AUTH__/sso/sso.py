@@ -59,7 +59,7 @@ def get_logged_in_user(context):
                         _get_base_url(context),
                         context["cs_sso_location"],
                     )
-                context["cs_content"] = "%s%s" % (lbox, context["cs_content"])
+                context["cs_content"] = "%s\n\n%s" % (lbox, context["cs_content"])
 
             context["cs_post_load"] = new_postload
             return {}
