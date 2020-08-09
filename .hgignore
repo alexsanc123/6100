@@ -1,3 +1,5 @@
+syntax: glob
+
 # Git hash from installing
 catsoop/dev.hash
 
