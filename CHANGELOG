@@ -78,15 +78,15 @@ DEPRECATED:
 REMOVED:
 
   * Removed slow/broken code for logging in via e-mail instead of username when
-      using the login auth type
+    using the login auth type
 
   * cs_upload_management is no longer relevant, as uploads are now handled via
-      a standard interface in cslog
+    a standard interface in cslog
 
   * Custom authentication types can no longer be specified at the course level.
 
   * Removed the choice of where file uploads are stored (cs_upload_management
-      is no longer recognized)
+    is no longer recognized)
 
   * Removed MathJax from the distribution
 
@@ -99,6 +99,9 @@ FIXED:
   * Fixed issues with incorrect scores being sent to LTI consumers
 
   * OpenID Connect auth type now properly checks JWT issuer.
+
+  * Fixed issue with number question type not accepting negative inputs (thanks
+    to Abdullah Negm)
 
 SECURITY:
 
@@ -114,10 +117,10 @@ DOCUMENTATION:
 ADDED:
 
   * Added support for top-level math environments without $ or $$:
-      equation, equation*, align, align*, eqnarray, eqnarray*
+    equation, equation*, align, align*, eqnarray, eqnarray*
 
   * Added support for drawing SVG diagrams using ASCII art
-      (ported from Markdeep https://casual-effects.com/markdeep)
+    (ported from Markdeep https://casual-effects.com/markdeep)
 
 CHANGED:
 
@@ -128,13 +131,13 @@ CHANGED:
 
 FIXED:
 
-* Fixed an issue with showhide tags that prevented them from properly
-  handling arbitrary contents (at the expense of nested showhide tags)
+  * Fixed an issue with showhide tags that prevented them from properly
+    handling arbitrary contents (at the expense of nested showhide tags)
 
-* Fixed alignment of first line within <pre><code> tags
+  * Fixed alignment of first line within <pre><code> tags
 
-* Fixed issue with csq_rerender ignoring prompts (courtesy of Valerie
-  Richmond)
+  * Fixed issue with csq_rerender ignoring prompts (courtesy of Valerie
+    Richmond)
 
 
 ####################
