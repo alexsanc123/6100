@@ -1,4 +1,16 @@
 ####################
+# Version 2019.9.8 #
+####################
+
+FIXED:
+
+  * BACKPORT: OpenID Connect auth type now properly checks JWT issuer.
+
+  * BACKPORT: Fixed issue with number question type not accepting negative
+    inputs
+
+
+####################
 # Version 2019.9.7 #
 ####################
 
@@ -18,6 +30,7 @@ SECURITY:
 
   * BACKPORT: Closed XSS vulnerability by escaping URLs in 404 error
     messages.
+
 
 ####################
 # Version 2019.9.6 #
