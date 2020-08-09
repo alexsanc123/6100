@@ -19,10 +19,16 @@ tutor.qtype_inherit("expression")
 defaults["csq_render_result"] = False
 
 
+def _is_simple_number(tree):
+    return tree[0] == "NUMBER" or tree[0] == "u-" and tree[1][0] == "NUMBER"
+
+
 def _input_check(src, tree):
-    if tree[0] == "NUMBER":
+    if _is_simple_number(tree):
         return None
-    if tree[0] == "/" and tree[1][0] == "NUMBER" and tree[2][0] == "NUMBER":
+    elif tree[0] == "/" and _is_simple_number(tree[1]) and _is_simple_number(tree[2]):
+        return None
+    elif tree[0] == "u-" and _input_check(src, tree[1]) is None:
         return None
     return "Your input must be a single number or simple fraction."
 
