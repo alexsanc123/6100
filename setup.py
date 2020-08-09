@@ -68,7 +68,11 @@ def dev_number_git():
 
 
 def _version_sort(x):
-    return tuple(map(int, x[1:].split("."))) if x.startswith("v") else (float("-inf"),)
+    return (
+        tuple(map(int, x[1:].split(".")))
+        if x.startswith("v") and (not x > "v%s" % CS_VERSION)
+        else (float("-inf"),)
+    )
 
 
 def dev_number_hg():
@@ -81,7 +85,7 @@ def dev_number_hg():
         return
     sha = tags["tip"][1]
     N = int(tags["tip"][0]) - int(tags[max(tags, key=_version_sort)][0])
-    if N <= 1:
+    if N <= 2:
         return
     try:
         _cmd = ["hg", "log", "-r", "tip"]
