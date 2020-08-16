@@ -1,2 +1,2 @@
-__version__ = "2020.9.0"
-__codename__ = "Cymric"
+__version__ = "2021.2.0"
+__codename__ = "Devon Rex"

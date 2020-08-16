@@ -6,6 +6,25 @@
 
 ADDED:
 
+CHANGED:
+
+DEPRECATED:
+
+REMOVED:
+
+FIXED:
+
+SECURITY:
+
+DOCUMENTATION:
+
+
+####################
+# Version 2020.9.0 #
+####################
+
+ADDED:
+
   * Added ability to conditionally show or hide HTML elements via the
     'cs-show-if' and 'cs-hide-if' attributes
 
@@ -73,8 +92,6 @@ CHANGED:
     possible protocol), to make sure that all supported Python versions can
     read logs produced by any other supported version.
 
-DEPRECATED:
-
 REMOVED:
 
   * Removed slow/broken code for logging in via e-mail instead of username when
@@ -106,8 +123,6 @@ FIXED:
 SECURITY:
 
   * Closed an XSS vulnerability by escaping the URL on 404 error pages
-
-DOCUMENTATION:
 
 
 ####################
