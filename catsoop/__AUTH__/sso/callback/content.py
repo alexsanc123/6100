@@ -86,12 +86,12 @@ if cs_session_data.get("cs_query_string", ""):
 
 if error is None:
     sso_data = {
-        "username": uname[0],
-        "email": email[0],
+        "username": uname[0].encode('utf-8'),
+        "email": email[0].encode('utf-8'),
     }
     fullname = data.get("name", [])
     if fullname:
-        sso_data["name"] = fullname
+        sso_data["name"] = fullname[0]
 
     cs_session_data.update(sso_data)
 
