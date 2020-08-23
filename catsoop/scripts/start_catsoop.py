@@ -122,6 +122,8 @@ def main():
         uwsgi_opts = [
             "--http",
             ":%s" % base_context.cs_wsgi_server_port,
+            "-b",
+            "65535",
             "--thunder-lock",
             "--wsgi-file",
             "wsgi.py",
