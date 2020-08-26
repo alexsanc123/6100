@@ -392,8 +392,9 @@ def _md_format_string(context, s, xml=True):
             o += "<%s%s>%s</%s>" % (t, r, b, t)
     text = o
 
-    if text.startswith("<p>") and text.endswith("</p>"):
-        text = text[3:-4]
+    import sys
+    if text.startswith("<p>") and text.endswith("</p>\n"):
+        text = text[3:-5]
 
     if diagram_sources:
         script = "\n".join(
