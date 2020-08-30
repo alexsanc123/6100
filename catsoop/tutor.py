@@ -184,20 +184,7 @@ def read_checker_result(context, magic):
         * `'extra_data'`: any extra data returned by the checker, or `None` for
             question types that don't return extra data
     """
-    with open(
-        os.path.join(
-            context["cs_data_root"],
-            "_logs",
-            "_checker",
-            "results",
-            magic[0],
-            magic[1],
-            magic,
-        ),
-        "rb",
-    ) as f:
-        out = context["csm_cslog"].unprep(f.read())
-    return out
+    return cslog.queue_get("checker", magic)["data"]
 
 
 def compute_page_stats(context, user, path, keys=None):

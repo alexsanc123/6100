@@ -393,6 +393,7 @@ def _md_format_string(context, s, xml=True):
     text = o
 
     import sys
+
     if text.startswith("<p>") and text.endswith("</p>\n"):
         text = text[3:-5]
 

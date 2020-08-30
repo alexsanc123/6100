@@ -14,6 +14,10 @@ REMOVED:
 
 FIXED:
 
+* Fixed the color of the "callout" box for the checking queue
+
+* Fixed broken tutor.read_checker_result
+
 SECURITY:
 
 DOCUMENTATION:
