@@ -2484,7 +2484,7 @@ ws_%(name)s.onmessage = function(event){
     }else if (j.type == 'running'){
         ws_%(name)s_state = 1;
         try{clearInterval(ws_%(name)s_interval);}catch(err){}
-        thediv.classList = 'callout callout-info';
+        thediv.classList = 'callout callout-note';
         themessage.innerHTML = 'Your submission is currently being checked<span id="%(name)s_ws_running_time"></span>.';
         document.querySelectorAll('#%(name)s_buttons button').forEach(function(b){b.disabled = false;});
         var sync = ((new Date()).valueOf()/1000 - j.now);
