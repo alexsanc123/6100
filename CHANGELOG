@@ -1,4 +1,17 @@
 ####################
+# Version 2020.9.1 #
+####################
+
+CHANGED:
+
+  * BACKPORT: Increase UWSGI's buffer-size argument
+
+SECURITY:
+
+  * BACKPORT: Closed XSS vulnerability in default handler
+
+
+####################
 # Version 2020.9.0 #
 ####################
 
