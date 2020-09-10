@@ -20,6 +20,8 @@ FIXED:
 
 SECURITY:
 
+* Fixed an XSS vulnerability in the default handler
+
 DOCUMENTATION:
 
 
