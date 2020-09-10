@@ -31,7 +31,7 @@ def command_line_interface(args=None, arglist=None):
 
     raw_version = pkg_resources.require("catsoop")[0].version
     version = '%s ("%s")' % (raw_version, codename)
-    if "dev" in version:
+    if any(i in version for i in ("hg", "git")):
         gitfile = os.path.join(os.path.dirname(__file__), "dev.hash")
         if os.path.isfile(gitfile):
             with open(gitfile, "r") as f:
