@@ -16,6 +16,7 @@
 
 import os
 import re
+import html
 import json
 import time
 import uuid
@@ -79,7 +80,7 @@ def _n(n):
 
 
 def _unknown_handler(action):
-    return lambda x: "Unknown Action: %s" % action
+    return lambda x: "Unknown Action: %s" % html.escape(action)
 
 
 def _get(context, key, default, cast=lambda x: x):
