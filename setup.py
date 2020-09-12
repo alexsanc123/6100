@@ -62,7 +62,7 @@ def dev_number_git():
         return
     try:
         N = int(
-            subprocess.check_output(["git", "rev-list", "--count", "HEAD"]).decode(
+            subprocess.check_output(["git", "rev-list", "--all", "--count"]).decode(
                 "ascii"
             )
         )
