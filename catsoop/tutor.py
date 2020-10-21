@@ -184,7 +184,7 @@ def read_checker_result(context, magic):
         * `'extra_data'`: any extra data returned by the checker, or `None` for
             question types that don't return extra data
     """
-    return cslog.queue_get("checker", magic)["data"]
+    return cslog.most_recent("_checker_results", [], magic)
 
 
 def compute_page_stats(context, user, path, keys=None):

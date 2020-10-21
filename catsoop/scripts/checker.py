@@ -167,6 +167,10 @@ def do_check(row):
 
         # store the results
         cslog.queue_update(CHECKER, row["id"], row, RESULTS)
+        # store a separate copy of the check result in a predictable
+        # location so that we can do a direct lookup without paying the
+        # performance cost of looking for this entry...
+        cslog.overwrite_log("_checker_results", [], row["id"], row)
 
         # now update the log appropriately
         def log_mutator(x):
@@ -240,6 +244,15 @@ while True:
                     p._entry["data"],
                     RESULTS,
                     **LOGGING_KWARGS
+                )
+                # store a separate copy of the check result in a predictable
+                # location so that we can do a direct lookup without paying the
+                # performance cost of looking for this entry...
+                cslog.overwrite_log(
+                    "_checker_results",
+                    [],
+                    p._entry["data"]["id"],
+                    p._entry["data"] ** LOGGING_KWARGS,
                 )
             dead.add(i)
         elif time.time() - p._started > REAL_TIMEOUT:
