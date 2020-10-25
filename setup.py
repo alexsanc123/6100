@@ -41,7 +41,7 @@ VERSION_FNAME = os.path.join(os.path.dirname(__file__), "catsoop", "__init__.py"
 ORIGINAL_VERSION = None
 
 
-def dev_number_git():
+def dev_number():
     try:
         last_version = subprocess.check_output(
             ["git", "describe", "--tags", "--match", "v*"]
@@ -79,57 +79,6 @@ def dev_number_git():
     return ("Git", sha, N, _date)
 
 
-def _version_sort(x):
-    return (
-        tuple(map(int, x[1:].split(".")))
-        if x.startswith("v") and (not x > "v%s" % CS_VERSION)
-        else (float("-inf"),)
-    )
-
-
-def dev_number_hg():
-    try:
-        tags = subprocess.check_output(["hg", "tags"]).decode("ascii")
-        tags = dict(i.strip().split() for i in tags.splitlines())
-        tags = {k: v.split(":") for k, v in tags.items()}
-    except Exception:
-        print("failed to find hg tags", file=sys.stderr)
-        return
-    try:
-        sha = (
-            subprocess.check_output(["hg", "--debug", "id"])
-            .decode("ascii")
-            .strip()
-            .split()[0]
-            .rstrip("+")
-        )
-    except:
-        sha = tags["tip"][1]
-    N = int(tags["tip"][0])
-    if N - int(tags[max(tags, key=_version_sort)][0]) <= 2:
-        # close enough to a tag to consider ourselves part of that tag
-        return
-    try:
-        _cmd = ["hg", "log", "-r", "tip"]
-        _info = subprocess.check_output(_cmd).decode("ascii")
-        _info = dict(i.strip().split(" ", 1) for i in _info.strip().splitlines())
-        _date = _info["date:"].strip()
-    except Exception:
-        _date = ""
-        print("failed to get hg commit date", file=sys.stderr)
-    return ("Mercurial", sha, N, _date)
-
-
-_vcs_shortname = {
-    "Mercurial": "hg",
-    "Git": "git",
-}
-
-
-def dev_number():
-    return dev_number_hg() or dev_number_git()
-
-
 def dirty_version():
     """
     If install/sdist is run from a git directory, add a devN suffix to reported
@@ -145,7 +94,7 @@ def dirty_version():
 
     # if we get to this point, we are not at a particular tag.  we'll modify
     # the __version__ from catsoop/__init__.py to include a .devN suffix.
-    CS_VERSION = "%s.dev%s+%s" % (CS_VERSION, N, _vcs_shortname[vcs],)
+    CS_VERSION = "%s.dev%s+git" % (CS_VERSION, N,)
     with open(os.path.join(os.path.dirname(__file__), "catsoop", "dev.hash"), "w") as f:
         f.write("{}|{}|{}".format(vcs, sha, _date))
     with open(VERSION_FNAME, "r") as f:
