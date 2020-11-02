@@ -608,7 +608,7 @@ def render_html_codemirror(last_log, **info):
     init = last_log.get(name, None)
     if init is None:
         init = make_initial_display(info)
-    init = str(init)
+    init = html.escape(str(init))
     return (
         f'\n<textarea name="{name}" id="{name}">{init}</textarea>'
         '\n<script type="text/javascript">'
