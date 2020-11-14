@@ -80,7 +80,7 @@ def _n(n):
 
 
 def _unknown_handler(action):
-    return lambda x: "Unknown Action: %s" % html.escape(action)
+    return lambda x: "Unknown Action: %s" % html.escape(html.escape(action))
 
 
 def _get(context, key, default, cast=lambda x: x):
