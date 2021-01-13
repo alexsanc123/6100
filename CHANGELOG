@@ -18,6 +18,8 @@ FIXED:
 
 * Fixed broken tutor.read_checker_result
 
+* Updated the "cert" auth type to work with NGINX
+
 SECURITY:
 
 * Fixed an XSS vulnerability in the default handler
