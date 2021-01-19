@@ -341,9 +341,9 @@ def _replace_diagrams(src):
 
                 this_source = "\n".join(diagram_source)
                 hash_ = _md5(this_source)
-                tag = (
-                    '<div class="cs-diagram-source" diagramalign="%s">Placeholder for Diagram <code class="cs-diagram-id">%s</code></div>\n'
-                    % (alignment, hash_,)
+                tag = '<div class="cs-diagram-source" diagramalign="%s">Placeholder for Diagram <code class="cs-diagram-id">%s</code></div>\n' % (
+                    alignment,
+                    hash_,
                 )
                 diagrams[hash_] = this_source
 
@@ -1056,13 +1056,17 @@ def handle_custom_tags(context, text):
 
         if emoji:
             for elt in tree.find_all(text=True):
-                if elt.parent.name not in {
-                    "code",
-                    "pre",
-                    "script",
-                    "[document]",
-                    "head",
-                } and not isinstance(elt, (Comment, Doctype)):
+                if (
+                    elt.parent.name
+                    not in {
+                        "code",
+                        "pre",
+                        "script",
+                        "[document]",
+                        "head",
+                    }
+                    and not isinstance(elt, (Comment, Doctype))
+                ):
                     elt.replaceWith(
                         BeautifulSoup(
                             re.sub(emoji_regex, replacer, str(elt)), "html.parser"

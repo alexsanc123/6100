@@ -52,7 +52,9 @@ class TestPostgres(CATSOOPTest, CSLogBackend):
     db_loc = "/tmp/catsoop_psql"
     port = 60037
 
-    def setUp(self,):
+    def setUp(
+        self,
+    ):
         CATSOOPTest.setUp(self)
         context = {}
 

@@ -334,7 +334,15 @@ def queue_push(queuename, initial_status, data):
     final_name = _new_queue_filename(queuename, initial_status, now, now, id)
     os.makedirs(os.path.dirname(staging_name), exist_ok=True)
     with open(staging_name, "wb") as f:
-        pickle.dump({"id": id, "worker": None, "data": prep(data),}, f, 4)
+        pickle.dump(
+            {
+                "id": id,
+                "worker": None,
+                "data": prep(data),
+            },
+            f,
+            4,
+        )
     os.makedirs(os.path.dirname(final_name), exist_ok=True)
     os.rename(staging_name, final_name)
     return id

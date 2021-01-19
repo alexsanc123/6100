@@ -28,7 +28,9 @@ from ..cslog import fs as cslog_fs
 
 
 class TestFS(CATSOOPTest, CSLogBackend):
-    def setUp(self,):
+    def setUp(
+        self,
+    ):
         CATSOOPTest.setUp(self)
 
         context = {}

@@ -226,7 +226,8 @@ def modify_most_recent(
                 )
             else:  # overwrite
                 c.execute(
-                    "UPDATE logs SET data=%s,updated=NOW() WHERE id=%s", (new_val, id_),
+                    "UPDATE logs SET data=%s,updated=NOW() WHERE id=%s",
+                    (new_val, id_),
                 )
     if connection is None:
         conn.close()
@@ -239,7 +240,11 @@ def clear_old_logs(db_name, path, age, connection=None):
         with conn.cursor() as c:
             c.execute(
                 "DELETE FROM logs WHERE db_name=%s AND path=%s AND updated < %s",
-                (db_name, "/".join(path), datetime.now() - timedelta(seconds=age),),
+                (
+                    db_name,
+                    "/".join(path),
+                    datetime.now() - timedelta(seconds=age),
+                ),
             )
     if connection is None:
         conn.close()
