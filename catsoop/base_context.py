@@ -51,7 +51,7 @@ CAT-SOOP's version number
 
 cs_version_codename = (
     '"%s"'
-    if all(i not in __version__ for i in ("hg", "git"))
+    if 'dev' not in __version__
     else '"%s" development snapshot'
 ) % __codename__
 """
