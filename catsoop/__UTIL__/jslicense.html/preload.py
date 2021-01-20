@@ -164,5 +164,8 @@ codemirror_files = [
         "codemirror/mode/dart/dart.js",
         "codemirror/mode/coffeescript/coffeescript.js",
         "codemirror/mode/pegjs/pegjs.js",
+        "codemirror/addon/fold/indent-fold.js",
+        "codemirror/addon/fold/foldgutter.js",
+        "codemirror/addon/fold/foldcode.js",
     )
 )
