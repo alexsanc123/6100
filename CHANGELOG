@@ -1,3 +1,11 @@
+#####################
+# Version 2019.9.10 #
+#####################
+
+SECURITY:
+
+  * BACKPORT: Closed XSS vulnerability in default handler
+
 ####################
 # Version 2019.9.9 #
 ####################
