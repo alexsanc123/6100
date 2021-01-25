@@ -24,6 +24,7 @@ or late loads at lower levels).
 import os
 import sys
 import logging
+import platform
 import traceback
 
 from catsoop import __version__, __codename__
@@ -50,12 +51,15 @@ CAT-SOOP's version number
 """
 
 cs_version_codename = (
-    '"%s"'
-    if 'dev' not in __version__
-    else '"%s" development snapshot'
+    '"%s"' if "dev" not in __version__ else '"%s" development snapshot'
 ) % __codename__
 """
 The codename for this version
+"""
+
+cs_python_version = platform.python_version()
+"""
+The version of the Python interpreter powering this instance
 """
 
 cs_fs_root = os.path.dirname(__file__)
