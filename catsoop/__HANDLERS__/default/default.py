@@ -2055,8 +2055,10 @@ def default_javascript(context):
             for (name, (q, args)) in list(namemap.items())
             if _get(args, skipper, False, bool)
         ]
+    context[
+        "cs_scripts"
+    ] += '<script type="text/javascript" src="_handler/default/cs_ajax.js"></script>'
     out = """
-<script type="text/javascript" src="_handler/default/cs_ajax.js"></script>
 <script type="text/javascript">
 // @license magnet:?xt=urn:btih:0b31508aeb0634b347b8270c7bee4d411b5d4109&dn=agpl-3.0.txt AGPL-v3
 catsoop.all_questions = %(allqs)r;

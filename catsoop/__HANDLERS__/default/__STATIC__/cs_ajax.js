@@ -205,8 +205,15 @@ catsoop.ajaxErrorCallback = function(name) {
     }
 }
 
+catsoop.callbacks = {};
+for (var i of ['submit', 'check', 'viewanswer', 'clearanswer', 'viewexplanation', 'grade', 'lock', 'unlock', 'save', 'copy', 'copy_seed', 'new_seed']){
+    catsoop.callbacks[i] = function(b){};
+}
 
 catsoop.send_request = function(names,action,send,done_function){
+    if (typeof done_function === "undefined"){
+        done_function = catsoop.callbacks[action] || function(b){};
+    }
     var form = {};
     for (var key in send){if (send.hasOwnProperty(key)){form[key] = send[key];}}
     var d = {action: action,
@@ -224,15 +231,11 @@ catsoop.send_request = function(names,action,send,done_function){
     var request = new XMLHttpRequest();
     request.onload = function(){
         catsoop.ajaxDoneCallback(d, catsoop.this_path, 0)(request.status, request.response);
-        if(typeof done_function !== "undefined"){
-            done_function(true);
-        }
+        done_function(true);
     }
     request.onerror = function(){
         catsoop.ajaxErrorCallback(names[0])(request.status, request.response);
-        if(typeof done_function !== "undefined"){
-            done_function(false);
-        }
+        done_function(false);
     }
     request.open('POST', catsoop.this_path, true);
     request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
