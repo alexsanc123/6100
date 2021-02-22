@@ -231,11 +231,11 @@ catsoop.send_request = function(names,action,send,done_function){
     var request = new XMLHttpRequest();
     request.onload = function(){
         catsoop.ajaxDoneCallback(d, catsoop.this_path, 0)(request.status, request.response);
-        done_function(true);
+        done_function(true, names);
     }
     request.onerror = function(){
         catsoop.ajaxErrorCallback(names[0])(request.status, request.response);
-        done_function(false);
+        done_function(false, names);
     }
     request.open('POST', catsoop.this_path, true);
     request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
