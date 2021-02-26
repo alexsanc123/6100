@@ -8,6 +8,12 @@ ADDED:
 
 * Added information about the Python version to the default footer
 
+* Added ability to easily change the Javascript callback functions invoked
+  after taking an action using the built-in action buttons.
+
+* Javascript callback functions now take a second parameter, the name(s) of the
+  question(s) that were affected by the action.
+
 CHANGED:
 
 DEPRECATED:
