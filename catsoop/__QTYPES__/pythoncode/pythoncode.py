@@ -88,12 +88,6 @@ defaults = {
     "csq_soln": 'print("Hello, World!")',
     "csq_tests": [],
     "csq_hint": lambda score, code, info: "",  # post-test hint generator
-    "csq_log_keypresses": True,
-    "csq_variable_blacklist": [],
-    "csq_import_blacklist": [],
-    "csq_cpu_limit": 2,
-    "csq_nproc_limit": 0,
-    "csq_memory_limit": 32e6,
     "csq_interface": "codemirror",
     "csq_rows": 14,
     "csq_font_size": 16,
