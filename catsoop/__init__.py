@@ -1,2 +1,2 @@
-__version__ = "2021.2.0"
-__codename__ = "Devon Rex"
+__version__ = "2021.9.0"
+__codename__ = "Foldex"
