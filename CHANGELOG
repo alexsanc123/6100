@@ -1,38 +1,28 @@
-########################
-# Current Developments #
-########################
-
-(Work toward next release. Currently under development.)
+####################
+# Version 2021.2.0 #
+####################
 
 ADDED:
 
-* Added information about the Python version to the default footer
+  * Added information about the Python version to the default footer
 
-* Added ability to easily change the Javascript callback functions invoked
-  after taking an action using the built-in action buttons.
+  * Added ability to easily change the Javascript callback functions invoked
+    after taking an action using the built-in action buttons.
 
-* Javascript callback functions now take a second parameter, the name(s) of the
-  question(s) that were affected by the action.
-
-CHANGED:
-
-DEPRECATED:
-
-REMOVED:
+  * Javascript callback functions now take a second parameter, the name(s) of
+    the question(s) that were affected by the action.
 
 FIXED:
 
-* Fixed the color of the "callout" box for the checking queue
+  * Fixed the color of the "callout" box for the checking queue
 
-* Fixed broken tutor.read_checker_result
+  * Fixed broken tutor.read_checker_result
 
-* Updated the "cert" auth type to work with NGINX
+  * Updated the "cert" auth type to work with NGINX
 
 SECURITY:
 
-* Fixed an XSS vulnerability in the default handler
-
-DOCUMENTATION:
+  * Fixed an XSS vulnerability in the default handler
 
 
 ####################
