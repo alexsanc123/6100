@@ -83,13 +83,13 @@ async def reporter(websocket, path):
             if magic in CURRENT["running"]:
                 status = "running"
             else:
-                # try:
-                res = cslog.queue_get("checker", magic, **LOGGING_KWARGS)
-                if res["status"] == "results":
-                    status = "results"
-                    results = res["data"]
-                # except:
-                #    pass
+                try:
+                    res = cslog.queue_get("checker", magic, **LOGGING_KWARGS)
+                    if res["status"] == "results":
+                        status = "results"
+                        results = res["data"]
+                except:
+                   pass
 
         # if our status hasn't changed, or if we don't know yet, don't send
         # anything; just keep waiting.

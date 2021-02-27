@@ -447,7 +447,6 @@ def queue_get(queuename, id):
 
         return entry
     except:
-        raise
         return None
 
 
