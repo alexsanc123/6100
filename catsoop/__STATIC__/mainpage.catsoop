@@ -65,7 +65,7 @@ The following courses are hosted on this system:
         if title is not None:
             title = title.replace('<br>', ' ').replace('<br/>', ' ').replace('</br>', ' ').replace('<br />', ' ')
         if title is None:
-            print('* <font color="red">Error loading course: %s</font>' % course_id)
+            print('* <font color="red">Error loading course: [%s](BASE/%s/)</font>' % (course_id, course_id))
         elif title == course_id:
             print('* [%s](BASE/%s/)' % (course_id, course_id))
         else:

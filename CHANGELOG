@@ -8,17 +8,22 @@ ADDED:
 
 CHANGED:
 
+  * On the main page, links are now shown even to courses that can't be
+    properly loaded, so that the underlying issue is easier to find (clicking
+    on the link shows a more detailed error message).
+
 DEPRECATED:
 
 REMOVED:
 
 FIXED:
 
-* Fixed issue with reporter websocket connection being lost.
+  * Fixed issue with reporter websocket connection being lost.
 
 SECURITY:
 
 DOCUMENTATION:
+
 
 ####################
 # Version 2021.2.0 #
