@@ -18,7 +18,9 @@ REMOVED:
 
 FIXED:
 
-  * Fixed issue with reporter websocket connection being lost.
+  * Fixed issue with reporter websocket connection being lost frequently.
+
+  * Fixed a crash related to multiprocessing on MacOS with Python 3.8.
 
 SECURITY:
 
