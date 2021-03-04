@@ -89,7 +89,7 @@ async def reporter(websocket, path):
                         status = "results"
                         results = res["data"]
                 except:
-                   pass
+                    pass
 
         # if our status hasn't changed, or if we don't know yet, don't send
         # anything; just keep waiting.

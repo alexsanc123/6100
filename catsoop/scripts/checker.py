@@ -48,8 +48,6 @@ QUEUED = "queued"
 RUNNING = "running"
 RESULTS = "results"
 
-PROBLEMSTATE_QUEUE = multiprocessing.Queue
-
 
 def log(msg):
     if not DEBUG:
@@ -194,89 +192,89 @@ def do_check(row):
     cslog.teardown_kwargs(context["cs_logging_kwargs"])
 
 
-LOGGING_KWARGS = cslog.setup_kwargs()
+if __name__ == "__main__":
+    LOGGING_KWARGS = cslog.setup_kwargs()
 
-running = []
+    running = []
 
-# if anything is in the "running" dir when we start, and it's owned by us,
-# that's an error.  turn those back to queued to force them to run again (put
-# them at the front of the queue).
-for entry in cslog.queue_all_entries(CHECKER, RUNNING, **LOGGING_KWARGS):
-    if entry["worker"] == cslog.WORKER_ID:
-        cslog.queue_update(
-            CHECKER, entry["id"], entry["data"], QUEUED, **LOGGING_KWARGS
-        )
+    # if anything is in the "running" dir when we start, and it's owned by us,
+    # that's an error.  turn those back to queued to force them to run again (put
+    # them at the front of the queue).
+    for entry in cslog.queue_all_entries(CHECKER, RUNNING, **LOGGING_KWARGS):
+        if entry["worker"] == cslog.WORKER_ID:
+            cslog.queue_update(
+                CHECKER, entry["id"], entry["data"], QUEUED, **LOGGING_KWARGS
+            )
 
+    # and now actually start running
+    if DEBUG:
+        log("starting main loop")
+    nrunning = None
 
-# and now actually start running
-if DEBUG:
-    log("starting main loop")
-nrunning = None
-
-while True:
-    # check for dead processes
-    dead = set()
-    if DEBUG and not (
-        len(running) == nrunning
-    ):  # output debug message when nrunning changes
-        nrunning = len(running)
-        log("have %d running (%s)" % (nrunning, running))
-    for i in range(len(running)):
-        p = running[i]
-        if not p.is_alive():
-            log("    Process %s is dead" % p)
-            if p.exitcode != 0:
-                p._entry["data"]["score"] = 0.0
-                p._entry["data"]["score_box"] = ""
-                if p.exitcode < 0:  # this probably only happens if we killed it
-                    p._entry["data"]["response"] = (
-                        "<font color='red'><b>Your submission could not be checked "
-                        "because the checker ran for too long.</b></font>"
+    while True:
+        # check for dead processes
+        dead = set()
+        if DEBUG and not (
+            len(running) == nrunning
+        ):  # output debug message when nrunning changes
+            nrunning = len(running)
+            log("have %d running (%s)" % (nrunning, running))
+        for i in range(len(running)):
+            p = running[i]
+            if not p.is_alive():
+                log("    Process %s is dead" % p)
+                if p.exitcode != 0:
+                    p._entry["data"]["score"] = 0.0
+                    p._entry["data"]["score_box"] = ""
+                    if p.exitcode < 0:  # this probably only happens if we killed it
+                        p._entry["data"]["response"] = (
+                            "<font color='red'><b>Your submission could not be checked "
+                            "because the checker ran for too long.</b></font>"
+                        )
+                    else:  # a python error or similar
+                        p._entry["data"]["response"] = (
+                            "<font color='red'><b>An unknown error occurred when "
+                            "processing your submission</b></font>"
+                        )
+                    cslog.queue_update(
+                        CHECKER,
+                        p._entry["data"]["id"],
+                        p._entry["data"],
+                        RESULTS,
+                        **LOGGING_KWARGS
                     )
-                else:  # a python error or similar
-                    p._entry["data"]["response"] = (
-                        "<font color='red'><b>An unknown error occurred when "
-                        "processing your submission</b></font>"
+                    # store a separate copy of the check result in a predictable
+                    # location so that we can do a direct lookup without paying the
+                    # performance cost of looking for this entry...
+                    cslog.overwrite_log(
+                        "_checker_results",
+                        [],
+                        p._entry["data"]["id"],
+                        p._entry["data"] ** LOGGING_KWARGS,
                     )
-                cslog.queue_update(
-                    CHECKER,
-                    p._entry["data"]["id"],
-                    p._entry["data"],
-                    RESULTS,
-                    **LOGGING_KWARGS
-                )
-                # store a separate copy of the check result in a predictable
-                # location so that we can do a direct lookup without paying the
-                # performance cost of looking for this entry...
-                cslog.overwrite_log(
-                    "_checker_results",
-                    [],
-                    p._entry["data"]["id"],
-                    p._entry["data"] ** LOGGING_KWARGS,
-                )
-            dead.add(i)
-        elif time.time() - p._started > REAL_TIMEOUT:
-            # kill this now, next pass through the loop will clean it up
-            try:
-                os.killpg(os.getpgid(p.pid), signal.SIGKILL)
-            except:
-                pass
-    if dead:
-        log("Removing %s" % dead)
-    for i in sorted(dead, reverse=True):
-        running.pop(i)
+                dead.add(i)
+            elif time.time() - p._started > REAL_TIMEOUT:
+                # kill this now, next pass through the loop will clean it up
+                try:
+                    os.killpg(os.getpgid(p.pid), signal.SIGKILL)
+                except:
+                    pass
+        if dead:
+            log("Removing %s" % dead)
+        for i in sorted(dead, reverse=True):
+            running.pop(i)
 
-    if base_context.cs_checker_parallel_checks - len(running) > 0:
-        # otherwise, add an entry to running.
-        new_entry = cslog.queue_pop(CHECKER, QUEUED, RUNNING, **LOGGING_KWARGS)
-        if new_entry is not None:
-            new_entry["data"]["id"] = new_entry["id"]
-            log("Starting checker with row=%s" % new_entry["data"])
-            p = multiprocessing.Process(target=do_check, args=(new_entry["data"],))
-            running.append(p)
-            p.start()
-            p._started = time.time()
-            p._entry = new_entry
-            log("Process pid = %s" % p.pid)
+        if base_context.cs_checker_parallel_checks - len(running) > 0:
+            # otherwise, add an entry to running.
+            new_entry = cslog.queue_pop(CHECKER, QUEUED, RUNNING, **LOGGING_KWARGS)
+            if new_entry is not None:
+                new_entry["data"]["id"] = new_entry["id"]
+                log("Starting checker with row=%s" % new_entry["data"])
+                p = multiprocessing.Process(target=do_check, args=(new_entry["data"],))
+                running.append(p)
+                p.start()
+                p._started = time.time()
+                p._entry = new_entry
+                log("Process pid = %s" % p.pid)
 
-    time.sleep(0.1)
+        time.sleep(0.1)
