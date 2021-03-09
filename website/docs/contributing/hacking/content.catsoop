@@ -5,7 +5,7 @@ cs_content_header = "CAT-SOOP Hacker's Guide"
 Welcome to the CAT-SOOP hacker's guide!  This page is aimed primarily at people
 who are interested in helping to continue to evolve CAT-SOOP as a platform in a
 direct way, by working on the code of CAT-SOOP itself.  It is intended to give
-you a brief overview of the CAT-SOOP code base and surrounding infrastructure,
+you a brief overview of the CAT-SOOP codebase and surrounding infrastructure,
 as well as the process for setting up a local testing copy and for contributing
 changes back to CAT-SOOP.
 
@@ -14,41 +14,36 @@ changes back to CAT-SOOP.
 <section>Getting Set Up</section>
 
 If you intend to make changes that you will eventually push upstream, a good
-first step is to make yourself an account on the [CAT-SOOP Gitea
-Instance](/git/catsoop/catsoop), which is the main hub for CAT-SOOP development
-and discussion.  You should also add an SSH public key to your account.
+first step is to make sure you have an account on the [community
+forum](/community), which is the main place where catsoop-related discussion
+happens.  In general, it is a good idea to make a post there describing the
+changes you plan to make (or if there is already a forum thread about it, to
+indicate your interest in a post to that thread).
 
-You may also want to make an account on the [forum](/forum/), though that is
-less necessary.
+You should also make an account for yourself on the [bug tracker](/bugs/),
+which is where development is coordinated.  And you can alsoadd yourself to the
+catsoop-dev@mit.edu mailing list if you're interested in participating in
+discussion there.
+
 
 <subsection>Cloning the Repository</subsection>
 
-After you have set up an account on the Gitea instance and added an SSH key,
-you should "fork" the [main repository](/git/catsoop/catsoop) by navigating to
-it and clicking the "fork" button.  This will create a copy of the repository
-associated with your username.
-
-Then you can clone that repository:
+When it is time to go ahead and make your change(s) to the code, it will be
+important to have a local copy of the code, by cloning the
+[Git](https://git-scm.com/) repository:
 
 ```nohighlight
-$ git clone git@catsoop.mit.edu:catsoop/catsoop
-```
-
-You may also want to add your fork as a secondary remote, so that you
-can push to it, with a command like the following:
-
-```nohighlight
-$ git remote add mine git@catsoop.mit.edu:USERNAME/catsoop
+@{TOR_STRING('git')} clone git://@{cs_url_root.split('/', 2)[-1]}/catsoop.git
 ```
 
 <subsection>Installing CAT-SOOP</subsection>
 
 The recommended setup for CAT-SOOP involves setting up a development
-environment inside of a Python virtualenv, which can be created with the
-following command (assuming virtualenv is installed):
+environment inside of a Python "virtual environment," which can be created with
+the following command (assuming virtualenv is installed):
 
 ```nohighlight
-$ python3 -m virtualenv -p `which python3` ENV_PATH
+python3 -m virtualenv -p `which python3` ENV_PATH
 ```
 
 where `ENV_PATH` is the location on disk where you want to create your new
@@ -57,40 +52,43 @@ virtual environment.  Then, you can activate the virtual environment so that
 system-wide Python installation:
 
 ```nohighlight
-$ source ENV_PATH/bin/activate
+source ENV_PATH/bin/activate
 ```
 
 Once you have activated the virtual environment, you can install CAT-SOOP by
 navigating to your clone of the repository and running:
 
 ```
-$ make develop
+make develop
 ```
 
-Once it has been installed, you should configure it:
+This will install catsoop in such a way that making changes to the source code
+only require restarting the server, without the need to first reinstall.
+
+Once catsoop has been installed, you should configure it:
 
 ```
-$ catsoop configure
+catsoop configure
 ```
 
 and then you can start the server with:
 
 ```
-$ catsoop start
+catsoop start
 ```
 
-and navigate your browser to `http://localhost:7667`.
+and navigate your browser to `http://localhost:7667` (or a different endpoint
+if you specified one).
 
-In order for this page to be interesting, you will want to put a course in the
-CAT-SOOP data root (default: `~/.local/share/catsoop`).  You may wish to clone
-the sample course if you do not already have another course to work with, using
-the following command:
+In order for the installation to be interesting, you will want to put a course
+in the CAT-SOOP data root (default: `~/.local/share/catsoop`).  You may wish to
+clone the sample course if you do not already have another course to work with,
+using the following command:
 
 ```nohighlight
-$ git clone git@catsoop.mit.edu:catsoop/sample_course ~/.local/share/catsoop/courses/sample_course
+@{TOR_STRING('git')} clone git://@{cs_url_root.split('/', 2)[-1]}/sample_course.git ~/.local/share/catsoop/courses/sample_course
 ```
 
-(if you want, you can also fork the `sample_course` repository and clone your own copy)
 
 <subsection>Making a First Change</subsection>
 
@@ -104,18 +102,10 @@ start`.
 
 <ref overview><a href="{link}">Section {number}</a></ref> provides an overview
 of the codebase, which you may wish to read as a starting point.  Additionally,
-issues in hive that are labeled as "beginner-friendly" might be other good
-opportunities to jump into the codebase.  You can view these issues
-[here](/git/catsoop/catsoop/issues?q=&type=all&state=open&labels=8&milestone=0&assignee=0),
+some issues in the issue tracker are marked as potential good
+opportunities for a first dive into the codebase.  You can view these issues
+[here](/bugs/view_all_bug_page.php?filter=6042230d31597),
 or by manually searching for them from the catsoop issue tracker.
-
-<section label="overview">Brief Overview of Codebase</section>
-
-TODO
-
-<subsection>Anatomy of a Page Load</subsection>
-
-TODO
 
 <section>Rules to Write/Commit By</section>
 
@@ -129,7 +119,7 @@ TODO
     docstrings should be formatted using CAT-SOOP Markdown, as the [API
     Documentation](COURSE/docs/api) is automatically generated from them.  In
     cases of adding new functionality or changing existing functionality, the
-    documentation should also be updated.
+    documentation should also be updated where appropriate.
 
 1. Substantial new functionality should have associated unit tests where
     appropriate.  Code related to user interaction / user interface is
@@ -178,25 +168,50 @@ Before sending your changes, please:
 1. Run `black` on the entire codebase, and make sure that no files change.
 1. Run `make test` and make sure that all tests pass (including any new
     tests you've written).
-1. Add an appropriate entry to `CHANGELOG.md`, and, if you wish, add your name to
-    the `CONTRIBUTORS.md` file.
+1. Add an appropriate entry to `CHANGELOG`, and, if you wish, add your name
+   to the `CONTRIBUTORS` file.
 
-<subsection>Sending</subsection>
+<subsection>Preparing and Sending Patches</subsection>
 
-In general, we prefer using Gitea's "pull request" feature for managing
-contributed changes to catsoop.  In order to start the process, you should push
-your changes to a new branch on your fork of the main repository.  When
-pushing, you should see a link for creating a new pull request.  You can follow
-this link, fill out a little bit of information about the changes, and submit
-your pull request.
+In general, we follow a patch-based contribution model, coordinated via the
+`catsoop-dev@mit.edu` mailing list and the [bug tracker](/bugs/).  The next
+step in that process, after making your changes and committing them locally, is
+to prepare patches to be shared with us.
 
-Alternatively, if you prefer it, feel free to attach patches (created using
-`git format-patch` to a message on the [community forum](/community).
+!!! note: Note
+    If you are having trouble generating your patch files, or if you have other
+    questions about the process, please reach out via the mailing lists, and we'd
+    be happy to help!
+
+There are a few different ways that we'll accept patches.
+
+1. For small patches, you can use the `git send-email` command to send your
+    patches via email.  There is a nice tutorial about this approach at
+    <https://git-send-email.io/>.  Please make sure to send patches to
+    `catsoop-dev@mit.edu`.
+
+1. You can instead use `git format-patch`.
+    If you are using Bash, then the following command, for example, will
+    generate a patch file containing all of the commits not present in the base
+    repo:
+
+    ```nohighlight
+    git format-patch "$(git merge-base dev `git branch --show-current`)" --stdout > NAME.patch
+    ```
+
+    You can then attach the patch to an e-mail to `catsoop-dev@mit.edu`.
+
+3. Alternatively, if your copy of the repository is accessible over a network
+    connection (for example, on a public source forge like Gitlab, or in a
+    publicly-accessible directory on Athena), it is fine to send a pointer to that
+    repository instead of sending patches.
+
 
 <subsection>Feedback</subsection>
 
-After you've sent your changes, you should receive a response (hopefully within
-a day or two) in one of the following flavors:
+After you've sent your changes, you should receive a response shortly
+thereafter (hopefully within a day or two). That response will usually come in
+one of the following flavors:
 
 1. Thanks!  We'll add these to CAT-SOOP!
 1. Thanks!  We're hosed right now but will take a detailed look when we get a chance.
@@ -207,19 +222,22 @@ in any case, feel free to continue the conversation, to make changes, etc.
 
 <section>Versioning and Releases</section>
 
+Typically, CAT-SOOP development is very "bursty," with most development
+happening during the summer months and January (in between academic terms), and
+relatively little development happening during the semesters.
+
 In general, the goal is to release a new version of CAT-SOOP once every
 semester.  As MIT's semesters start in September and February, respectively,
-the goal is to release a new major version just before the start of each
-semester.  These releases will be versioned by date, with version `20YY.9`
-referring to the September release, and `20YY.2` referring to the February
-release.
+this means a new major version just before the start of each semester.
+Releases are versioned by date, with version `20YY.9` referring to the
+September release, and `20YY.2` referring to the February release.
 
 Beyond this, additional "minor" version numbers may also be used, usually for
 bug fixes.  In general, version `20YY.M.V` refers to the `V`<sup>th</sup>
-release of version `20YY.M`.  `V` starts from `0`, so the initial release of
-each major version is `20YY.M.0`.  Unlike major version bumps, these minor
-versions will not happen on a fixed schedule, but, rather, will be released as
-necessary, or as interesting new features are added.
+release of version `20YY.M`.  We start counting `V` from `0`, so the initial
+release of each major version is `20YY.M.0`.  Unlike major version bumps, these
+minor versions will not happen on a fixed schedule, but, rather, will be
+released as necessary, or as interesting new features are added.
 
 Most major versions will only be supported for one semester (until the next
 version's release) and may contain backwards-incompatible changes, but,
@@ -227,11 +245,33 @@ starting with `2019.9`, the September releases in odd-numbered years will be
 tagged as **long-term support** (LTS) releases and will continue to be
 supported for two full years.  These versions will receive no
 backwards-incompatible changes during that time (except in the case where such
-a change is necessary for security reasons).  Each LTS version will have a
-separate branch in the repository, named like `20YY.M-lts`, where bugfixes
-will be backported from the `dev` branch.
+a change is necessary for security reasons).
 
 Each new release (including minor releases) will be accompanied by a post to
 the community forum, which will include information about what changed from the
 previous version, as well as an indication of steps that need to be taken when
 upgrading.
+
+<subsection>Repository Structure</subsection>
+
+All development happens on the `dev` branch in the Git repository.
+
+Each version of catsoop has a separate branch in the repository, named like
+`v20YY.M` (for regular versions) or `v20YY.M-lts` (for LTS versions), where
+bugfixes and other changes are backported from the `dev` branch.  Generally,
+new features and bugfixes only make their way into non-`dev` branches by way
+of backporting changes to those branches; that is to say, changes always happen
+on `dev` first.
+
+Each release is tagged with a version number `v20YY.M.V`.  Additionally, the
+current release and the current LTS release are tagged with `current_release`
+and `current_lts`, respectively.  These tagged releases are also signed with
+[Adam's PGP key](https://hz.mit.edu/hz_pubkey.asc).
+
+<section label="overview">Brief Overview of Codebase</section>
+
+TODO
+
+<subsection>Anatomy of a Page Load</subsection>
+
+TODO

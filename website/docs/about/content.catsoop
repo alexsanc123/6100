@@ -2,8 +2,6 @@
 cs_content_header = cs_long_name
 </python>
 
-@{todo}
-
 <tableofcontents/>
 
 <section>About CAT-SOOP</section>
@@ -52,7 +50,8 @@ active (particularly in the time between MIT's semesters).
 
 <section>Courses Using CAT-SOOP</section>
 
-The following are some of the courses I know of that use (or have used) CAT-SOOP:
+The following are some of the courses I know of that use (or have used)
+CAT-SOOP as their main LMS:
 
 * MIT 6.0001: _Introduction to Computer Science Programming in Python_
 * MIT 6.0002: _6.0002 Introduction to Computational Thinking and Data Science_
@@ -73,4 +72,5 @@ The following are some of the courses I know of that use (or have used) CAT-SOOP
 * Olin College ENGR2340: _Dynamics_
 * Olin College SCI2050: _The Art of Approximation in Science and Engineering_
 
-If you use CAT-SOOP in your class, please [let me know](mailto:hz@mit.edu)!
+If you use CAT-SOOP in your class, please let us know by introducing yourself
+on the [community forum](/community)!

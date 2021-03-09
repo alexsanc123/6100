@@ -2,12 +2,21 @@
 cs_content_header = cs_long_name
 </python>
 
-The easiest and best way to contribute to CAT-SOOP is to use it, to report any
-issues you find, and to tell your colleagues if you like it!  Please see below
-for some guidelines about contributing more directly to CAT-SOOP, and please
-don't hesitate to reach out if you have questions.
+It's always exciting to receive contributions that help improve CAT-SOOP, so
+thank you!
 
-### Do you have a question about using CAT-SOOP?
+It's also worth mentioning that contributing to CAT-SOOP does not necessarily
+mean writing code; there are lots of other ways to help out, too!  The easiest
+and best way to contribute to CAT-SOOP is to use it, to report any issues you
+find, and to tell your friends/colleagues if you like it!  Please see below for
+some guidelines about contributing more directly to CAT-SOOP, and please don't
+hesitate to reach out if you have questions.
+
+In general, we use the [community forum](/community) to develop conversations
+around ideas and to help to turn those ideas into actions.  Everyone is welcome
+to contribute to that process.
+
+### Do you have a question about using CAT-SOOP, or a request for a new feature?
 
 We're happy to help!  The best way to get help is to make a new post on the
 [community forum](/community).  If you wish to do so without creating an
@@ -15,28 +24,37 @@ account on the forum, you can  send an e-mail to `community@catsoop.mit.edu`.
 
 ### Did you find a bug?
 
-**If you have found a security vulnerability, please do not post publicly.** In
-that case, please instead send e-mail directly to Adam at `hz@mit.edu`,
-optionally encrypting your message with [his public
-key](https://hz.mit.edu/hz_pubkey.asc).  Alternatively, feel free to [send Adam
-a private message via the community forum](/community/new-message?username=hz).
+As with most other things, the best place to report issues is the [community
+forum](/community), with the exception of security issues (see below).  When
+reporting a bug, please be as descriptive as you can, and please try to include
+an example that demonstrates the issue if possible.  Among other things, it is
+helpful to know what version of catsoop you're running, what you were trying to
+do, and the precise nature of the failure mode (including error messages, if
+any).
 
-Please be as descriptive as you can, and please try to include an example that
-demonstrates the issue if possible.
+!!! error: Responsible Disclosure of Security Issues
+    In order to help minimize the effect of security issues, **if you have found a security vulnerability, we ask that you please do not post about it
+    publicly until we have had a reasonable amount of time to fix the issue.**
+    Instead, please send e-mail directly to Adam at `hz@mit.edu`,
+    optionally encrypting your message with [his public
+    key](https://hz.mit.edu/hz_pubkey.asc).  Alternatively, feel free to [send Adam
+    a private message via the community forum](/community/new-message?username=hz).
 
-### Do you intend to add a new feature, change an existing behavior, or fix a bug?
 
-A good place to start is to suggest your change via the [community
-forum](/community), and to read through the [hacker's guide](CURRENT/hacking)
-for information on the process for contributing code, as well as information
-about coding style, tests, etc.
+### Are you interested in contributing code?
+
+If you are interested in contributing _code_ to catsoop (to fix a bug or
+implement a new feature, for example), a good place to start is to suggest your
+change via the [community forum](/community), and to read through the [hacker's
+guide](CURRENT/hacking) for information on the process for contributing code,
+as well as information about coding style, tests, etc.
 
 #### Do you want to contribute to the documentation?
 
-I really appreciate it!
+Contributions to documentation are especially appreciated!
 
 If you are comfortable doing so, the best way to submit documentation changes
 is by the same process used for code, as described in the [hacker's
 guide](CURRENT/hacking).  But documentation changes in any format are more than
-welcome!  Feel free just to e-mail your changes/suggestions (in any format) to
-`community@catsoop.mit.edu`.
+welcome!  Feel free just to post your changes/suggestions (in any format) to
+the [community forum](/community) (or e-mail to `community@catsoop.mit.edu`).
