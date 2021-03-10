@@ -25,37 +25,6 @@ cs_top_menu = [
 ]
 
 
-def callout(note, header, style):
-    return """<div class="callout callout-%s">
-<h4>%s</h4>
-%s
-</div>""" % (
-        style,
-        header,
-        csm_language._md_format_string(globals(), note),
-    )
-
-
-def note(x):
-    print(callout(x, "Note", "info"))
-    return ""
-
-
-def warning(x):
-    print(callout(x, "Warning", "danger"))
-    return ""
-
-
-def doublecheck(x):
-    print(callout(x, "Double Check", "warning"))
-    return ""
-
-
-def aside(x):
-    print(callout(x, "Aside", "warning"))
-    return ""
-
-
 todo = """!!! warning: This Page Needs Attention
     Contributions to documentation are more than welcome!
     You can post suggestions, questions, or other feedback to the <a
