@@ -8,13 +8,16 @@ ADDED:
 
 CHANGED:
 
-  * Upgraded KaTeX to version 0.13.0.
+  * Upgraded KaTeX to version 0.13.0
 
-  * Upgrades Twemoji to v13.0.2.
+  * Upgrades Twemoji to v13.0.2
 
   * On the main page, links are now shown even to courses that can't be
     properly loaded, so that the underlying issue is easier to find (clicking
-    on the link shows a more detailed error message).
+    on the link shows a more detailed error message)
+
+  * Auto-generated csq_name fields now increment only for questions that don't
+    have names specified (reverts a change from 2020.9.0)
 
 DEPRECATED:
 
@@ -22,9 +25,9 @@ REMOVED:
 
 FIXED:
 
-  * Fixed issue with reporter websocket connection being lost frequently.
+  * Fixed issue with reporter websocket connection being lost frequently
 
-  * Fixed a crash related to multiprocessing on MacOS with Python 3.8.
+  * Fixed a crash related to multiprocessing on MacOS with Python 3.8
 
 SECURITY:
 
@@ -40,10 +43,10 @@ ADDED:
   * Added information about the Python version to the default footer
 
   * Added ability to easily change the Javascript callback functions invoked
-    after taking an action using the built-in action buttons.
+    after taking an action using the built-in action buttons
 
   * Javascript callback functions now take a second parameter, the name(s) of
-    the question(s) that were affected by the action.
+    the question(s) that were affected by the action
 
 FIXED:
 

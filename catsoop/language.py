@@ -136,7 +136,7 @@ def xml_pre_handle(context):
             exec(code, e)
             if "csq_name" not in e:
                 e["csq_name"] = "q%06d" % qcount
-            qcount += 1
+                qcount += 1
             if e["csq_name"] in names_seen:
                 o.append(
                     (
