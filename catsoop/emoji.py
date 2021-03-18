@@ -1514,6 +1514,7 @@ EMOJI_MAP = {
     "water_closet": "🚾",
     "water_drop": "💧",
     "water_polo": "🤽",
+    "water_wave": "🌊",
     "watermelon": "🍉",
     "wave": "👋",
     "wavy_dash": "〰",
