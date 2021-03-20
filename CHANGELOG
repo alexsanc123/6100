@@ -19,6 +19,9 @@ CHANGED:
   * Auto-generated csq_name fields now increment only for questions that don't
     have names specified (reverts a change from 2020.9.0)
 
+  * The pythonic and pythonliteral question types now allow checking for valid
+    formatting.
+
 DEPRECATED:
 
 REMOVED:

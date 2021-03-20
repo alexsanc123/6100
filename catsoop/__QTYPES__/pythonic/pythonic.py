@@ -56,6 +56,21 @@ INVALID_SUBMISSION_MSG = (
     "valid Python expression.</font>  "
 )
 
+checktext = "Check Formatting"
+
+
+def handle_check(submissions, **info):
+    base1["get_sandbox"](info)
+    code = info["csq_code_pre"]
+    code += "\n%s" % submissions[info["csq_name"]].strip()
+    sub = info["sandbox_run_code"](
+        info, code, info.get("csq_options", {}), result_as_string=True
+    )
+    if sub["err"].strip():
+        return '<font color="red">Your submission is not properly formatted.</font>'
+    else:
+        return "Your submission is properly formatted."
+
 
 def handle_submission(submissions, **info):
     sub = submissions[info["csq_name"]].strip()

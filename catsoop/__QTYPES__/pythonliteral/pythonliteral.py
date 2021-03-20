@@ -19,6 +19,24 @@ import ast
 tutor.qtype_inherit("pythonic")
 base, _ = tutor.question("pythonic")
 
+checktext = "Check Formatting"
+
+
+def handle_check(submissions, **info):
+    out = base["handle_check"](submissions, **info)
+    if "not properly" in out:
+        return out
+
+    sub = submissions[info["csq_name"]].strip()
+
+    try:
+        x = ast.parse(sub).body[0].value
+        assert not isinstance(x, ast.BinOp)
+        ast.literal_eval(x)
+        return out
+    except:
+        return '<font color="red">Your submission is not a valid Python literal.</font>'
+
 
 def handle_submission(submissions, **info):
     sub = submissions[info["csq_name"]].strip()
