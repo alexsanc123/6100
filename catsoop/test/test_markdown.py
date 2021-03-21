@@ -115,6 +115,25 @@ class TestMarkdownMath(CATSOOPTest):
         for i, o in pairs:
             self.assertEqual(_md(i), o)
 
+    def test_inline_code(self):
+        ins = [
+            "py`hello`",
+            "py``hello`` there",
+            "`hello` there",
+            "`hell\no` there",
+            "py`hell\no` there",
+        ]
+        outs = [
+            '<span class="hl"><code class="lang-py">hello</code></span>',
+            '<span class="hl"><code class="lang-py">hello</code></span> there',
+            "<code>hello</code> there",
+            "<code>hell\no</code> there",
+            '<span class="hl"><code class="lang-py">hell\no</code></span> there',
+        ]
+
+        for i, o in zip(ins, outs):
+            self.assertEqual(_md(i), o)
+
 
 if __name__ == "__main__":
     unittest.main()

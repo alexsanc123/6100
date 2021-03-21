@@ -139,7 +139,8 @@ LANGS = [
 
 class SyntaxHighlightedCodeSpan(SpanToken):
     pattern = re.compile(
-        r"(?P<lang>(?:%s)?)(?P<open>`+)(?P<body>.*?)(?P=open)" % "|".join(LANGS)
+        r"(?P<lang>(?:%s)?)(?P<open>`+)(?P<body>.*?)(?P=open)" % "|".join(LANGS),
+        re.DOTALL,
     )
     parse_inner = False
     precedence = SpanToken.precedence + 2

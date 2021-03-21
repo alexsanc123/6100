@@ -32,6 +32,9 @@ FIXED:
 
   * Fixed a crash related to multiprocessing on MacOS with Python 3.8
 
+  * Fixed an issue with rendering inline code blocks split across multiple
+    lines of Markdown.
+
 SECURITY:
 
 DOCUMENTATION:
