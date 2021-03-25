@@ -29,14 +29,7 @@ development is coordinated.
 
 When it is time to go ahead and make your change(s) to the code, it will be
 important to have a local copy of the code, by cloning the
-[Mercurial](https://www.mercurial-scm.org/) repository:
-
-```nohighlight
-@{TOR_STRING('hg')} clone https://@{cs_url_root.split('/', 2)[-1]}/catsoop
-```
-
-We also offer a [Git](https://git-scm.com/) mirror if you prefer working with
-Git instead of Mercurial
+[Git](https://git-scm.com/) repository:
 
 ```nohighlight
 @{TOR_STRING('git')} clone git://@{cs_url_root.split('/', 2)[-1]}/catsoop.git
@@ -92,15 +85,8 @@ clone the sample course if you do not already have another course to work with,
 using the following command:
 
 ```nohighlight
-@{TOR_STRING('hg')} clone https://@{cs_url_root.split('/', 2)[-1]}/hg/sample_course ~/.local/share/catsoop/courses/sample_course
-```
-
-or, using the Git mirror:
-
-```nohighlight
 @{TOR_STRING('git')} clone git://@{cs_url_root.split('/', 2)[-1]}/sample_course.git ~/.local/share/catsoop/courses/sample_course
 ```
-
 
 
 <subsection>Making a First Change</subsection>
@@ -117,12 +103,11 @@ process and restarting it.
 
 <subsection>Next Steps</subsection>
 
-<ref overview><a href="{link}">Section {number}</a></ref> provides an overview
-of the codebase, which you may wish to read as a starting point.  Additionally,
-some issues in the issue tracker are marked as potential good
-opportunities for a first dive into the codebase.  You can view these issues
-[here](/bugs/view_all_bug_page.php?filter=6042230d31597),
-or by manually searching for them from the catsoop issue tracker.
+If you don't already have an idea in mind, some issues in the issue tracker are
+marked as potential good opportunities for a first dive into the codebase.  You
+can view these issues [here](/bugs/view_all_bug_page.php?filter=6042230d31597),
+or by manually searching for them from the catsoop issue tracker, and feel free
+to reach out if you need help!
 
 <section>Rules to Write/Commit By</section>
 
@@ -200,59 +185,31 @@ to prepare patches to be shared with us.
     questions about the process, please reach out via the mailing lists, and we'd
     be happy to help!
 
-There are a few different options for sharing changes made to the Mercurial
-repository:
+There are a few different ways that we'll accept patches.
 
-1. For small changes, `hg export` is the preferred method for sharing.  For
-    single-commit changes, the following will generate a patch file:
+1. For small patches, you can use the `git send-email` command to send your
+    patches via email.  There is a nice tutorial about this approach at
+    <https://git-send-email.io/>.  Please make sure to send patches to
+    `catsoop-dev@mit.edu`.
 
-    ```nohighlight
-    hg export tip > NAME.patch
-    ```
-
-    For changes involving multiple commits, the following will generate a patch
-    containing all commits that are not present on the base repo:
-
-    ```nohighlight
-    hg export `hg outgoing -q --template "{rev} "` > NAME.patch
-    ```
-
-2. For larger changes, `hg bundle` is preferable, as the files it produces are
-    much smaller.  The following command will generate a bundle containing all
-    commits that are not present on the base repo:
-
-    ```nohighlight
-    hg bundle `hg outgoing -q --template "-r {rev} "` NAME.hg
-    ```
-
-
-3. Alternatively, if your copy of the repository is accessible over a network
-    connection (for example, via HTTP or public SSH, or via a
-    publicly-accesisble directory on Athena), it is fine to send a pointer to that
-    repository instead of sending patches.
-
-<subsubsection>Preparing Patches with Git</subsubsection>
-
-If you are using the Git mirror, there are also a few options:
-
-1. For small changes, `git format-patch` is the preferred method for sharing.
-    The following command, for example, will generate a patch file containing
-    all of the commits not present in the base repo:
+1. You can instead use `git format-patch`.
+    If you are using Bash, then the following command, for example, will
+    generate a patch file containing all of the commits not present in the base
+    repo:
 
     ```nohighlight
     git format-patch "$(git merge-base dev `git branch --show-current`)" --stdout > NAME.patch
     ```
 
-2. Alternatively, if your copy of the repository is accessible over a network
+    You can then attach the patch to an e-mail to `catsoop-dev@mit.edu` (or, if
+    you prefer, as an attachment in the forum or the bug tracker).
+
+3. Alternatively, if your copy of the repository is accessible over a network
     connection (for example, on a public source forge like Gitlab, or in a
     publicly-accessible directory on Athena), it is fine to send a pointer to that
-    repository instead of sending patches.
+    repository instead of sending patches (you could use `git request-pull` or
+    any other mechanism).
 
-<subsubsection>Sending</subsubsection>
-
-When you have your patches prepared and ready to send, please either send them
-to `catsoop-dev@mit.edu`, or attach them to the corresponding issue in the bug
-tracker.
 
 <subsection>Feedback</subsection>
 
@@ -301,24 +258,16 @@ upgrading.
 
 <subsection>Repository Structure</subsection>
 
-All development happens on the `default` branch in the Git repository.
+All development happens on the `dev` branch in the Git repository.
 
 Each version of catsoop has a separate branch in the repository, named like
 `v20YY.M` (for regular versions) or `v20YY.M-lts` (for LTS versions), where
-bugfixes and other changes are backported from the `default` branch.
-Generally, new features and bugfixes only make their way into non-`default`
-branches by way of backporting changes to those branches; that is to say,
-changes should always happen on `default` first.
+bugfixes and other changes are backported from the `dev` branch.  Generally,
+new features and bugfixes only make their way into non-`default` branches by
+way of backporting changes to those branches; that is to say, changes should
+always happen on `dev` first.
 
 Each release is tagged with a version number `v20YY.M.V`.  Additionally, the
 current release and the current LTS release are tagged with `current_release`
 and `current_lts`, respectively.  These tagged releases are also signed with
 [Adam's PGP key](https://hz.mit.edu/hz_pubkey.asc).
-
-<section label="overview">Brief Overview of Codebase</section>
-
-TODO
-
-<subsection>Anatomy of a Page Load</subsection>
-
-TODO

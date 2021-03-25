@@ -36,11 +36,8 @@ about CAT-SOOP at [this page](COURSE/docs/about).
     * Community Forum <https://catsoop.mit.edu/community>
 
 * Code:
-    * Mercurial repository: `@{TOR_STRING('hg')} clone https://@{cs_url_root.split('/', 2)[-1]}/hg/catsoop`
     * Git repository: `@{TOR_STRING('git')} clone git://@{cs_url_root.split('/', 2)[-1]}/catsoop.git`
-
-* Repository Web Access:
-    * <@{cs_url_root}/hg/>
+    * Repository Web Access: <@{cs_url_root}/cgit/catsoop.git>
 
 
 ## CAN I USE IT FOR MY COURSE?
