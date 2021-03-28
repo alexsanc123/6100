@@ -33,7 +33,10 @@ FIXED:
   * Fixed a crash related to multiprocessing on MacOS with Python 3.8
 
   * Fixed an issue with rendering inline code blocks split across multiple
-    lines of Markdown.
+    lines of Markdown
+
+  * Attempted fix for rendering of the catsoop logo in the footer on
+    iOS/Safari
 
 SECURITY:
 

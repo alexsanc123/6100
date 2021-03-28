@@ -108,6 +108,8 @@ pre code {
 .catsooplogo {
   text-align: center;
   overflow: hidden;
+  white-space: pre;
+  word-wrap: normal;
   background: transparent;
   border: none;
   line-height: 1.1em;
