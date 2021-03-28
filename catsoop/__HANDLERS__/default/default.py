@@ -434,6 +434,8 @@ def handle_view(context):
 
     page += default_javascript(context)
     page += default_timer(context)
+    if _get(context, "cs_log_page_views", False, bool):
+        log_action(context, {})
     return page
 
 
