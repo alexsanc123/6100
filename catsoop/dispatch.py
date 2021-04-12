@@ -408,7 +408,6 @@ def display_page(context):
             "</font></b></center><p>"
         ) % {"u": context["cs_username"]}
         context["cs_content"] = impmsg + context["cs_content"]
-    context["cs_content"] = language.handle_custom_tags(context, context["cs_content"])
     default = os.path.join(
         context.get("cs_fs_root", base_context.cs_fs_root),
         "__STATIC__",
