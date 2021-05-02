@@ -41,8 +41,6 @@ FIXED:
   * Attempted fix for rendering of the catsoop logo in the footer on
     iOS/Safari
 
-  * Avoid redundant call to handle_custom_tags function when rendering a page
-
 SECURITY:
 
 DOCUMENTATION:
