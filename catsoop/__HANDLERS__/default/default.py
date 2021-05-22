@@ -45,6 +45,7 @@ def new_entry(context, qname, action):
 
     Returns uuid for the new queue entry.
     """
+    id_ = str(uuid.uuid4())
     obj = {
         "path": context["cs_path_info"],
         "username": context.get("cs_username", "None"),
@@ -59,9 +60,20 @@ def new_entry(context, qname, action):
     if session.get("is_lti_user"):
         obj["lti_data"] = session.get("lti_data")
 
-    return context["csm_cslog"].queue_push(
-        "checker", "queued", obj, **context["cs_logging_kwargs"]
+    # safely save queue entry in database file (stage then mv)
+    loc = os.path.join(context["cs_data_root"], "_logs", "_checker", "staging", id_)
+    os.makedirs(os.path.dirname(loc), exist_ok=True)
+    with open(loc, "wb") as f:
+        f.write(context["csm_cslog"].prep(obj))
+    newloc = os.path.join(
+        context["cs_data_root"],
+        "_logs",
+        "_checker",
+        "queued",
+        "%s_%s" % (time.time(), id_),
     )
+    shutil.move(loc, newloc)
+    return id_
 
 
 def _n(n):
@@ -164,12 +176,8 @@ def handle_copy_seed(context):
         uname = context[_n("real_uname")]
         path = context["cs_path_info"]
         logname = "random_seed"
-        stored = context["csm_cslog"].most_recent(
-            impersonated, path, logname, None, **context["cs_logging_kwargs"]
-        )
-        context["csm_cslog"].update_log(
-            uname, path, logname, stored, **context["cs_logging_kwargs"]
-        )
+        stored = context["csm_cslog"].most_recent(impersonated, path, logname, None)
+        context["csm_cslog"].update_log(uname, path, logname, stored)
     return handle_save(context)
 
 
@@ -187,7 +195,6 @@ def handle_new_seed(context):
         context["cs_path_info"],
         "random_seed",
         _new_random_seed(),
-        **context["cs_logging_kwargs"]
     )
 
     # Rerender the questions
@@ -211,7 +218,6 @@ def handle_activate(context):
             context["cs_path_info"],
             "problemstate",
             newstate,
-            **context["cs_logging_kwargs"]
         )
         context[_n("last_log")] = newstate
     return handle_view(context)
@@ -225,7 +231,6 @@ def handle_copy(context):
             context["cs_path_info"],
             "problemstate",
             {},
-            **context["cs_logging_kwargs"]
         )
         context[_n("last_log")] = ll
     return handle_save(context)
@@ -441,9 +446,7 @@ def handle_view(context):
 
 def get_manual_grading_entry(context, name):
     uname = context["cs_user_info"].get("username", "None")
-    log = context["csm_cslog"].read_log(
-        uname, context["cs_path_info"], "problemgrades", **context["cs_logging_kwargs"]
-    )
+    log = context["csm_cslog"].read_log(uname, context["cs_path_info"], "problemgrades")
     out = None
     for i in log:
         if i["qname"] == name:
@@ -493,7 +496,6 @@ def handle_clearanswer(context):
         context["cs_path_info"],
         "problemstate",
         newstate,
-        **context["cs_logging_kwargs"]
     )
 
     # log submission in problemactions
@@ -564,7 +566,6 @@ def handle_viewexplanation(context, outdict=None, skip_empty=False):
         context["cs_path_info"],
         "problemstate",
         newstate,
-        **context["cs_logging_kwargs"]
     )
 
     # log submission in problemactions
@@ -626,7 +627,6 @@ def handle_viewanswer(context):
         context["cs_path_info"],
         "problemstate",
         newstate,
-        **context["cs_logging_kwargs"]
     )
 
     # log submission in problemactions
@@ -692,7 +692,6 @@ def handle_lock(context):
         context["cs_path_info"],
         "problemstate",
         newstate,
-        **context["cs_logging_kwargs"]
     )
 
     # log submission in problemactions
@@ -763,7 +762,6 @@ def handle_grade(context):
             context["cs_path_info"],
             "problemgrades",
             i,
-            **context["cs_logging_kwargs"]
         )
 
     # log submission in problemactions
@@ -806,7 +804,6 @@ def handle_unlock(context):
         context["cs_path_info"],
         "problemstate",
         newstate,
-        **context["cs_logging_kwargs"]
     )
 
     # log submission in problemactions
@@ -887,7 +884,6 @@ def handle_save(context):
             context["cs_path_info"],
             "problemstate",
             newstate,
-            **context["cs_logging_kwargs"]
         )
 
         # log submission in problemactions
@@ -1012,7 +1008,6 @@ def handle_check(context):
         context["cs_path_info"],
         "problemstate",
         newstate,
-        **context["cs_logging_kwargs"]
     )
 
     # log submission in problemactions
@@ -1228,7 +1223,6 @@ def handle_submit(context):
         context["cs_path_info"],
         "problemstate",
         newstate,
-        **context["cs_logging_kwargs"]
     )
 
     # if this was using the "legacy" grading mode and we're using LTI, send the
@@ -1588,7 +1582,6 @@ def log_action(context, log_entry):
         context["cs_path_info"],
         "problemactions",
         entry,
-        **context["cs_logging_kwargs"]
     )
 
 
@@ -1688,18 +1681,18 @@ def render_question(elt, context, lastsubmit, wrap=True):
     magic = context[_n("last_log")].get("checker_ids", {}).get(name, None)
 
     if magic is not None:
-        try:
-            checker_entry = {
-                "status": "results",
-                "data": cslog.most_recent("_checker_results", [], magic),
-            }
-            assert checker_entry["data"] is not None
-        except:
-            checker_entry = cslog.queue_get(
-                "checker", magic, **context["cs_logging_kwargs"]
-            )
-        if checker_entry["status"] == "results":
-            result = checker_entry["data"]
+        checker_loc = os.path.join(
+            context["cs_data_root"],
+            "_logs",
+            "_checker",
+            "results",
+            magic[0],
+            magic[1],
+            magic,
+        )
+        if os.path.isfile(checker_loc):
+            with open(checker_loc, "rb") as f:
+                result = context["csm_cslog"].unprep(f.read())
             message = (
                 '\n<script type="text/javascript">'
                 "\n// @license magnet:?xt=urn:btih:0b31508aeb0634b347b8270c7bee4d411b5d4109&dn=agpl-3.0.txt AGPL-v3"
@@ -1713,7 +1706,6 @@ def render_question(elt, context, lastsubmit, wrap=True):
             except:
                 pass
             message += "\n" + result["response"]
-
         else:
             message = WEBSOCKET_RESPONSE % {
                 "name": name,
@@ -1989,7 +1981,6 @@ def pre_handle(context):
         context["cs_path_info"],
         "problemstate",
         {},
-        **context["cs_logging_kwargs"]
     )
     _cs_group_path = context.get("cs_groups_to_use", context["cs_path_info"])
     context[_n("all_groups")] = context["csm_groups"].list_groups(
@@ -2037,7 +2028,7 @@ def pre_handle(context):
                     value[0],
                 )
 
-                cslog.store_upload(*upload, **context["cs_logging_kwargs"])
+                cslog.store_upload(*upload)
                 value[1] = upload[0]
 
 
@@ -2190,7 +2181,6 @@ def _get_scores(context):
                 context["cs_path_info"],
                 "problemstate",
                 {},
-                **context["cs_logging_kwargs"]
             )
             log = context["csm_tutor"].compute_page_stats(
                 context, username, context["cs_path_info"], ["state"]
@@ -2298,10 +2288,7 @@ def handle_stats(context):
 
 def _real_name(context, username):
     return (
-        context["csm_cslog"].most_recent(
-            "_extra_info", [], username, None, **context["cs_logging_kwargs"]
-        )
-        or {}
+        context["csm_cslog"].most_recent("_extra_info", [], username, None) or {}
     ).get("name", None)
 
 

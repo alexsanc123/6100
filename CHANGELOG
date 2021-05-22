@@ -25,9 +25,13 @@ CHANGED:
   * The pythonic and pythonliteral question types now allow checking for valid
     formatting.
 
+  * Reverted changes to cslog module and how the checker queue process works.
+
 DEPRECATED:
 
 REMOVED:
+
+  * Removed PostgreSQL as a logging mechanism.
 
 FIXED:
 

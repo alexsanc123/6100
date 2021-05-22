@@ -64,12 +64,8 @@ def initialize_api_token(context, user_info):
         k: v for (k, v) in user_info.items() if k in {"username", "name", "email"}
     }
     token = new_api_token(context, user_info["username"])
-    context["csm_cslog"].overwrite_log(
-        "_api_tokens", [], str(token), user_info, **context["cs_logging_kwargs"]
-    )
-    context["csm_cslog"].update_log(
-        "_api_users", [], user_info["username"], token, **context["cs_logging_kwargs"]
-    )
+    context["csm_cslog"].overwrite_log("_api_tokens", [], str(token), user_info)
+    context["csm_cslog"].update_log("_api_users", [], user_info["username"], token)
     return token
 
 
@@ -87,9 +83,7 @@ def userinfo_from_token(context, tok):
     `'username'`, `'name'`, and `'email'`.  Returns `None` if the given token
     is invalid.
     """
-    return context["csm_cslog"].most_recent(
-        "_api_tokens", [], str(tok), None, **context["cs_logging_kwargs"]
-    )
+    return context["csm_cslog"].most_recent("_api_tokens", [], str(tok), None)
 
 
 def get_logged_in_user(context):
@@ -162,9 +156,7 @@ def get_user_information(
             error = "Invalid API token: %s" % api_token
         else:
             user["api_token"] = api_token
-            extra_info = log.most_recent(
-                "_extra_info", [], user["username"], {}, **context["cs_logging_kwargs"]
-            )
+            extra_info = log.most_recent("_extra_info", [], user["username"], {})
             user.update(extra_info)
     else:
         if uname is not None and passwd is not None:
@@ -180,7 +172,6 @@ def get_user_information(
                     [],
                     user["username"],
                     None,
-                    **context["cs_logging_kwargs"]
                 )
         else:
             error = "API token or username and password hash required."

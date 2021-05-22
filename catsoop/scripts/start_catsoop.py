@@ -50,9 +50,6 @@ def main():
     import catsoop.base_context as base_context
     import catsoop.loader as loader
     from catsoop.process import set_pdeathsig
-    from catsoop.cslog import initialize_database
-
-    initialize_database()
 
     # Make sure the checker database is set up
     checker_db_loc = os.path.join(base_context.cs_data_root, "_logs", "_checker")

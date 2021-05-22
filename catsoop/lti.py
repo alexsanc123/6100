@@ -127,9 +127,7 @@ class lti4cs(pylti.common.LTIBase):
         logging = context["csm_cslog"]
         uname = context["cs_user_info"]["username"]
         db_name = "_lti_data"
-        logging.overwrite_log(
-            db_name, [], uname, self.lti_data, **context["cs_logging_kwargs"]
-        )
+        logging.overwrite_log(db_name, [], uname, self.lti_data)
 
 
 class lti4cs_response(object):
@@ -147,9 +145,7 @@ class lti4cs_response(object):
             logging = context["csm_cslog"]
             uname = context["cs_user_info"]["username"]
             db_name = "_lti_data"
-            self.lti_data = logging.most_recent(
-                db_name, [], uname, **context["cs_logging_kwargs"]
-            )  # retrieve LTI data
+            self.lti_data = logging.most_recent(db_name, [], uname)  # retrieve LTI data
         self.consumers = context.get("cs_lti_config")["consumers"]
         self.pylti_url_fix = context.get("cs_lti_config").get("pylti_url_fix", {})
 

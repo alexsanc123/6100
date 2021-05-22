@@ -42,9 +42,7 @@ def handle_submission(submissions, **info):
     ll = submissions.get(name, None)
     if ll is not None:
         if info["csq_extract_data"]:
-            submissions[name] = info["csm_cslog"].retrieve_upload(
-                ll[1], **info["cs_logging_kwargs"]
-            )[1]
+            submissions[name] = info["csm_cslog"].retrieve_upload(ll[1])[1]
         o.update(base["handle_submission"](submissions, **info))
     return o
 

@@ -54,7 +54,6 @@ def handle(context):
         [context["cs_course"]],
         logname,
         log_entry,
-        **context["cs_logging_kwargs"]
     )
 
     if m is None:

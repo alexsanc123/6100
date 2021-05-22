@@ -606,7 +606,6 @@ def main(environment, return_context=False, form_data=None):
     context = {}
     context["cs_env"] = environment
     context["cs_now"] = time.now()
-    context["cs_logging_kwargs"] = cslog.setup_kwargs()
     force_error = False
     try:
         # DETERMINE WHAT PAGE WE ARE LOADING
@@ -618,7 +617,6 @@ def main(environment, return_context=False, form_data=None):
 
         # RETURN STATIC FILE RESPONSE RIGHT AWAY
         if len(path_info) > 0 and path_info[0] == "_static":
-            cslog.teardown_kwargs(context["cs_logging_kwargs"])
             return serve_static_file(
                 context, static_file_location(context, path_info[1:]), environment
             )
@@ -666,7 +664,6 @@ def main(environment, return_context=False, form_data=None):
         # CHECK FOR VALID CONFIGURATION
         if e is not None:
             LOGGER.error("[dispatch.main] internal server error %s" % e)
-            cslog.teardown_kwargs(context["cs_logging_kwargs"])
             return (
                 ("500", "Internal Server Error"),
                 {"Content-type": "text/plain", "Content-length": str(len(e))},
@@ -725,7 +722,6 @@ def main(environment, return_context=False, form_data=None):
         # Handle LTI (must be done prior to authentication & other processing)
         if path_info and context["cs_course"] == "_lti":
             LOGGER.info("[dispatch.main] serving LTI")
-            cslog.teardown_kwargs(context["cs_logging_kwargs"])
             return lti.serve_lti(
                 context, path_info, environment, form_data, main, return_context
             )
@@ -739,7 +735,6 @@ def main(environment, return_context=False, form_data=None):
             )
             if x == "missing":
                 LOGGER.info("[dispatch.main] preload returned missing")
-                cslog.teardown_kwargs(context["cs_logging_kwargs"])
                 return errors.do_404_message(context)
 
             _set_colors(context)
@@ -756,7 +751,6 @@ def main(environment, return_context=False, form_data=None):
                     session.set_session_data(
                         context, context["cs_sid"], context["cs_session_data"]
                     )
-                    cslog.teardown_kwargs(context["cs_logging_kwargs"])
                     return display_page(context)
                 redir = None
                 if user_info.get("cs_reload", False):
@@ -772,7 +766,6 @@ def main(environment, return_context=False, form_data=None):
                     session.set_session_data(
                         context, context["cs_sid"], context["cs_session_data"]
                     )
-                    cslog.teardown_kwargs(context["cs_logging_kwargs"])
                     return redirect(redir)
 
                 # ONCE WE HAVE THAT, GET USER INFORMATION
@@ -806,7 +799,6 @@ def main(environment, return_context=False, form_data=None):
             if context.get("cs_course", None):
                 result = is_resource(context, [context["cs_course"]] + path_info)
                 if not result:
-                    cslog.teardown_kwargs(context["cs_logging_kwargs"])
                     return errors.do_404_message(context)
 
             # FINALLY, LOAD CONTENT
@@ -822,7 +814,6 @@ def main(environment, return_context=False, form_data=None):
                 % default_course
             )
             if default_course is not None:
-                cslog.teardown_kwargs(context["cs_logging_kwargs"])
                 return redirect(
                     "/".join(
                         [
@@ -867,7 +858,6 @@ def main(environment, return_context=False, form_data=None):
             session.set_session_data(
                 context, context["cs_sid"], context["cs_session_data"]
             )
-            cslog.teardown_kwargs(context["cs_logging_kwargs"])
             return res
         if "cs_post_handle" in context:
             context["cs_post_handle"](context)
@@ -888,7 +878,6 @@ def main(environment, return_context=False, form_data=None):
             out = errors.do_error_message(context)
     out = out[:-1] + (out[-1].encode("utf-8"),)
     out[1].update({"Content-length": str(len(out[-1]))})
-    cslog.teardown_kwargs(context["cs_logging_kwargs"])
     if return_context:
         LOGGER.info("[dispatch.main] Returning context instead of HTML response")
         return context

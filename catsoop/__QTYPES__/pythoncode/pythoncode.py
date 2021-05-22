@@ -166,9 +166,7 @@ checktext = "Run Code"
 def get_code(sub, info):
     try:
         try:
-            code = info["csm_cslog"].retrieve_upload(
-                sub[1], **info["cs_logging_kwargs"]
-            )[1]
+            code = info["csm_cslog"].retrieve_upload(sub[1])[1]
             code = code.decode("utf-8")
         except:
             code = sub

@@ -96,7 +96,6 @@ def generate_api_token_for_user(context, user_info):
             [],
             user_info["username"],
             None,
-            **context["cs_logging_kwargs"]
         )
         if tok is None:
             # if no token found, create a new one.
@@ -232,14 +231,20 @@ def _get_user_information(context, into, course, username, do_preload=False):
     cslog = context["csm_cslog"]
     if "username" in into:
         logininfo = cslog.most_recent(
-            "_logininfo", [], into["username"], {}, **context["cs_logging_kwargs"]
+            "_logininfo",
+            [],
+            into["username"],
+            {},
         )
         logininfo = {
             k: v for k, v in logininfo.items() if k in ("username", "name", "email")
         }
         into.update(logininfo)
         extra_info = cslog.most_recent(
-            "_extra_info", [], into["username"], {}, **context["cs_logging_kwargs"]
+            "_extra_info",
+            [],
+            into["username"],
+            {},
         )
         into.update(extra_info)
 

@@ -1,5 +1,5 @@
 # This file is part of CAT-SOOP
-# Copyright (c) 2011-2021 by The CAT-SOOP Developers <catsoop-dev@mit.edu>
+# Copyright (c) 2011-2020 by The CAT-SOOP Developers <catsoop-dev@mit.edu>
 #
 # This program is free software: you can redistribute it and/or modify it under
 # the terms of the GNU Affero General Public License as published by the Free
@@ -14,44 +14,66 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-Logging mechanisms using the filesystem
+Logging mechanisms in catsoopdb
+
+From a high-level perspective, CAT-SOOP's logs are sequences of Python objects.
+
+A log is identified by a `db_name` (typically a username), a `path` (a list of
+strings starting with a course name), and a `logname` (a string).
 
 On disk, each log is a file containing one or more entries, where each entry
 consists of:
 
-* 8 bytes representing the length of the entry
+* 8 bits representing the length of the entry
 * a binary blob (pickled Python object, potentially encrypted and/or
     compressed)
-* the 8-byte length repeated
+* the 8-bit length repeated
+
+This module provides functions for interacting with and modifying those logs.
+In particular, it provides ways to retrieve the Python objects in a log, or to
+add new Python objects to a log.
 """
 
 import os
-import glob
+import ast
+import sys
+import lzma
 import time
 import uuid
 import base64
 import pickle
-import shutil
 import struct
 import hashlib
+import importlib
 import contextlib
 
 from collections import OrderedDict
 from datetime import datetime, timedelta
 
-from filelock import FileLock
-
-from .. import time as cstime
-from .. import base_context
-
-from . import (
-    prep,
-    unprep,
-    compress_encrypt,
-    decompress_decrypt,
-    hash_db_info,
-    WORKER_ID,
-)
+_nodoc = {
+    "passthrough",
+    "FileLock",
+    "SEP_CHARS",
+    "get_separator",
+    "good_separator",
+    "modify_most_recent",
+    "NoneType",
+    "OrderedDict",
+    "datetime",
+    "timedelta",
+    "COMPRESS",
+    "Cipher",
+    "ENCRYPT_KEY",
+    "ENCRYPT_PASS",
+    "RawFernet",
+    "compress_encrypt",
+    "decompress_decrypt",
+    "default_backend",
+    "log_lock",
+    "prep",
+    "sep",
+    "unprep",
+}
 
 
 @contextlib.contextmanager
@@ -59,18 +81,69 @@ def passthrough():
     yield
 
 
-def setup_kwargs():
-    return {}
+from . import util
+from . import base_context
+from . import time as cstime
+from filelock import FileLock
 
+importlib.reload(base_context)
 
-def teardown_kwargs(kwargs):
-    return
+COMPRESS = base_context.cs_log_compression
+
+ENCRYPT_KEY = None
+ENCRYPT_PASS = os.environ.get("CATSOOP_PASSPHRASE", None)
+if ENCRYPT_PASS is not None:
+    with open(
+        os.path.join(os.path.dirname(os.environ["CATSOOP_CONFIG"]), "encryption_salt"),
+        "rb",
+    ) as f:
+        SALT = f.read()
+    ENCRYPT_KEY = hashlib.pbkdf2_hmac(
+        "sha256", ENCRYPT_PASS.encode("utf8"), SALT, 100000, dklen=32
+    )
 
 
 def log_lock(path):
     lock_loc = os.path.join(base_context.cs_data_root, "_locks", *path) + ".lock"
     os.makedirs(os.path.dirname(lock_loc), exist_ok=True)
     return FileLock(lock_loc)
+
+
+def compress_encrypt(x):
+    if COMPRESS:
+        x = lzma.compress(x)
+    if ENCRYPT_KEY is not None:
+        x = util.simple_encrypt(ENCRYPT_KEY, x)
+    return x
+
+
+def prep(x):
+    """
+    Helper function to serialize a Python object.
+    """
+    return compress_encrypt(pickle.dumps(x, -1))
+
+
+def decompress_decrypt(x):
+    if ENCRYPT_KEY is not None:
+        x = util.simple_decrypt(ENCRYPT_KEY, x)
+    if COMPRESS:
+        x = lzma.decompress(x)
+    return x
+
+
+def unprep(x):
+    """
+    Helper function to deserialize a Python object.
+    """
+    return pickle.loads(decompress_decrypt(x))
+
+
+def _e(x, person):
+    p = hashlib.sha512(person.encode("utf-8")).digest()[:9]
+    return base64.urlsafe_b64encode(
+        hashlib.blake2b(x.encode("utf-8"), person=b"catsoop%s" % p).digest()
+    ).decode("utf-8")
 
 
 def get_log_filename(db_name, path, logname):
@@ -83,7 +156,11 @@ def get_log_filename(db_name, path, logname):
     * `path`: the path to the page associated with the log
     * `logname`: the name of the log
     """
-    db_name, path, logname = hash_db_info(db_name, path, logname)
+    if ENCRYPT_KEY is not None:
+        seed = path[0] if path else db_name
+        path = [_e(p, seed + repr(path[:ix])) for ix, p in enumerate(path)]
+        db_name = _e(db_name, seed + db_name)
+        logname = _e(logname, seed + repr(path))
     if path:
         course = path[0]
         return os.path.join(
@@ -93,7 +170,7 @@ def get_log_filename(db_name, path, logname):
             course,
             db_name,
             *(path[1:]),
-            "%s.log" % logname,
+            "%s.log" % logname
         )
     else:
         return os.path.join(
@@ -255,18 +332,10 @@ def modify_most_recent(
     return new_val
 
 
-def initialize_database():
-    """
-    Initialize the log storage on disk
-    """
-    pass
-
-
 def clear_old_logs(db_name, path, expire):
     """
     Clear logs older than the given value.  Primarily used for session handling
     """
-    db_name, path, _ = hash_db_info(db_name, path, "")
     directory = os.path.dirname(get_log_filename(db_name, path, "test"))
     try:
         logs = os.listdir(directory)
@@ -281,8 +350,21 @@ def clear_old_logs(db_name, path, expire):
             pass
 
 
+def prepare_upload(username, data, filename):
+    hstring = hashlib.sha256(data).hexdigest()
+    info = {
+        "filename": filename,
+        "username": username,
+        "time": cstime.detailed_timestamp(cstime.now()),
+        "hash": hstring,
+    }
+    return "%s%s" % (hstring, uuid.uuid4().hex), prep(info), compress_encrypt(data)
+
+
 def store_upload(id_, info, data):
-    dir_ = os.path.join(base_context.cs_data_root, "_logs", "_uploads", id_)
+    dir_ = os.path.join(
+        base_context.cs_data_root, "_logs", "_uploads", id_[0], id_[1], id_
+    )
     os.makedirs(dir_, exist_ok=True)
     with open(os.path.join(dir_, "info"), "wb") as f:
         f.write(info)
@@ -291,7 +373,9 @@ def store_upload(id_, info, data):
 
 
 def retrieve_upload(id_):
-    dir_ = os.path.join(base_context.cs_data_root, "_logs", "_uploads", id_)
+    dir_ = os.path.join(
+        base_context.cs_data_root, "_logs", "_uploads", id_[0], id_[1], id_
+    )
     try:
         with open(os.path.join(dir_, "info"), "rb") as f:
             info = unprep(f.read())
@@ -300,170 +384,3 @@ def retrieve_upload(id_):
         return info, data
     except FileNotFoundError:
         return None
-
-
-def _queue_location(queuename):
-    return os.path.join(base_context.cs_data_root, "_logs", "_queues", queuename)
-
-
-def _get_statuses(queuename):
-    return os.listdir(_queue_location(queuename))
-
-
-def _get_staging_filename(id):
-    return os.path.join(_queue_location(""), "_staging", id)
-
-
-def _new_queue_filename(queuename, status, created, updated, id):
-    basename = f"{created}_{updated}_{id}"
-    return os.path.join(_queue_location(queuename), status, basename)
-
-
-def _get_entries(queuename, status):
-    try:
-        root = os.path.join(_queue_location(queuename), status)
-        return {f: os.path.join(root, f) for f in os.listdir(root)}
-    except:
-        return {}
-
-
-def queue_push(queuename, initial_status, data):
-    now = time.time()
-    id = str(uuid.uuid4())
-    staging_name = _get_staging_filename(id)
-    final_name = _new_queue_filename(queuename, initial_status, now, now, id)
-    os.makedirs(os.path.dirname(staging_name), exist_ok=True)
-    with open(staging_name, "wb") as f:
-        pickle.dump(
-            {
-                "id": id,
-                "worker": None,
-                "data": prep(data),
-            },
-            f,
-            4,
-        )
-    os.makedirs(os.path.dirname(final_name), exist_ok=True)
-    os.rename(staging_name, final_name)
-    return id
-
-
-def queue_pop(queuename, old_status, new_status=None):
-    for shortname, fullname in sorted(_get_entries(queuename, old_status).items()):
-        try:
-            # try moving to staging area; that's our indication that we
-            # actually got an entry
-            created, updated, id = shortname.split("_")
-            staging_name = _get_staging_filename(id)
-            os.rename(fullname, staging_name)
-        except:
-            continue
-
-        # if we get here, we moved this to staging, so it belongs to us.
-        # load the data first:
-
-        with open(staging_name, "rb") as f:
-            entry = pickle.load(f)
-        entry["queuename"] = queuename
-        entry["status"] = old_status
-        entry["worker"] = WORKER_ID
-        entry["created"] = float(created)
-        entry["updated"] = float(updated)
-
-        # want to set a new status, go for it.  otherwise, we'll just delete
-        # this entry from the queue.
-        if new_status is None:
-            shutil.rmtree(staging_name, ignore_errors=True)
-        else:
-            now = time.time()
-            entry["updated"] = now
-            entry["status"] = new_status
-            with open(staging_name, "wb") as f:
-                pickle.dump(entry, f, 4)
-            new_name = _new_queue_filename(queuename, new_status, created, now, id)
-            os.makedirs(os.path.dirname(new_name), exist_ok=True)
-            os.rename(staging_name, new_name)
-
-        entry["data"] = unprep(entry["data"])  # unprep the data for the thing we return
-        return entry
-    return None
-
-
-def queue_update(queuename, id, new_data, new_status=None):
-    for i in range(100):
-        try:
-            cur_name = glob.glob(
-                os.path.join(_queue_location(queuename), "*", f"*_{id}")
-            )[0]
-            staging_name = _get_staging_filename(id)
-            os.rename(cur_name, staging_name)
-            break
-        except:
-            time.sleep(0.001)
-            continue
-    else:
-        return None
-
-    status = cur_name.split(os.sep)[-2]
-    created, updated, _ = os.path.basename(cur_name).split("_")
-
-    with open(staging_name, "rb") as f:
-        entry = pickle.load(f)
-
-    entry["worker"] = WORKER_ID
-    entry["data"] = prep(new_data)
-    with open(staging_name, "wb") as f:
-        pickle.dump(entry, f, 4)
-
-    new_status = new_status or status
-    new_name = _new_queue_filename(queuename, new_status, created, updated, id)
-    os.makedirs(os.path.dirname(new_name), exist_ok=True)
-    os.rename(staging_name, new_name)
-
-    entry["queuename"] = queuename
-    entry["status"] = new_status
-    entry["created"] = float(created)
-    entry["updated"] = float(updated)
-    entry["data"] = new_data  # return the enprepped data here
-    return entry
-
-
-def queue_get(queuename, id):
-    try:
-        filename = glob.glob(os.path.join(_queue_location(queuename), "*", f"*_{id}"))[
-            0
-        ]
-        with open(filename, "rb") as f:
-            entry = pickle.load(f)
-
-        entry["queuename"] = queuename
-        entry["status"] = filename.split(os.sep)[-2]
-
-        created, updated, _ = os.path.basename(filename).split("_")
-        entry["created"] = float(created)
-        entry["updated"] = float(updated)
-
-        entry["data"] = unprep(entry["data"])
-
-        return entry
-    except:
-        return None
-
-
-def queue_all_entries(queuename, status):
-    out = []
-    for shortname, fullname in sorted(_get_entries(queuename, status).items()):
-        with open(fullname, "rb") as f:
-            entry = pickle.load(f)
-
-        entry["queuename"] = queuename
-        entry["status"] = status
-
-        created, updated, _ = shortname.split("_")
-        entry["created"] = float(created)
-        entry["updated"] = float(updated)
-
-        entry["data"] = unprep(entry["data"])
-
-        out.append(entry)
-    return out

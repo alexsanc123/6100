@@ -259,7 +259,6 @@ def generate_context(path):
     ctx = {}
     load_global_data(ctx)
     ctx["cs_path_info"] = path
-    ctx["cs_logging_kwargs"] = {}
     if path:
         ctx["cs_course"] = path[0]
         cfile = ctx["csm_dispatch"].content_file_location(ctx, path)
@@ -553,7 +552,6 @@ def load_content(context, course, path, into, content_file=None):
         [course] + path,
         "question_info",
         None,
-        **context["cs_logging_kwargs"],
     )
     if (
         course not in {None, "_util"}
@@ -574,5 +572,4 @@ def load_content(context, course, path, into, content_file=None):
             [course] + path,
             "question_info",
             {"timestamp": last_mod, "questions": qs},
-            **context["cs_logging_kwargs"],
         )

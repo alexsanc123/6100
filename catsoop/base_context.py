@@ -324,12 +324,6 @@ Special: user information data configuration flags (e.g. used for groups)
 
 # Log Options
 
-cs_log_storage_backend = "fs"
-"""
-Special: where should catsoop store its logs?  (`fs` for filesystem, `postgres`
-for PostgreSQL database)
-"""
-
 cs_log_compression = False
 """
 Special: Boolean indicating whether log entries should be compressed.

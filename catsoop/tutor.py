@@ -68,9 +68,7 @@ def get_manual_grading_entry(context, name):
 
     """
     uname = context["cs_user_info"].get("username", "None")
-    log = context["csm_cslog"].read_log(
-        uname, context["cs_path_info"], "problemgrades", **context["cs_logging_kwargs"]
-    )
+    log = context["csm_cslog"].read_log(uname, context["cs_path_info"], "problemgrades")
     out = None
     for i in log:
         if i["qname"] == name:
@@ -184,12 +182,20 @@ def read_checker_result(context, magic):
         * `'extra_data'`: any extra data returned by the checker, or `None` for
             question types that don't return extra data
     """
-    try:
-        log = cslog.most_recent("_checker_results", [], magic)
-        assert log is not None
-        return log
-    except:
-        return cslog.queue_get("checker", magic)["data"]
+    with open(
+        os.path.join(
+            context["cs_data_root"],
+            "_logs",
+            "_checker",
+            "results",
+            magic[0],
+            magic[1],
+            magic,
+        ),
+        "rb",
+    ) as f:
+        out = context["csm_cslog"].unprep(f.read())
+    return out
 
 
 def compute_page_stats(context, user, path, keys=None):
@@ -246,26 +252,19 @@ def compute_page_stats(context, user, path, keys=None):
     out = {}
     if "state" in keys:
         keys.remove("state")
-        out["state"] = logging.most_recent(
-            user, path, "problemstate", {}, **context["cs_logging_kwargs"]
-        )
+        out["state"] = logging.most_recent(user, path, "problemstate", {})
     if "actions" in keys:
         keys.remove("actions")
-        out["actions"] = logging.read_log(
-            user, path, "problemactions", **context["cs_logging_kwargs"]
-        )
+        out["actions"] = logging.read_log(user, path, "problemactions")
     if "manual_grades" in keys:
         keys.remove("manual_grades")
-        out["manual_grades"] = logging.read_log(
-            user, path, "problemgrades", **context["cs_logging_kwargs"]
-        )
+        out["manual_grades"] = logging.read_log(user, path, "problemgrades")
     if "question_info" in keys and "context" not in keys:
         qi_log = logging.most_recent(
             "_question_info",
             path,
             "question_info",
             None,
-            **context["cs_logging_kwargs"]
         )
         if qi_log is not None:
             keys.remove("question_info")
@@ -591,7 +590,6 @@ def _get_random_seed(context, n=100, force_new=False):
             context["cs_path_info"],
             "random_seed",
             None,
-            **context["cs_logging_kwargs"]
         )
     if stored is None:
         stored = _new_random_seed(n)
@@ -600,7 +598,6 @@ def _get_random_seed(context, n=100, force_new=False):
             context["cs_path_info"],
             "random_seed",
             stored,
-            **context["cs_logging_kwargs"]
         )
     return stored
 

@@ -219,9 +219,7 @@ if cs_session_data.get("cs_query_string", ""):
 if error is None:
     # we made it! set session data and redirect to original page
     csm_session.set_session_data(globals(), cs_sid, session)
-    csm_cslog.overwrite_log(
-        "_extra_info", [], session["username"], openid_info, **cs_logging_kwargs
-    )
+    csm_cslog.overwrite_log("_extra_info", [], session["username"], openid_info)
     cs_handler = "redirect"
 else:
     cs_handler = "passthrough"

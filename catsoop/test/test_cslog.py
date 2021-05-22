@@ -31,7 +31,8 @@ from collections import Counter
 
 from ..test import CATSOOPTest
 
-from .. import cslog as cslog_base
+from .. import cslog
+from .. import loader
 
 
 # -----------------------------------------------------------------------------
@@ -198,7 +199,7 @@ class CSLogBackend:
     def test_logging_uploads(self):
         content = "hello 🐈".encode("utf-8")
         h = hashlib.sha256(content).hexdigest()
-        id_, info, data = cslog_base.prepare_upload("testuser", content, "cat.txt")
+        id_, info, data = cslog.prepare_upload("testuser", content, "cat.txt")
         self.cslog.store_upload(id_, info, data)
 
         ret_info, ret_data = self.cslog.retrieve_upload(id_)
@@ -207,184 +208,16 @@ class CSLogBackend:
 
         self.assertEqual(self.cslog.retrieve_upload(id_[::-1]), None)
 
-    def test_queue_ops(self):
-        # add a couple of queue entries
-        vals = [4, 8, 15, 16, 23, 42]
-        ids = [self.cslog.queue_push("testqueue", "something", v) for v in vals]
 
-        # check that the queue order is right
-        entries = self.cslog.queue_all_entries("testqueue", "something")
-        self.assertEqual([i["data"] for i in entries], vals)
+class TestFS(CATSOOPTest, CSLogBackend):
+    def setUp(
+        self,
+    ):
+        CATSOOPTest.setUp(self)
 
-        # read each entry
-        for id_, v in zip(ids, vals):
-            entry = self.cslog.queue_get("testqueue", id_)
-            self.assertEqual(entry["id"], id_)
-            self.assertEqual(entry["data"], v)
-            self.assertEqual(entry["status"], "something")
-            self.assertEqual(entry["created"], entry["updated"])
+        context = {}
+        loader.load_global_data(context)
+        self.cslog = cslog
 
-        # pop one entry into a different category
-        x = self.cslog.queue_pop("testqueue", "something", "something_else")
-        self.assertEqual(x["data"], 4)
-        self.assertEqual(x["status"], "something_else")
-        self.assertNotEqual(x["created"], x["updated"])
-
-        # check that the queue order is right
-        entries = self.cslog.queue_all_entries("testqueue", "something")
-        self.assertEqual([i["data"] for i in entries], vals[1:])
-        entries = self.cslog.queue_all_entries("testqueue", "something_else")
-        self.assertEqual([i["data"] for i in entries], [4])
-
-        # pop from nonexistent, make sure we get None
-        self.assertEqual(self.cslog.queue_pop("testqueue", "nope", "something"), None)
-        self.assertEqual(self.cslog.queue_pop("testq", "something", "something"), None)
-
-        # let's update some entries
-        x = self.cslog.queue_update("testqueue", ids[2], "cat")
-        y = self.cslog.queue_update(
-            "testqueue", ids[3], "dog", new_status="something_else"
-        )
-        self.assertEqual(x["data"], "cat")
-        self.assertEqual(x["status"], "something")
-        self.assertEqual(y["data"], "dog")
-        self.assertEqual(y["status"], "something_else")
-
-        # try updating nonexistent one
-        self.assertEqual(self.cslog.queue_update("testqueue", "ABCDEFG", 20), None)
-        self.assertEqual(self.cslog.queue_update("testq", x["id"], 20), None)
-
-        # pop one entry away entirely (8 should still be at the front of the queue, then 'cat')
-        self.assertEqual(self.cslog.queue_pop("testqueue", "something")["data"], 8)
-
-        # check that we have what we expect
-        entries = self.cslog.queue_all_entries("testqueue", "something")
-        self.assertEqual([i["data"] for i in entries], ["cat", 23, 42])
-        entries = self.cslog.queue_all_entries("testqueue", "something_else")
-        self.assertEqual([i["data"] for i in entries], [4, "dog"])
-
-    def _pushes(self, n, size, offset=0, queue="test", status="stage1"):
-        orig_len = len(self.cslog.queue_all_entries(queue, status))
-
-        procs = []
-
-        def pushstuff(n):
-            for i in range(size):
-                self.cslog.queue_push(queue, status, size * n + i + offset)
-
-        for i in range(n):
-            p = multiprocessing.Process(target=pushstuff, args=(i,))
-            p.start()
-            procs.append(p)
-
-        # we'll need to wait for everyone to finish!
-        for p in procs:
-            p.join()
-
-        self.assertEqual(
-            len(self.cslog.queue_all_entries(queue, status)), n * size + orig_len
-        )
-
-    def test_queue_stress_pop(self):
-        # first, push one entry on
-        self.cslog.queue_push("test", "stage1", -1)
-
-        # now push a bunch of stuff and make sure it all makes it in
-        self._pushes(10, 100)
-        self._pushes(20, 100, 1000)
-
-        # now pop one thing off, this should be the first.
-        self.assertEqual(self.cslog.queue_pop("test", "stage1")["data"], -1)
-
-        # now pop a bunch of stuff off and make sure we get the right results
-        # back
-        procs = []
-
-        def popstuff(n):
-            mystage = "stage%d" % (2 + n)
-            o = -1
-            while o is not None:
-                o = self.cslog.queue_pop("test", "stage1", mystage)
-
-        for i in range(20):
-            p = multiprocessing.Process(target=popstuff, args=(i,))
-            procs.append(p)
-        for p in procs:
-            p.start()
-        for p in procs:
-            p.join()
-        all_entries = []
-        for i in range(20):
-            this_entries = self.cslog.queue_all_entries("test", "stage%d" % (2 + i))
-            all_entries.extend(this_entries)
-        self.assertEqual({i["data"] for i in all_entries}, set(range(3000)))
-        self.assertEqual(self.cslog.queue_all_entries("test", "stage1"), [])
-
-    def test_queue_stress_poptonowhere(self):
-        self._pushes(10, 100)
-        ids = [i["id"] for i in self.cslog.queue_all_entries("test", "stage1")]
-
-        procs = []
-
-        def popout(n):
-            out = set()
-            o = -1
-            while o is not None:
-                o = self.cslog.queue_pop("test", "stage1")
-                if o is not None:
-                    out.add(o["id"])
-            with open("/tmp/catsoop_test_%s" % n, "wb") as f:
-                pickle.dump(out, f)
-
-        for i in range(100):
-            p = multiprocessing.Process(target=popout, args=(i,))
-            procs.append(p)
-        for p in procs:
-            p.start()
-        for p in procs:
-            p.join()
-
-        allids = set()
-        for i in range(100):
-            with open("/tmp/catsoop_test_%s" % i, "rb") as f:
-                new = pickle.load(f)
-                allids |= new
-
-        self.assertEqual(allids, set(ids))
-        self.assertEqual(self.cslog.queue_all_entries("test", "stage1"), [])
-
-    def test_queue_stress_update(self):
-        self._pushes(10, 10)
-        ids = [i["id"] for i in self.cslog.queue_all_entries("test", "stage1")]
-
-        procs = []
-
-        def update(n, ids):
-            mystage = "stage%s" % (2 + n)
-            out = set()
-            o = -1
-            random.shuffle(ids)
-            for i in ids:
-                o = self.cslog.queue_update("test", i, 7, mystage)
-                if o is not None:
-                    out.add(o["id"])
-            with open("/tmp/catsoop_test_%s" % n, "wb") as f:
-                pickle.dump(out, f)
-
-        for i in range(100):
-            p = multiprocessing.Process(target=update, args=(i, ids))
-            p.start()
-            procs.append(p)
-
-        for p in procs:
-            p.join()
-
-        allids = set()
-        for i in range(100):
-            with open("/tmp/catsoop_test_%s" % i, "rb") as f:
-                new = pickle.load(f)
-                self.assertEqual(len(new), 100)
-                allids |= new
-
-        self.assertEqual(allids, set(ids))
-        self.assertEqual({self.cslog.queue_get("test", i)["data"] for i in ids}, {7})
+        _logs_dir = os.path.join(context["cs_data_root"], "_logs")
+        shutil.rmtree(_logs_dir, ignore_errors=True)  # start with fresh logs each time
