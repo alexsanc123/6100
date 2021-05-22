@@ -140,10 +140,14 @@ def unprep(x):
 
 
 def _e(x, person):
-    p = hashlib.sha512(person.encode("utf-8")).digest()[:9]
-    return base64.urlsafe_b64encode(
-        hashlib.blake2b(x.encode("utf-8"), person=b"catsoop%s" % p).digest()
-    ).decode("utf-8")
+    p = hashlib.sha512(ENCRYPT_KEY + person.encode("utf-8")).digest()[:9]
+    return (
+        base64.urlsafe_b64encode(
+            hashlib.blake2b(x.encode("utf-8"), person=b"catsoop%s" % p).digest()
+        )
+        .decode("utf-8")
+        .rstrip("==")
+    )
 
 
 def get_log_filename(db_name, path, logname):

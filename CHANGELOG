@@ -47,6 +47,8 @@ FIXED:
 
 SECURITY:
 
+  * Logs are now encrypted by default.
+
 DOCUMENTATION:
 
 

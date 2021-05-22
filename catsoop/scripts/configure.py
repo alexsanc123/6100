@@ -380,14 +380,13 @@ def configure_production():
     )
 
     print()
-    print("By default, CAT-SOOP logs are not encrypted.")
+    print("By default, CAT-SOOP logs are encrypted.")
     print(
         "Encryption can improve the privacy of people using CAT-SOOP by making"
         " the logs difficult to read for anyone without a particular passphrase."
         " Encrypted logs also mitigate the risks associated with backing up"
         " CAT-SOOP logs to servers you don't control.  Encryption comes with the"
-        " downside that encrypted logs are not human readable, and that reading"
-        " and writing encrypted logs is slower."
+        " slight downside that reading and writing encrypted logs is slower."
     )
 
     should_encrypt = yesno(
@@ -396,7 +395,7 @@ def configure_production():
         "encrypt the logs if you are running CAT-SOOP on a "
         "machine where logs are not already encrypted through "
         "some other means.\n" + QUESTION("Should CAT-SOOP encrypt its logs?"),
-        default="N",
+        default="Y",
     )
 
     if should_encrypt:
@@ -475,7 +474,7 @@ def configure_production():
 
     should_compress = yesno(
         QUESTION("Should CAT-SOOP compress its logs?"),
-        default="Y" if should_encrypt else "N",
+        default="N",
     )
 
     # Web Stuff
@@ -644,7 +643,8 @@ cs_checker_parallel_checks = %d
         if should_encrypt and not is_restore:
             print(
                 WARNING(
-                    "Please save the following two pieces of information, which are necessary in case you need another CAT-SOOP instance to read logs encrypted by this instance."
+                    "Please save the following two pieces of information in a secure location."
+                    "They are necessary in case you need another CAT-SOOP instance to read logs encrypted by this instance."
                 )
             )
             print()
