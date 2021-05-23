@@ -71,16 +71,6 @@ SOFTWARE.
 ########
 
 
-The CAT-SOOP distribution contains a verbatim copy of Mathjax, a Javascript
-library for math rendering in the browser (https://www.mathjax.org/), in the
-__STATIC__/scripts/mathjax directory.  Mathjax is licensed under the Apache
-License (version 2.0):
-    https://github.com/mathjax/MathJax/blob/master/LICENSE
-
-
-########
-
-
 The CAT-SOOP distribution contains a verbatim copy of
 highlightjs-line-numbers.js, which adds support for adding line numbers to code
 highlighted by hljs.
