@@ -13,7 +13,7 @@ CHANGED:
 
   * Upgraded KaTeX to version 0.13.6
 
-  * Upgraded Twemoji to v13.0.2
+  * Upgraded Twemoji to v13.1.0
 
   * On the main page, links are now shown even to courses that can't be
     properly loaded, so that the underlying issue is easier to find (clicking
