@@ -158,7 +158,6 @@ def main():
             extras_require={"postgres": ["psycopg2"], "test": ["pytest"]},
             package_dir={"catsoop": "catsoop"},
             package_data={"catsoop": ["scripts/*"]},
-            test_suite="catsoop.test",
             classifiers=[
                 "Development Status :: 4 - Beta",
                 "Intended Audience :: Education",
