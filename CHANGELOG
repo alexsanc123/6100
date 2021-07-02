@@ -9,6 +9,8 @@ ADDED:
   * Logging of page views (in the problemactions) can now be enabled by setting
     cs_log_page_views = True
 
+  * Allow running via "python3 -m catsoop" in addition to "catsoop"
+
 CHANGED:
 
   * Upgraded KaTeX to version 0.13.11
