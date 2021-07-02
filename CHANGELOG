@@ -23,15 +23,15 @@ CHANGED:
     have names specified (reverts a change from 2020.9.0)
 
   * The pythonic and pythonliteral question types now allow checking for valid
-    formatting.
+    formatting
 
-  * Reverted changes to cslog module and how the checker queue process works.
+  * Reverted changes to cslog module and how the checker queue process works
 
 DEPRECATED:
 
 REMOVED:
 
-  * Removed PostgreSQL as a logging mechanism.
+  * Removed PostgreSQL as a logging mechanism
 
 FIXED:
 
@@ -47,7 +47,9 @@ FIXED:
 
 SECURITY:
 
-  * Logs are now encrypted by default.
+  * Logs are now encrypted by default
+
+  * Remove information about the Python version from the default footer
 
 DOCUMENTATION:
 
