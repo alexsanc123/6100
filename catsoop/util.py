@@ -19,7 +19,10 @@ Extra utilities that don't have a home anywhere else
 
 import os
 import ast
+import base64
 import hashlib
+
+import urllib.parse
 
 from datetime import datetime, timedelta
 from collections import OrderedDict
@@ -38,6 +41,33 @@ _nodoc = {
     "datetime",
     "timedelta",
 }
+
+
+def remote_checker_key():
+    """
+    Helper: derive the key for encrypting messages to/from a remote checker
+    """
+    assert base_context.cs_remote_checker_shared_secret is not None
+    return hashlib.blake2b(
+        base_context.cs_remote_checker_shared_secret,
+        person=b"cs_remote",
+        digest_size=32,
+    ).digest()
+
+
+def remote_checker_encode(data):
+    """
+    Create the body of a message to/from a remote checker
+    """
+    payload = base64.b64encode(simple_encrypt(remote_checker_key(), pickle.dumps(data)))
+    return urllib.parse.urlencode({"payload": payload}).encode("utf-8")
+
+
+def remote_checker_decode(msg):
+    """
+    Interpret the body of a message to/from a remote checker
+    """
+    return simple_decrypt(remote_checker_key(), base64.b64decode(msg))
 
 
 def simple_encrypt(key, msg):

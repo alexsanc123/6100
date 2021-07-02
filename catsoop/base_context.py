@@ -259,7 +259,7 @@ cs_checker_server_port = 7668
 Special: The local port on which the websocket server should run
 """
 
-cs_checker_global_timeout = 120
+cs_checker_global_timeout = 600
 """
 Special: The absolute maximum length (in seconds) that a checker should be
 allowed to run before being killed.  This trumps any limits set by a particular
@@ -271,6 +271,13 @@ cs_checker_parallel_checks = 1
 """
 Special: The number of checks the checker should run simultaneously.
 """
+
+cs_remote_checker_shared_secret = None
+"""
+Special: Shared secret for remote checkers (if not set, will use local checkers
+instead)
+"""
+
 
 # UWSGI Server
 
