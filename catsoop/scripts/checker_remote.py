@@ -240,9 +240,15 @@ if __name__ == "__main__":
         log("starting main loop")
 
     REMOTE_URLS = {}  # checker_id
-    REMOTE_PROCESSES = {}  # checker_id: [{magic: (row, time_started), ...}, max_processes]
-    REMOTE_COURSES = {}  # checker_id: set of courses that the checker is ready to check for
-    REMOTE_ALL_COURSES = {}  # checker_id: set of all courses the checker reported being OK to check for
+    REMOTE_PROCESSES = (
+        {}
+    )  # checker_id: [{magic: (row, time_started), ...}, max_processes]
+    REMOTE_COURSES = (
+        {}
+    )  # checker_id: set of courses that the checker is ready to check for
+    REMOTE_ALL_COURSES = (
+        {}
+    )  # checker_id: set of all courses the checker reported being OK to check for
     REMOTE_ALIVE_TIME = {}  # checker_id: last time heard from
 
     COURSE_GIT_HASHES = {}  # current head
@@ -263,7 +269,9 @@ if __name__ == "__main__":
             try:
                 COURSE_GIT_HASHES[course] = (
                     subprocess.check_output(
-                        ["git", "rev-parse", "HEAD"], stderr=subprocess.PIPE, cwd=full_path
+                        ["git", "rev-parse", "HEAD"],
+                        stderr=subprocess.PIPE,
+                        cwd=full_path,
                     )
                     .strip()
                     .decode("utf-8")
@@ -312,7 +320,9 @@ if __name__ == "__main__":
                     # no response back, or something like that; just ignore this...
                     continue
                 to_remove = {
-                    remote for remote in REMOTE_URLS if REMOTE_URLS[remote] == action["url"]
+                    remote
+                    for remote in REMOTE_URLS
+                    if REMOTE_URLS[remote] == action["url"]
                 }
                 for r in to_remove:
                     clear_remote(r)
@@ -384,7 +394,9 @@ if __name__ == "__main__":
                                     x.setdefault("cached_responses", {})[name] = row[
                                         "response"
                                     ]
-                                    x.setdefault("extra_data", {})[name] = row["extra_data"]
+                                    x.setdefault("extra_data", {})[name] = row[
+                                        "extra_data"
+                                    ]
                                     cslog.overwrite_log(
                                         row["username"],
                                         row["path"],
@@ -467,7 +479,9 @@ if __name__ == "__main__":
                     except:
                         to_remove.add(remote)
                         continue
-                    shutil.move(os.path.join(QUEUED, first), os.path.join(RUNNING, magic))
+                    shutil.move(
+                        os.path.join(QUEUED, first), os.path.join(RUNNING, magic)
+                    )
                     REMOTE_PROCESSES[remote][0][magic] = (row, time.time())
                     break
             else:

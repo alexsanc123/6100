@@ -271,7 +271,6 @@ if __name__ == "__main__":
         else:
             shutil.move(os.path.join(RUNNING, f), os.path.join(QUEUED, "0_%s" % f))
 
-
     while True:
         if REMOTE:
             # a bunch of logic here for remote checkers only (local checkers will
@@ -325,7 +324,9 @@ if __name__ == "__main__":
                 time.sleep(2)
                 continue
             else:
-                courses_to_update = [(i[0], new_hashes[i[0]]) for i in courses_to_update]
+                courses_to_update = [
+                    (i[0], new_hashes[i[0]]) for i in courses_to_update
+                ]
                 if courses_to_update:
                     data = util.remote_checker_encode(
                         {
@@ -390,11 +391,18 @@ if __name__ == "__main__":
                     if REMOTE:
                         print("try dead process")
                         data = util.remote_checker_encode(
-                            {"id": MY_ID, "action": "check_done", "row": row, "url": MY_URL}
+                            {
+                                "id": MY_ID,
+                                "action": "check_done",
+                                "row": row,
+                                "url": MY_URL,
+                            }
                         )
                         try:
                             req = urllib.request.Request(REMOTE_URL, data=data)
-                            resp = json.loads(urllib.request.urlopen(req, timeout=3).read())
+                            resp = json.loads(
+                                urllib.request.urlopen(req, timeout=3).read()
+                            )
                             assert resp["ok"]
                             print("success")
                         except:

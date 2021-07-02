@@ -130,7 +130,10 @@ def main(options=[]):
                 base_context.cs_wsgi_server_min_processes
                 >= base_context.cs_wsgi_server_max_processes
             ):
-                uwsgi_opts = ["--processes", str(base_context.cs_wsgi_server_min_processes)]
+                uwsgi_opts = [
+                    "--processes",
+                    str(base_context.cs_wsgi_server_min_processes),
+                ]
             else:
                 uwsgi_opts = [
                     "--cheaper",
@@ -158,7 +161,9 @@ def main(options=[]):
 
             procs.append((base_dir, ["uwsgi"] + uwsgi_opts, 0.1, "WSGI Server"))
         else:
-            raise ValueError("unsupported wsgi server: %r" % base_context.cs_wsgi_server)
+            raise ValueError(
+                "unsupported wsgi server: %r" % base_context.cs_wsgi_server
+            )
 
     running = []
 
