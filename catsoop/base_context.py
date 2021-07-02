@@ -278,6 +278,11 @@ Special: Shared secret for remote checkers (if not set, will use local checkers
 instead)
 """
 
+cs_remote_checker_for = None
+"""
+Special: The URL of the catsoop instance for which this catsoop instance is a
+checker, if any
+"""
 
 # UWSGI Server
 
