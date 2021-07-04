@@ -70,7 +70,9 @@ logedit        : edit the content of a given log in a text editor
 """
 
     parser = argparse.ArgumentParser(
-        description=help_text, formatter_class=argparse.RawTextHelpFormatter
+        prog="catsoop",
+        description=help_text,
+        formatter_class=argparse.RawTextHelpFormatter,
     )
     parser.add_argument("command", help=cmd_help)
     parser.add_argument("args", nargs="*", help="arguments for the given command")
