@@ -152,7 +152,7 @@ def main():
             long_description_content_type="text/plain",
             include_package_data=True,
             entry_points={
-                "console_scripts": ["catsoop = catsoop.main:command_line_interface"]
+                "console_scripts": ["catsoop = catsoop.__main__:command_line_interface"]
             },
             install_requires=requirements,
             extras_require={"postgres": ["psycopg2"], "test": ["pytest"]},

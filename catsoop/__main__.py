@@ -143,3 +143,7 @@ logedit        : edit the content of a given log in a text editor
     else:
         print("Unknown command %s" % args.command)
         sys.exit(-1)
+
+
+if __name__ == "__main__":
+    command_line_interface()
