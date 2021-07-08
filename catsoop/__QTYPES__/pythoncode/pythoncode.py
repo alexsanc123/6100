@@ -165,11 +165,10 @@ checktext = "Run Code"
 
 def get_code(sub, info):
     try:
-        try:
-            code = info["csm_cslog"].retrieve_upload(sub[1])[1]
+        code = sub.get("data", None)
+        if code is None:
+            code = info["csm_cslog"].retrieve_upload(sub["id"])[1]
             code = code.decode("utf-8")
-        except:
-            code = sub
         return code.replace("\r\n", "\n")
     except:
         return {
@@ -526,11 +525,8 @@ def render_html_textarea(last_log, **info):
 
 def render_html_upload(last_log, **info):
     name = info["csq_name"]
-    init = last_log.get(name, (None, info["csq_initial"]))
-    if isinstance(init, str):
-        fname = ""
-    else:
-        fname, init = init
+    init = last_log.get(name, {'type': 'file', 'data': info["csq_initial"], 'name': ''})
+    fname = init.get('name', '')
     params = {
         "name": name,
         "init": str(init),
@@ -546,29 +542,15 @@ def render_html_upload(last_log, **info):
             """\n<a href="data:text/plain;base64,%(b64init)s" """
             """target="_blank"%(dl)s>Code Skeleton</a><br />"""
         ) % params
-    if last_log.get(name, None) is not None:
+    if 'id' in init:
         try:
-            fname, loc = last_log[name]
-            loc = os.path.basename(loc)
-            _path = info["cs_path_info"]
-            if info["csm_cslog"].ENCRYPT_KEY is not None:
-                seed = (
-                    info["cs_path_info"][0]
-                    if info["cs_path_info"]
-                    else info["cs_path_info"]
-                )
-                _path = [
-                    info["csm_cslog"]._e(i, repr(seed)) for i in info["cs_path_info"]
-                ]
-            else:
-                _path = info["cs_path_info"]
-            qstring = urlencode({"id": loc})
+            qstring = urlencode({"id": init['id']})
             out += "<br/>"
             out += (
                 '<a href="%s/_util/get_upload?%s" '
                 'download="%s">Download Most '
                 "Recent Submission</a><br/>"
-            ) % (info["cs_url_root"], qstring, html.escape(fname))
+            ) % (info["cs_url_root"], qstring, html.escape(ll.get('name', init['name'])))
         except:
             pass
     out += (
@@ -600,7 +582,8 @@ def render_html_codemirror(last_log, **info):
     init = last_log.get(name, None)
     if init is None:
         init = make_initial_display(info)
-    init = html.escape(str(init))
+    else:
+        init = html.escape(get_code(init, info))
     return (
         f'\n<textarea name="{name}" id="{name}">{init}</textarea>'
         '\n<script type="text/javascript">'

@@ -2016,20 +2016,22 @@ def pre_handle(context):
     else:
         names = context["cs_form"].get("names", "[]")
         context[_n("question_names")] = json.loads(names)
-        context[_n("form")] = json.loads(context["cs_form"].get("data", "{}"))
-        for name, value in context[_n("form")].items():
+        form = context[_n("form")] = json.loads(context["cs_form"].get("data", "{}"))
+        for name, value in form.items():
             if name == "__names__":
                 continue
             if isinstance(value, list):
-
-                upload = cslog.prepare_upload(
-                    context["cs_username"],
-                    csm_thirdparty.data_uri.DataURI(value[1]).data,
-                    value[0],
-                )
-
-                cslog.store_upload(*upload)
-                value[1] = upload[0]
+                # this was a file upload.
+                rawdata = csm_thirdparty.data_uri.DataURI(value[1]).data
+                form[name] = {"type": "file", "name": value[0]}
+                if context["cs_upload_management"] == "db":
+                    form[name]["data"] = rawdata
+                else:
+                    form[name]["id"] = cslog.store_upload(
+                        context["cs_username"], rawdata, value[0]
+                    )
+            else:
+                form[name] = {"type": "raw", "data": value}
 
 
 def _get_auto_view(context):
