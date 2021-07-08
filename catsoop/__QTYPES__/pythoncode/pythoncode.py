@@ -525,12 +525,13 @@ def render_html_textarea(last_log, **info):
 
 def render_html_upload(last_log, **info):
     name = info["csq_name"]
-    init = last_log.get(name, {'type': 'file', 'data': info["csq_initial"], 'name': ''})
-    fname = init.get('name', '')
+    init = last_log.get(name, {"type": "file", "data": info["csq_initial"], "name": ""})
+    fname = init.get("name", "")
+    init_code = get_code(init, info)
     params = {
         "name": name,
-        "init": str(init),
-        "safeinit": (init or "").replace("<", "&lt;"),
+        "init": str(init_code),
+        "safeinit": html.escape(init_code or ""),
         "b64init": b64encode(make_initial_display(info).encode()).decode(),
         "dl": (' download="%s"' % info["csq_skeleton_name"])
         if "csq_skeleton_name" in info
@@ -542,15 +543,19 @@ def render_html_upload(last_log, **info):
             """\n<a href="data:text/plain;base64,%(b64init)s" """
             """target="_blank"%(dl)s>Code Skeleton</a><br />"""
         ) % params
-    if 'id' in init:
+    if "id" in init:
         try:
-            qstring = urlencode({"id": init['id']})
+            qstring = urlencode({"id": init["id"]})
             out += "<br/>"
             out += (
                 '<a href="%s/_util/get_upload?%s" '
                 'download="%s">Download Most '
                 "Recent Submission</a><br/>"
-            ) % (info["cs_url_root"], qstring, html.escape(ll.get('name', init['name'])))
+            ) % (
+                info["cs_url_root"],
+                qstring,
+                html.escape(ll.get("name", init["name"])),
+            )
         except:
             pass
     out += (
