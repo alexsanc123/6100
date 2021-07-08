@@ -27,7 +27,7 @@ def handle_check(submissions, **info):
     if "not properly" in out:
         return out
 
-    sub = submissions[info["csq_name"]].strip()
+    sub = submissions[info["csq_name"]]["data"].strip()
 
     try:
         x = ast.parse(sub).body[0].value
@@ -39,7 +39,7 @@ def handle_check(submissions, **info):
 
 
 def handle_submission(submissions, **info):
-    sub = submissions[info["csq_name"]].strip()
+    sub = submissions[info["csq_name"]]["data"].strip()
 
     inp = info["csq_input_check"](sub)
     if inp is not None:

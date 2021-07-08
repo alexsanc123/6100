@@ -47,14 +47,14 @@ checktext = "Preview"
 
 
 def handle_check(submission, **info):
-    last = submission.get(info["csq_name"])
+    last = submission.get(info["csq_name"])["data"]
     return richtext_format(info, last)
 
 
 def handle_submission(submissions, **info):
     o = _base_handle_submit(submissions, **info)
     o["msg"] = o.get("msg", "") + richtext_format(
-        info, submissions[info["csq_name"]], msg="Submitted:"
+        info, submissions[info["csq_name"]]["data"], msg="Submitted:"
     )
     return o
 
