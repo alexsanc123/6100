@@ -60,15 +60,22 @@ def render_html(last_log, **info):
     out += (
         """<script type="text/javascript">"""
         "\n// @license magnet:?xt=urn:btih:0b31508aeb0634b347b8270c7bee4d411b5d4109&dn=agpl-3.0.txt AGPL-v3"
-        """\ndocument.getElementById('%s_select_button').addEventListener('click', function (){"""
-        """\n    document.getElementById("%s").click();"""
+        """\ndocument.getElementById('%(name)s_select_button').addEventListener('click', function (){"""
+        """\n    document.getElementById("%(name)s").click();"""
         """\n});"""
-        """\ndocument.getElementById('%s').addEventListener('change', function (){"""
-        """\n    document.getElementById('%s_selected_file').innerText = document.getElementById('%s').value;"""
-        """\n});"""
+        """\ndocument.getElementById('%(name)s').onchange = function (){"""
+        """\n    document.getElementById('%(name)s_selected_file').innerText = document.getElementById('%(name)s').value;"""
+        """\n};"""
+        """\ndnd_%(name)s = document.getElementById('cs_qdiv_%(name)s');"""
+        """\ndnd_%(name)s.ondragover = dnd_%(name)s.ondragenter = function(e){e.preventDefault();};"""
+        """\ndnd_%(name)s.ondrop = function(e){"""
+        """\n    document.getElementById("%(name)s").files = e.dataTransfer.files;"""
+        """\n    document.getElementById('%(name)s').onchange();"""
+        """\n    e.preventDefault();"""
+        """\n};"""
         "\n// @license-end"
         """</script>"""
-    ) % (name, name, name, name, name)
+    ) % {"name": name}
     ll = last_log.get(name, None)
     if ll is not None:
         try:

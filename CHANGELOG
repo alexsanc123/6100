@@ -6,6 +6,9 @@
 
 ADDED:
 
+  * File uploads in the built-in question types now support
+    dragging-and-dropping files (in addition to the normal file-chooser setup)
+
   * Logging of page views (in the problemactions) can now be enabled by setting
     cs_log_page_views = True
 
