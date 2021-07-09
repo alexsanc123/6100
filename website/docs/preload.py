@@ -30,4 +30,4 @@ todo = """!!! warning: This Page Needs Attention
     You can post suggestions, questions, or other feedback to the <a
     href="/community" target="_blank">community forum</a>.  If you don't want
     to create an account there, you can post by sending e-mail to
-    `community@catsoop.mit.edu`."""
+    `community@catsoop.org`."""

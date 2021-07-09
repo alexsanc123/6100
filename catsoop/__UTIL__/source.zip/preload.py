@@ -3,4 +3,4 @@ SOURCE_README = """This archive contains the source code for the CAT-SOOP instan
 The (potentially modified) source of the base system is located in the "catsoop" directory.
 
 CAT-SOOP
-https://catsoop.mit.edu"""
+https://catsoop.org"""
