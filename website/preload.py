@@ -7,6 +7,6 @@ cs_footer = """The content of this page is Copyright &copy; 2016-2021 by the CAT
 This content is licensed under the <a href="BASE/_util/license" target="_blank">GNU Affero General Public License, version 3</a>, as is CAT-SOOP itself.<br/>
 The original form of this content is source code in the CAT-SOOP specification format.<br/>
 The source code is available in the <code>website</code> directory of the Git repository at the following address:<br/>
-<code>https://%s/cgit/catsoop.git</code>.<br/><hr width="300" style="background-color:#000000;border-color:#000000" />""" % (
-    cs_url_root.split("/", 2)[2]
+<code>%s/cgit/catsoop</code>.<br/><hr width="300" style="background-color:#000000;border-color:#000000" />""" % (
+    cs_url_root
 )
