@@ -94,7 +94,7 @@ If you're not sure what to put there, a decent place to start is with the
 the following:
 
 ```
-$ git clone git://catsoop.mit.edu/sample_course.git ~/.local/share/catsoop/courses/sample_course
+$ git clone git://catsoop.org/sample_course.git ~/.local/share/catsoop/courses/sample_course
 ```
 
 <section>Start CAT-SOOP</section>

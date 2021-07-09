@@ -134,7 +134,7 @@ def main():
                 "catsoop.scripts",
             ],
             scripts=[],
-            url="https://catsoop.mit.edu",
+            url="https://catsoop.org",
             license="AGPLv3+",
             description="CAT-SOOP is a tool for automatic collection and assessment of online exercises.",
             long_description=readme,
