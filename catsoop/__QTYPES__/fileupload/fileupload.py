@@ -78,16 +78,31 @@ def render_html(last_log, **info):
     ) % {"name": name}
     ll = last_log.get(name, None)
     if ll is not None:
+        link = None
         try:
-            qstring = urlencode({"id": ll["id"]})
-            out += "<br/>"
-            out += (
-                '<a href="%s/_util/get_upload?%s" '
-                'download="%s">Download Most '
-                "Recent Submission</a>"
-            ) % (info["cs_url_root"], qstring, html.escape(ll["name"]))
+            if "id" in ll:
+                qstring = urlencode({"id": ll["id"]})
+                link = "%s/_util/get_upload?%s" % (info["cs_url_root"], qstring)
+            else:
+                mtype = (
+                    mimetypes.guess_type(ll["name"])[0] or "application/octet-stream"
+                )
+                link = "data:%s;base64,%s" % (
+                    mtype,
+                    base64.b64encode(ll["data"]).decode("utf-8"),
+                )
         except:
             pass
+        if link is not None:
+            out += "<br/>"
+            out += (
+                '<a href="%s" '
+                'download="%s">Download Most '
+                "Recent Submission</a><br/>"
+            ) % (
+                link,
+                html.escape(ll["name"]),
+            )
     return out
 
 
