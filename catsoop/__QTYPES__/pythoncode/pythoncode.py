@@ -18,7 +18,9 @@ import os
 import ast
 import html
 import json
+import base64
 import logging
+import mimetypes
 import traceback
 
 import collections.abc
@@ -526,9 +528,11 @@ def render_html_textarea(last_log, **info):
 
 def render_html_upload(last_log, **info):
     name = info["csq_name"]
-    init = last_log.get(name, {"type": "file", "data": info["csq_initial"], "name": ""})
+    init = last_log.get(name, {"type": "file", "data": info["csq_initial"], "name": "", "init": True})
     fname = init.get("name", "")
     init_code = get_code(init, info)
+    if isinstance(init_code, dict):
+        init_code = None
     params = {
         "name": name,
         "init": str(init_code),
@@ -544,25 +548,29 @@ def render_html_upload(last_log, **info):
             """\n<a href="data:text/plain;base64,%(b64init)s" """
             """target="_blank"%(dl)s>Code Skeleton</a><br />"""
         ) % params
-    if "id" in init:
-        try:
+    link = None
+    try:
+        if "id" in init:
             qstring = urlencode({"id": init["id"]})
+            link = '%s/_util/get_upload?%s' % (info['cs_url_root'], qstring)
+        elif "init" not in init:
+            mtype = mimetypes.guess_type(init['name'])[0] or 'application/octet-stream'
+            link = 'data:%s;base64,%s' % (mtype, base64.b64encode(init['data']).decode('utf-8'))
+    except:
+        pass
+    if link is not None:
             out += "<br/>"
             out += (
-                '<a href="%s/_util/get_upload?%s" '
+                '<a href="%s" '
                 'download="%s">Download Most '
                 "Recent Submission</a><br/>"
             ) % (
-                info["cs_url_root"],
-                qstring,
-                html.escape(ll.get("name", init["name"])),
+                link,
+                html.escape(init["name"]),
             )
-        except:
-            pass
     out += (
-        """\n<input type="file" style="display: none" id=%(name)s name="%(name)s" />"""
-        % params
-    )
+        '\n<input type="file" style="display: none" id="%(name)s" name="%(name)s" />'
+    ) % params
     out += (
         """\n<button class="btn btn-catsoop" id="%s_select_button">Select File</button>&nbsp;"""
         """\n<tt><span id="%s_selected_file">No file selected</span></tt>"""
