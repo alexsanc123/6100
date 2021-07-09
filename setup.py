@@ -44,7 +44,7 @@ ORIGINAL_VERSION = None
 def dev_number():
     try:
         last_version = subprocess.check_output(
-            ["git", "describe", "--tags", "--match", "v*"]
+            ["git", "describe", "--tags", "--match", "v*", "dev"]
         ).decode("ascii")
     except Exception:
         print("failed to find git tags", file=sys.stderr)
@@ -52,6 +52,8 @@ def dev_number():
     if len(last_version.strip().split("-")) != 3:
         # if this is just a tag name, that tells us we're at that tag
         return
+    else:
+        N = int(last_version.strip().split("-")[1])
     try:
         sha = (
             subprocess.check_output(["git", "rev-parse", "HEAD"])
@@ -66,14 +68,6 @@ def dev_number():
             .decode("ascii")
             .strip()
             .splitlines()
-        )
-    except:
-        return
-    try:
-        N = int(
-            subprocess.check_output(["git", "rev-list", "--count", "HEAD"]).decode(
-                "ascii"
-            )
         )
     except:
         return
@@ -103,12 +97,7 @@ def dirty_version():
 
     # if we get to this point, we are not at a particular tag.  we'll modify
     # the __version__ from catsoop/__init__.py to include a .devN suffix.
-    CS_VERSION = "%s.dev%s+git.%s%s" % (
-        CS_VERSION,
-        N,
-        sha[:8],
-        ".local%s" % dirty if dirty else "",
-    )
+    CS_VERSION = "%s.dev%s%s" % (CS_VERSION, N, "+%s" % dirty if dirty else "")
     with open(os.path.join(os.path.dirname(__file__), "catsoop", "dev.hash"), "w") as f:
         f.write("{}|{}|{}".format(vcs, sha, _date))
     with open(VERSION_FNAME, "r") as f:
