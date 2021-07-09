@@ -528,7 +528,9 @@ def render_html_textarea(last_log, **info):
 
 def render_html_upload(last_log, **info):
     name = info["csq_name"]
-    init = last_log.get(name, {"type": "file", "data": info["csq_initial"], "name": "", "init": True})
+    init = last_log.get(
+        name, {"type": "file", "data": info["csq_initial"], "name": "", "init": True}
+    )
     fname = init.get("name", "")
     init_code = get_code(init, info)
     if isinstance(init_code, dict):
@@ -552,22 +554,23 @@ def render_html_upload(last_log, **info):
     try:
         if "id" in init:
             qstring = urlencode({"id": init["id"]})
-            link = '%s/_util/get_upload?%s' % (info['cs_url_root'], qstring)
+            link = "%s/_util/get_upload?%s" % (info["cs_url_root"], qstring)
         elif "init" not in init:
-            mtype = mimetypes.guess_type(init['name'])[0] or 'application/octet-stream'
-            link = 'data:%s;base64,%s' % (mtype, base64.b64encode(init['data']).decode('utf-8'))
+            mtype = mimetypes.guess_type(init["name"])[0] or "application/octet-stream"
+            link = "data:%s;base64,%s" % (
+                mtype,
+                base64.b64encode(init["data"]).decode("utf-8"),
+            )
     except:
         pass
     if link is not None:
-            out += "<br/>"
-            out += (
-                '<a href="%s" '
-                'download="%s">Download Most '
-                "Recent Submission</a><br/>"
-            ) % (
-                link,
-                html.escape(init["name"]),
-            )
+        out += "<br/>"
+        out += (
+            '<a href="%s" ' 'download="%s">Download Most ' "Recent Submission</a><br/>"
+        ) % (
+            link,
+            html.escape(init["name"]),
+        )
     out += (
         '\n<input type="file" style="display: none" id="%(name)s" name="%(name)s" />'
     ) % params
@@ -578,16 +581,23 @@ def render_html_upload(last_log, **info):
     out += (
         """\n<script type="text/javascript">"""
         "\n// @license magnet:?xt=urn:btih:0b31508aeb0634b347b8270c7bee4d411b5d4109&dn=agpl-3.0.txt AGPL-v3"
-        """\ndocument.getElementById('%s').value = '';"""
-        """\ndocument.getElementById('%s_select_button').addEventListener('click', function (){"""
-        """\n    document.getElementById("%s").click();"""
+        """\ndocument.getElementById('%(name)s').value = '';"""
+        """\ndocument.getElementById('%(name)s_select_button').addEventListener('click', function (){"""
+        """\n    document.getElementById("%(name)s").click();"""
         """\n});"""
-        """\ndocument.getElementById('%s').addEventListener('change', function (){"""
-        """\n    document.getElementById('%s_selected_file').innerText = document.getElementById('%s').value;"""
-        """\n});"""
+        """\ndocument.getElementById('%(name)s').onchange = function (){"""
+        """\n    document.getElementById('%(name)s_selected_file').innerText = document.getElementById('%(name)s').value;"""
+        """\n};"""
+        """\ndnd_%(name)s = document.getElementById('cs_qdiv_%(name)s');"""
+        """\ndnd_%(name)s.ondragover = dnd_%(name)s.ondragenter = function(e){e.preventDefault();};"""
+        """\ndnd_%(name)s.ondrop = function(e){"""
+        """\n    document.getElementById("%(name)s").files = e.dataTransfer.files;"""
+        """\n    document.getElementById('%(name)s').onchange();"""
+        """\n    e.preventDefault();"""
+        """\n};"""
         "\n// @license-end"
         """\n</script>"""
-    ) % (name, name, name, name, name, name)
+    ) % params
     return out
 
 
