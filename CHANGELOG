@@ -29,6 +29,11 @@ CHANGED:
 
   * Reverted changes to cslog module and how the checker queue process works
 
+  * Logs now store information about file uploads in a more intuitive format
+
+  * cs_upload_management returns as a way to control where uploaded files are
+    stored (directly in the database, or as separate files)
+
 DEPRECATED:
 
 REMOVED:

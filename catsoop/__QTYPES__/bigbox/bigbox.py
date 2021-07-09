@@ -43,5 +43,7 @@ def render_html(last_log, **info):
     out = '<textarea rows="%d" cols="%d"' % (rows, cols)
     out += ' name="%s"' % info["csq_name"]
     out += ' id="%s"' % info["csq_name"]
-    out += ">%s</textarea><br>" % escape(last_log.get(info["csq_name"], ""))
+    out += ">%s</textarea><br>" % escape(
+        last_log.get(info["csq_name"], {"data": ""})["data"]
+    )
     return out

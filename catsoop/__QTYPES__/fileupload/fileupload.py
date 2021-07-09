@@ -37,12 +37,12 @@ defaults.update(
 
 
 def handle_submission(submissions, **info):
-    o = {"score": None, "msg": "", "rerender": True}
+    o = {"score": 0.0, "msg": "", "rerender": True}
     name = info["csq_name"]
     ll = submissions.get(name, None)
     if ll is not None:
-        if info["csq_extract_data"]:
-            submissions[name] = info["csm_cslog"].retrieve_upload(ll[1])[1]
+        if "data" not in ll:
+            ll["data"] = info["csm_cslog"].retrieve_upload(ll["id"])[1]
         o.update(base["handle_submission"](submissions, **info))
     return o
 
@@ -72,14 +72,13 @@ def render_html(last_log, **info):
     ll = last_log.get(name, None)
     if ll is not None:
         try:
-            fname, loc = ll
-            qstring = urlencode({"id": loc})
+            qstring = urlencode({"id": ll["id"]})
             out += "<br/>"
             out += (
                 '<a href="%s/_util/get_upload?%s" '
                 'download="%s">Download Most '
                 "Recent Submission</a>"
-            ) % (info["cs_url_root"], qstring, html.escape(fname))
+            ) % (info["cs_url_root"], qstring, html.escape(ll["name"]))
         except:
             pass
     return out
@@ -89,7 +88,7 @@ def answer_display(**info):
     name = info["csq_soln_filename"]
     if info["csq_soln_type"] == "string":
         data = csm_thirdparty.data_uri.DataURI.make(
-            "text/plain", None, True, info["csq_soln"]
+            info.get("cs_content_type", "text/plain"), None, True, info["csq_soln"]
         )
     else:
         data = csm_thirdparty.data_uri.DataURI.from_file(info["csq_soln"])

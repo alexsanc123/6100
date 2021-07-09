@@ -31,7 +31,7 @@ def get_parsed_reps(submissions, **info):
     funcs.update(info.get("csq_funcs", {}))
     parsed = []
     for (ix, (prompt, solutions)) in enumerate(info["csq_expressions"]):
-        osub = sub = submissions.get("__%s_%04d" % (info["csq_name"], ix), "")
+        osub = sub = submissions.get("__%s_%04d" % (info["csq_name"], ix), "")["data"]
         fprompt = csm_language.source_transform_string(info, prompt)
         try:
             sub = parser.parse(sub)
@@ -61,7 +61,7 @@ def handle_submission(submissions, **info):
     parsed = []
 
     for (ix, (prompt, solutions)) in enumerate(info["csq_expressions"]):
-        sub = submissions.get("__%s_%04d" % (info["csq_name"], ix), "")
+        sub = submissions.get("__%s_%04d" % (info["csq_name"], ix), {"data": ""})
 
         # check each solution and save the results
         this_question = []
@@ -104,7 +104,7 @@ def render_html(submissions, **info):
         if info.get("csq_size", None) is not None:
             out += ' size="%s"' % info["csq_size"]
 
-        out += ' value="%s"' % escape(submissions.get(qbox_name, ""))
+        out += ' value="%s"' % escape(submissions.get(qbox_name, {"data": ""})["data"])
         out += ' name="%s"' % qbox_name
         out += ' id="%s"' % qbox_name
         out += " /></td></tr>"

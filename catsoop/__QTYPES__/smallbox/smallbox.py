@@ -35,7 +35,7 @@ def total_points(**info):
 
 def handle_submission(submissions, **info):
     check = info["csq_check_function"]
-    sub = submissions[info["csq_name"]]
+    sub = submissions[info["csq_name"]]["data"]
     soln = info["csq_soln"]
     check_result = check(sub, soln)
     if isinstance(check_result, collections.abc.Mapping):
@@ -74,7 +74,7 @@ def render_html(last_log, **info):
     if info.get("csq_size", None) is not None:
         out += ' size="%s"' % info["csq_size"]
 
-    out += ' value="%s"' % escape(last_log.get(info["csq_name"], ""))
+    out += ' value="%s"' % escape(last_log.get(info["csq_name"], {"data": ""})["data"])
     out += ' name="%s"' % info["csq_name"]
     out += ' id="%s"' % info["csq_name"]
     return out + " />"

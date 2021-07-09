@@ -26,7 +26,7 @@ def total_points(**info):
 
 
 def handle_submission(submissions, **info):
-    tok, un = submissions[info["csq_name"]].split(",")
+    tok, un = submissions[info["csq_name"]]["data"].split(",")
     i = csm_api.userinfo_from_token(info, tok)
     new = dict(info)
     uinfo = info["csm_auth"]._get_user_information(

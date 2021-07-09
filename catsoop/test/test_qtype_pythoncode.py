@@ -111,7 +111,7 @@ class Test_Pythoncode(CATSOOPTest):
         context = self.context
         csq = self.csq
         info = self.info
-        form = {csq_name: test_good_sgd_function}
+        form = {csq_name: {"data": test_good_sgd_function}}
         ret = csq["handle_submission"](form, **info)
         # print("ret=", ret)
 
@@ -128,7 +128,7 @@ class Test_Pythoncode(CATSOOPTest):
             return x > 3
         """
 
-        form = {csq_name: test_bad1_sgd_function}
+        form = {csq_name: {"data": test_bad1_sgd_function}}
         ret = csq["handle_submission"](form, **info)
 
         assert "Our solution did not produce a value for" not in str(ret)
@@ -140,7 +140,7 @@ class Test_Pythoncode(CATSOOPTest):
         csq = self.csq
         info = self.info
         info["csq_hint"] = sgd_hint
-        form = {csq_name: test_good_sgd_function}
+        form = {csq_name: {"data": test_good_sgd_function}}
         ret = csq["handle_submission"](form, **info)
 
         assert "Our solution did not produce a value for" not in str(ret)

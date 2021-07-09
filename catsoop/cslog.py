@@ -354,36 +354,46 @@ def clear_old_logs(db_name, path, expire):
             pass
 
 
-def prepare_upload(username, data, filename):
-    hstring = hashlib.sha256(data).hexdigest()
+def store_upload(username, data, filename):
+    data = compress_encrypt(data)
+    content_hash = hashlib.blake2b(data).hexdigest()
     info = {
         "filename": filename,
         "username": username,
         "time": cstime.detailed_timestamp(cstime.now()),
-        "hash": hstring,
+        "hash": content_hash,
     }
-    return "%s%s" % (hstring, uuid.uuid4().hex), prep(info), compress_encrypt(data)
+    info = prep(info)
+    info_hash = hashlib.blake2b(info).hexdigest()
 
+    for (id_, content) in ((info_hash, info), (content_hash, data)):
+        dir_ = os.path.join(
+            base_context.cs_data_root, "_logs", "_uploads", id_[0], id_[1]
+        )
+        os.makedirs(dir_, exist_ok=True)
+        with open(os.path.join(dir_, id_), "wb") as f:
+            f.write(content)
 
-def store_upload(id_, info, data):
-    dir_ = os.path.join(
-        base_context.cs_data_root, "_logs", "_uploads", id_[0], id_[1], id_
-    )
-    os.makedirs(dir_, exist_ok=True)
-    with open(os.path.join(dir_, "info"), "wb") as f:
-        f.write(info)
-    with open(os.path.join(dir_, "content"), "wb") as f:
-        f.write(data)
+    return info_hash
 
 
 def retrieve_upload(id_):
-    dir_ = os.path.join(
+    info_file = os.path.join(
         base_context.cs_data_root, "_logs", "_uploads", id_[0], id_[1], id_
     )
     try:
-        with open(os.path.join(dir_, "info"), "rb") as f:
+        with open(info_file, "rb") as f:
             info = unprep(f.read())
-        with open(os.path.join(dir_, "content"), "rb") as f:
+        content_hash = info["hash"]
+        data_file = os.path.join(
+            base_context.cs_data_root,
+            "_logs",
+            "_uploads",
+            content_hash[0],
+            content_hash[1],
+            content_hash,
+        )
+        with open(data_file, "rb") as f:
             data = decompress_decrypt(f.read())
         return info, data
     except FileNotFoundError:

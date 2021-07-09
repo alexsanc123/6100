@@ -62,7 +62,7 @@ checktext = "Check Formatting"
 def handle_check(submissions, **info):
     base1["get_sandbox"](info)
     code = info["csq_code_pre"]
-    code += "\n%s" % submissions[info["csq_name"]].strip()
+    code += "\n%s" % submissions[info["csq_name"]]["data"].strip()
     sub = info["sandbox_run_code"](
         info, code, info.get("csq_options", {}), result_as_string=True
     )
@@ -73,7 +73,7 @@ def handle_check(submissions, **info):
 
 
 def handle_submission(submissions, **info):
-    sub = submissions[info["csq_name"]].strip()
+    sub = submissions[info["csq_name"]]["data"].strip()
     LOGGER.error("[qtypes.pythonic] submission: %r" % sub)
 
     inp = info["csq_input_check"](sub)

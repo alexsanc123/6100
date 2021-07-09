@@ -407,7 +407,7 @@ def handle_submission(submissions, **info):
         if len(info["csq_variable_dimensions"]) > 0:
             assert check_numpy()
 
-        _sub = sub = submissions[info["csq_name"]]
+        _sub = sub = submissions[info["csq_name"]]["data"]
         solns = info["csq_soln"]
 
         parser = _get_parser(info)
@@ -492,7 +492,7 @@ checktext = "Check Syntax"
 def handle_check(submission, **info):
     if len(info["csq_variable_dimensions"]) > 0:
         assert check_numpy()
-    last = submission.get(info["csq_name"])
+    last = submission.get(info["csq_name"])["data"]
     return get_display(info, info["csq_name"], last)
 
 

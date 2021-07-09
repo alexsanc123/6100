@@ -328,12 +328,27 @@ cs_log_encryption = False
 Special: Boolean indicating whether log entries should be encrypted.
 """
 
-# File Upload Type
+cs_upload_management = "file"
+"""
+Special: defines how CAT-SOOP should handle file uploads.  Must be `'file'` or
+`'db'`.
+
+In `'file'` mode, CAT-SOOP will store the uploaded files on disk, under
+`<cs_data_root>/_logs/_uploads`.
+
+In `'db'` mode, CAT-SOOP will store the contents of the files directly in the
+CAT-SOOP logs.
+"""
+
+# Sandboxing Stuff
 
 cs_python_intepreter = "python3"
 """
 Path to python interpreter used for sandboxed python execution of checking code
 """
+
+
+# Debugging Function
 
 cs_debug_level = os.environ.get("CATSOOP_DEBUG_LEVEL", "WARNING")
 try:
@@ -341,8 +356,6 @@ try:
 except:
     pass
 cs_lti_debug_level = "WARNING"
-
-# Debugging Function
 
 import os
 

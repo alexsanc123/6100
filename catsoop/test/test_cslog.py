@@ -199,13 +199,10 @@ class CSLogBackend:
     def test_logging_uploads(self):
         content = "hello 🐈".encode("utf-8")
         h = hashlib.sha256(content).hexdigest()
-        id_, info, data = cslog.prepare_upload("testuser", content, "cat.txt")
-        self.cslog.store_upload(id_, info, data)
+        id_ = cslog.store_upload("testuser", content, "cat.txt")
 
         ret_info, ret_data = self.cslog.retrieve_upload(id_)
-        self.assertEqual(ret_info, self.cslog.unprep(info))
         self.assertEqual(ret_data, content)
-
         self.assertEqual(self.cslog.retrieve_upload(id_[::-1]), None)
 
 

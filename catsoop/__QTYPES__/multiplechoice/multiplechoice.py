@@ -50,7 +50,7 @@ def total_points(**info):
 def handle_submission(submissions, **info):
     check = info["csq_check_function"]
     soln = info["csq_soln"]
-    sub = submissions[info["csq_name"]]
+    sub = submissions[info["csq_name"]]["data"]
     if info["csq_renderer"] == "checkbox":
         try:
             sub = json.loads(sub)
@@ -115,10 +115,11 @@ def render_html(last_log, **info):
 def render_html_dropdown(last_log, **info):
     if last_log is None:
         last_log = {}
+    ll = last_log.get(info["csq_name"], {"data": "-1"})["data"]
     out = '\n<select id="%s" name="%s" >' % (info["csq_name"], info["csq_name"])
     for (ix, i) in enumerate(["--"] + info["csq_options"]):
         out += '\n<option value="%s" ' % (ix - 1)
-        if last_log.get(info["csq_name"], "-1") == str(ix - 1):
+        if ll == str(ix - 1):
             out += "selected "
         out += ">%s</option>" % i
     out += "</select>"
@@ -135,7 +136,7 @@ def render_html_checkbox(last_log, **info):
         last = {}
     else:
         try:
-            last = json.loads(last)
+            last = json.loads(last["data"])
         except:
             last = {}
         if not isinstance(last, dict):
@@ -184,7 +185,7 @@ def render_html_radio(last_log, **info):
         last_log = {}
     out = '<table border="0">'
     name = info["csq_name"]
-    last = last_log.get(info["csq_name"], None)
+    last = last_log.get(info["csq_name"], {"data": None})["data"]
     for (ix, i) in enumerate(info["csq_options"]):
         out += '\n<tr><td align="center">'
         if last == str(ix):
