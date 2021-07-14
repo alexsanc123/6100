@@ -172,6 +172,7 @@ def do_check(row):
             if DEBUG:
                 log("check name=%s, msg=%s" % (name, msg))
 
+        row["name"] = name
         row["score"] = score
         row["score_box"] = score_box
         row["response"] = language.handle_custom_tags(context, msg)
