@@ -470,3 +470,11 @@ if not os.path.isdir(cs_data_root):
 else:
     if not os.access(cs_data_root, os.W_OK):
         _cs_config_errors.append("the web server must be able to write to cs_data_root")
+
+
+# check that, if we're using remote checkers, we're storing file uploads in the
+# logs
+if cs_remote_checker_shared_secret is not None and cs_upload_management != "db":
+    _cs_config_errors.append(
+        "if cs_remote_checker_shared_secret is specified, cs_upload_management must be 'db'"
+    )
