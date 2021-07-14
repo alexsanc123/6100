@@ -16,6 +16,8 @@
 
 import os
 import sys
+import json
+import uuid
 import time
 import pickle
 import shutil
@@ -37,6 +39,7 @@ if CATSOOP_LOC not in sys.path:
 import catsoop.base_context as base_context
 import catsoop.lti as lti
 import catsoop.auth as auth
+import catsoop.util as util
 import catsoop.cslog as cslog
 import catsoop.loader as loader
 import catsoop.language as language
@@ -45,6 +48,7 @@ import catsoop.dispatch as dispatch
 from catsoop.process import set_pdeathsig
 
 CHECKER_DB_LOC = os.path.join(base_context.cs_data_root, "_logs", "_checker")
+COURSES_LOC = os.path.join(base_context.cs_data_root, "courses")
 RUNNING = os.path.join(CHECKER_DB_LOC, "running")
 QUEUED = os.path.join(CHECKER_DB_LOC, "queued")
 RESULTS = os.path.join(CHECKER_DB_LOC, "results")
@@ -316,7 +320,7 @@ if __name__ == "__main__":
                     req = urllib.request.Request(action["url"], data=data)
                     resp = json.loads(urllib.request.urlopen(req, timeout=3).read())
                     assert resp["ok"]
-                except:
+                except Exception as e:
                     # no response back, or something like that; just ignore this...
                     continue
                 to_remove = {
@@ -370,6 +374,7 @@ if __name__ == "__main__":
                             if not os.path.isfile(old_loc):
                                 continue
                             new_loc = os.path.join(RESULTS, magic[0], magic[1], magic)
+                            os.makedirs(os.path.dirname(new_loc), exist_ok=True)
                             with open(new_loc, "wb") as f:
                                 f.write(cslog.prep(row))
                             os.unlink(old_loc)
@@ -420,7 +425,6 @@ if __name__ == "__main__":
                                     ):
                                         lti.update_lti_score(lti_handler, x, namemap)
                         except:
-                            raise
                             pass
 
         # check for processes that have been running for too long with no results

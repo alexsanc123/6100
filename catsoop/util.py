@@ -20,6 +20,7 @@ Extra utilities that don't have a home anywhere else
 import os
 import ast
 import base64
+import pickle
 import hashlib
 
 import urllib.parse

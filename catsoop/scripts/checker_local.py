@@ -16,16 +16,20 @@
 
 import os
 import sys
+import json
 import time
+import pickle
 import shutil
 import signal
 import logging
 import tempfile
 import traceback
+import subprocess
 import collections
 import multiprocessing
 
 from datetime import datetime
+import urllib.parse, urllib.request
 
 CATSOOP_LOC = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 if CATSOOP_LOC not in sys.path:
@@ -34,6 +38,7 @@ if CATSOOP_LOC not in sys.path:
 import catsoop.base_context as base_context
 import catsoop.lti as lti
 import catsoop.auth as auth
+import catsoop.util as util
 import catsoop.cslog as cslog
 import catsoop.loader as loader
 import catsoop.language as language
@@ -42,6 +47,7 @@ import catsoop.dispatch as dispatch
 from catsoop.process import set_pdeathsig
 
 CHECKER_DB_LOC = os.path.join(base_context.cs_data_root, "_logs", "_checker")
+COURSES_LOC = os.path.join(base_context.cs_data_root, "courses")
 RUNNING = os.path.join(CHECKER_DB_LOC, "running")
 QUEUED = os.path.join(CHECKER_DB_LOC, "queued")
 RESULTS = os.path.join(CHECKER_DB_LOC, "results")
@@ -314,7 +320,7 @@ if __name__ == "__main__":
                         "courses": COURSE_GIT_HASHES,
                     }
                 )
-                print("TRYING TO CONNECT", data)
+                print("TRYING TO CONNECT", data, REMOTE_URL)
                 try:
                     req = urllib.request.Request(REMOTE_URL, data=data)
                     resp = json.loads(urllib.request.urlopen(req, timeout=3).read())
