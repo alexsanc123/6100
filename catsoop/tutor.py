@@ -624,10 +624,7 @@ def init_random(context):
 
     **Returns:** `None`
     """
-    try:
-        seed = _get_random_seed(context)
-    except:
-        seed = "___".join([context["cs_username"]] + context["cs_path_info"])
+    seed = "/".join([context["cs_username"], *context["cs_path_info"]])
     context["cs_random_seed"] = seed
     context["cs_random"].seed(seed)
     context["cs_random_inited"] = True

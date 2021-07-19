@@ -83,6 +83,13 @@ logedit        : edit the content of a given log in a text editor
         "--quiet", help="decrease debug output verbosity", action="store_true"
     )
     parser.add_argument(
+        "-o",
+        help="option to pass to the script in question",
+        action="append",
+        default=[],
+        dest="options",
+    )
+    parser.add_argument(
         "--log-level", type=int, help="force log level to that specified", default=None
     )
     default_config_location = os.environ.get(
@@ -125,7 +132,7 @@ logedit        : edit the content of a given log in a text editor
         from .scripts import start_catsoop
 
         print("cfn=%s" % cfn)
-        start_catsoop.startup_catsoop(cfn)
+        start_catsoop.startup_catsoop(cfn, args.options)
 
     elif args.command == "logread":
         from .scripts import log_scripts

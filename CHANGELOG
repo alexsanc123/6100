@@ -14,6 +14,9 @@ ADDED:
 
   * Allow running via "python3 -m catsoop" in addition to "catsoop"
 
+  * Added experimental support for running checkers on separate machines from
+    the web server
+
 CHANGED:
 
   * Upgraded KaTeX to version 0.13.11

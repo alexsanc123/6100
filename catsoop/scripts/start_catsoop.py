@@ -46,7 +46,7 @@ cs_logo = r"""
 """
 
 
-def main():
+def main(options=[]):
     import catsoop.base_context as base_context
     import catsoop.loader as loader
     from catsoop.process import set_pdeathsig
@@ -54,85 +54,116 @@ def main():
     # Make sure the checker database is set up
     checker_db_loc = os.path.join(base_context.cs_data_root, "_logs", "_checker")
 
-    for subdir in ("queued", "running", "results", "staging"):
+    for subdir in ("queued", "running", "results", "staging", "actions"):
         os.makedirs(os.path.join(checker_db_loc, subdir), exist_ok=True)
 
-    procs = [
-        (scripts_dir, [sys.executable, "checker.py"], 0.1, "Checker"),
-        (scripts_dir, [sys.executable, "reporter.py"], 0.1, "Reporter"),
-    ]
+    if not options:
+        options = ["checker", "reporter", "web", "plugins"]
 
-    # put plugin autostart scripts into the list
-
-    ctx = loader.generate_context([])
-    for plugin in loader.available_plugins(ctx, course=None):
-        script_dir = os.path.join(plugin, "autostart")
-        if os.path.isdir(script_dir):
-            for script in sorted(os.listdir(script_dir)):
-                if not script.endswith(".py"):
-                    continue
-                procs.append(
-                    (
-                        script_dir,
-                        [sys.executable, script],
-                        0.1,
-                        os.path.join(script_dir, script),
-                    )
-                )
-
-    # set up WSGI options
-
-    if base_context.cs_wsgi_server == "cheroot":
-        print("[start_catsoop] Using cheroot for web service")
-        wsgi_ports = base_context.cs_wsgi_server_port
-
-        if not isinstance(wsgi_ports, list):
-            wsgi_ports = [wsgi_ports]
-
-        for port in wsgi_ports:
+    procs = []
+    if "checker" in options:
+        local_only = base_context.cs_remote_checker_shared_secret is None
+        remote_for = base_context.cs_remote_checker_for is not None
+        if local_only or remote_for:
             procs.append(
                 (
                     scripts_dir,
-                    [sys.executable, "wsgi_server.py", str(port)],
+                    [sys.executable, "checker_local.py"],
                     0.1,
-                    "WSGI Server at Port %d" % port,
-                )
+                    "Local Checker",
+                ),
             )
-    elif base_context.cs_wsgi_server == "uwsgi":
-        print("[start_catsoop] Using uwsgi for web service")
-        if (
-            base_context.cs_wsgi_server_min_processes
-            >= base_context.cs_wsgi_server_max_processes
-        ):
-            uwsgi_opts = ["--processes", str(base_context.cs_wsgi_server_min_processes)]
         else:
+            procs.append(
+                (
+                    scripts_dir,
+                    [sys.executable, "checker_remote.py"],
+                    0.1,
+                    "Remote Checker Manager",
+                ),
+            )
+
+    if "reporter" in options:
+        procs.append((scripts_dir, [sys.executable, "reporter.py"], 0.1, "Reporter"))
+
+    # put plugin autostart scripts into the list
+
+    if "plugins" in options:
+        ctx = loader.generate_context([])
+        for plugin in loader.available_plugins(ctx, course=None):
+            script_dir = os.path.join(plugin, "autostart")
+            if os.path.isdir(script_dir):
+                for script in sorted(os.listdir(script_dir)):
+                    if not script.endswith(".py"):
+                        continue
+                    procs.append(
+                        (
+                            script_dir,
+                            [sys.executable, script],
+                            0.1,
+                            os.path.join(script_dir, script),
+                        )
+                    )
+
+    # set up WSGI options
+
+    if "web" in options:
+        if base_context.cs_wsgi_server == "cheroot":
+            print("[start_catsoop] Using cheroot for web service")
+            wsgi_ports = base_context.cs_wsgi_server_port
+
+            if not isinstance(wsgi_ports, list):
+                wsgi_ports = [wsgi_ports]
+
+            for port in wsgi_ports:
+                procs.append(
+                    (
+                        scripts_dir,
+                        [sys.executable, "wsgi_server.py", str(port)],
+                        0.1,
+                        "WSGI Server at Port %d" % port,
+                    )
+                )
+        elif base_context.cs_wsgi_server == "uwsgi":
+            print("[start_catsoop] Using uwsgi for web service")
+            if (
+                base_context.cs_wsgi_server_min_processes
+                >= base_context.cs_wsgi_server_max_processes
+            ):
+                uwsgi_opts = [
+                    "--processes",
+                    str(base_context.cs_wsgi_server_min_processes),
+                ]
+            else:
+                uwsgi_opts = [
+                    "--cheaper",
+                    str(base_context.cs_wsgi_server_min_processes),
+                    "--workers",
+                    str(base_context.cs_wsgi_server_max_processes),
+                    "--cheaper-step",
+                    "1",
+                    "--cheaper-initial",
+                    str(base_context.cs_wsgi_server_min_processes),
+                ]
+
             uwsgi_opts = [
-                "--cheaper",
-                str(base_context.cs_wsgi_server_min_processes),
-                "--workers",
-                str(base_context.cs_wsgi_server_max_processes),
-                "--cheaper-step",
-                "1",
-                "--cheaper-initial",
-                str(base_context.cs_wsgi_server_min_processes),
-            ]
+                "--http",
+                ":%s" % base_context.cs_wsgi_server_port,
+                "-b",
+                "65535",
+                "--thunder-lock",
+                "--lazy",
+                "--wsgi-file",
+                "wsgi.py",
+                "--touch-reload",
+                "wsgi.py",
+            ] + uwsgi_opts
 
-        uwsgi_opts = [
-            "--http",
-            ":%s" % base_context.cs_wsgi_server_port,
-            "-b",
-            "65535",
-            "--thunder-lock",
-            "--lazy",
-            "--wsgi-file",
-            "wsgi.py",
-            "--touch-reload",
-            "wsgi.py",
-        ] + uwsgi_opts
-
-        procs.append((base_dir, ["uwsgi"] + uwsgi_opts, 0.1, "WSGI Server"))
-    else:
-        raise ValueError("unsupported wsgi server: %r" % base_context.cs_wsgi_server)
+            procs.append((base_dir, ["uwsgi"] + uwsgi_opts, 0.1, "WSGI Server"))
+        else:
+            raise ValueError(
+                "unsupported wsgi server: %r" % base_context.cs_wsgi_server
+            )
 
     running = []
 
@@ -170,7 +201,7 @@ def main():
         time.sleep(1)
 
 
-def startup_catsoop(config_loc=None):
+def startup_catsoop(config_loc=None, options=[]):
     print(cs_logo)
     print("Using base_dir=%s" % base_dir)
     config_loc = config_loc or os.environ.get(
@@ -208,7 +239,7 @@ def startup_catsoop(config_loc=None):
                 break
             else:
                 print("Passphrase does not match stored hash.  Try again.")
-    main()
+    main(options)
 
 
 if __name__ == "__main__":
