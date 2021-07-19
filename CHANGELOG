@@ -37,6 +37,8 @@ CHANGED:
   * cs_upload_management returns as a way to control where uploaded files are
     stored (directly in the database, or as separate files)
 
+  * Changed the location of the default remote sandbox for running Python code
+
 DEPRECATED:
 
 REMOVED:
