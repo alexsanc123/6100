@@ -83,6 +83,9 @@ class CSLogBackend:
         )
         self.assertEqual(self.cslog.most_recent(user, path2, name), {"cat": "miau"})
 
+        self.cslog.delete_log(user, path2, name)
+        self.assertEqual(self.cslog.most_recent(user, path2, name, "test"), "test")
+
         # we'll leave it up to the logging backend whether they delete the
         # _whole_ log if it hasn't been updated since the given time, or
         # whether they only delete the old entries.

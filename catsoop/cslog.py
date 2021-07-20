@@ -239,6 +239,31 @@ def overwrite_log(db_name, path, logname, new, lock=True):
         _modify_log(fname, new, "wb")
 
 
+def delete_log(db_name, path, logname, lock=True):
+    """
+    Deletes an entire log.
+
+    **Parameters:**
+
+    * `db_name`: the name of the database to overwrite
+    * `path`: the path to the page associated with the log
+    * `logname`: the name of the log
+
+    **Optional Parameters:**
+
+    * `lock` (default `True`): whether the database should be locked during
+        this update
+    """
+    # get an exclusive lock on this file before making changes
+    fname = get_log_filename(db_name, path, logname)
+    cm = log_lock([db_name] + path + [logname]) if lock else passthrough()
+    with cm:
+        try:
+            os.unlink(fname)
+        except FileNotFoundError:
+            pass
+
+
 def _read_log(db_name, path, logname, lock=True):
     fname = get_log_filename(db_name, path, logname)
     # get an exclusive lock on this file before reading it

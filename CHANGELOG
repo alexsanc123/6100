@@ -17,6 +17,8 @@ ADDED:
   * Added experimental support for running checkers on separate machines from
     the web server
 
+  * Added a delete_log function to the cslog module
+
 CHANGED:
 
   * On the main page, links are now shown even to courses that can't be
