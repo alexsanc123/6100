@@ -951,20 +951,8 @@ def handle_check(context):
         newstate["last_submit"][name] = sub
         question, args = namemap[name]
 
-        grading_mode = _get(args, "csq_grading_mode", "auto", str)
-        if grading_mode == "legacy":
-            try:
-                msg = question["handle_check"](context[_n("form")], **args)
-            except:
-                msg = exc_message(context)
-            out["score_display"] = ""
-            out["message"] = context["csm_language"].handle_custom_tags(context, msg)
-            if name in newstate.get("checker_ids", {}):
-                del newstate["checker_ids"][name]
-
-            newstate["cached_responses"][name] = out["message"]
-            newstate["score_displays"][name] = ""
-        else:
+        async_ = _get(args, "csq_autograder_async", False, bool)
+        if async_:
             magic = new_entry(context, name, "check")
 
             entry_ids[name] = entry_id = magic
@@ -998,6 +986,18 @@ def handle_check(context):
             newstate["score_displays"][name] = ""
             if name in newstate.get("cached_responses", {}):
                 del newstate["cached_responses"][name]
+        else:
+            try:
+                msg = question["handle_check"](context[_n("form")], **args)
+            except:
+                msg = exc_message(context)
+            out["score_display"] = ""
+            out["message"] = context["csm_language"].handle_custom_tags(context, msg)
+            if name in newstate.get("checker_ids", {}):
+                del newstate["checker_ids"][name]
+
+            newstate["cached_responses"][name] = out["message"]
+            newstate["score_displays"][name] = ""
 
         outdict[name] = out
 
@@ -1090,84 +1090,93 @@ def handle_submit(context):
 
         question, args = namemap[name]
         grading_mode = _get(args, "csq_grading_mode", "auto", str)
+        async_ = _get(args, "csq_autograder_async", False, bool)
         if grading_mode == "auto":
-            # 'auto' grading mode is the default.  sends things to the
-            # asynchronous checker to be run.
-            magic = new_entry(context, name, "submit")
-            entry_ids[name] = entry_id = magic
-            out["message"] = WEBSOCKET_RESPONSE % {
-                "name": name,
-                "magic": entry_id,
-                "websocket": context["cs_checker_websocket"],
-                "loading": context["cs_loading_image"],
-                "id_css": (
-                    ' style="display:none;"'
-                    if context.get("cs_show_submission_id", True)
-                    else ""
-                ),
-            }
-            out["magic"] = entry_id
-            out["score_display"] = ""
-            if name in newstate["cached_responses"]:
-                del newstate["cached_responses"][name]
-            newstate["checker_ids"][name] = entry_id
-            newstate["last_submit_id"][name] = entry_id
-        elif grading_mode == "legacy":
-            # 'legacy' grading mode implements the old behavior: check the
-            # submission and cache the result, all within this request.
-            if name in newstate["checker_ids"]:
-                del newstate["checker_ids"][name]
-            try:
-                resp = question["handle_submission"](context[_n("form")], **args)
-                score = resp["score"]
-                msg = context["csm_language"].handle_custom_tags(context, resp["msg"])
-                extra = resp.get("extra_data", None)
-            except:
-                resp = {}
-                score = 0.0
-                msg = exc_message(context)
-                extra = None
-            out["score"] = scores[name] = newstate.setdefault("scores", {})[
-                name
-            ] = score
-            out["message"] = messages[name] = newstate["cached_responses"][name] = msg
-            out["score_display"] = context["csm_tutor"].make_score_display(
-                context,
-                args,
-                name,
-                score,
-                assume_submit=True,
-                last_log=context[_n("last_log")],
-            )
-            newstate["extra_data"][name] = out["extra_data"] = extra
-
-            # auto lock if the option is set.
-            if resp.get("lock", False):
-                c = dict(context)
-                c[_n("question_names")] = [name]
-                o = json.loads(handle_lock(c)[2])
-                ll = context[_n("last_log")]
-                newstate["locked"] = ll.get("locked", set())
-                outdict[name].update(o[name])
-
-            # auto view answer if the option is set
-            if "submit_all" not in context[_n("orig_perms")]:
-                x = nsubmits_left(context, name)
-                if question.get("allow_viewanswer", True) and (
-                    (
-                        (out["score"] == 1 and "perfect" in _get_auto_view(args))
-                        or (x[0] == 0 and "nosubmits" in _get_auto_view(args))
+            if async_:
+                # asynchronous checker.  sends things to the work queue to be
+                # run.
+                magic = new_entry(context, name, "submit")
+                entry_ids[name] = entry_id = magic
+                out["message"] = WEBSOCKET_RESPONSE % {
+                    "name": name,
+                    "magic": entry_id,
+                    "websocket": context["cs_checker_websocket"],
+                    "loading": context["cs_loading_image"],
+                    "id_css": (
+                        ' style="display:none;"'
+                        if context.get("cs_show_submission_id", True)
+                        else ""
+                    ),
+                }
+                out["magic"] = entry_id
+                out["score_display"] = ""
+                if name in newstate["cached_responses"]:
+                    del newstate["cached_responses"][name]
+                newstate["checker_ids"][name] = entry_id
+                newstate["last_submit_id"][name] = entry_id
+            else:
+                # synchronous autograding mode implements the old behavior:
+                # check the submission and cache the result, all within this
+                # request.
+                if name in newstate["checker_ids"]:
+                    del newstate["checker_ids"][name]
+                try:
+                    resp = question["handle_submission"](context[_n("form")], **args)
+                    score = resp["score"]
+                    msg = context["csm_language"].handle_custom_tags(
+                        context, resp["msg"]
                     )
-                    and _get(args, "csq_allow_viewanswer", True, bool)
-                ):
-                    # this is a hack...
+                    extra = resp.get("extra_data", None)
+                except:
+                    resp = {}
+                    score = 0.0
+                    msg = exc_message(context)
+                    extra = None
+                out["score"] = scores[name] = newstate.setdefault("scores", {})[
+                    name
+                ] = score
+                out["message"] = messages[name] = newstate["cached_responses"][
+                    name
+                ] = msg
+                out["score_display"] = context["csm_tutor"].make_score_display(
+                    context,
+                    args,
+                    name,
+                    score,
+                    assume_submit=True,
+                    last_log=context[_n("last_log")],
+                )
+                newstate["extra_data"][name] = out["extra_data"] = extra
+
+                # auto lock if the option is set.
+                if resp.get("lock", False):
                     c = dict(context)
                     c[_n("question_names")] = [name]
-                    o = json.loads(handle_viewanswer(c)[2])
+                    o = json.loads(handle_lock(c)[2])
                     ll = context[_n("last_log")]
-                    newstate["answer_viewed"] = ll.get("answer_viewed", set())
-                    newstate["explanation_viewed"] = ll.get("explanation_viewed", set())
+                    newstate["locked"] = ll.get("locked", set())
                     outdict[name].update(o[name])
+
+                # auto view answer if the option is set
+                if "submit_all" not in context[_n("orig_perms")]:
+                    x = nsubmits_left(context, name)
+                    if question.get("allow_viewanswer", True) and (
+                        (
+                            (out["score"] == 1 and "perfect" in _get_auto_view(args))
+                            or (x[0] == 0 and "nosubmits" in _get_auto_view(args))
+                        )
+                        and _get(args, "csq_allow_viewanswer", True, bool)
+                    ):
+                        # this is a hack...
+                        c = dict(context)
+                        c[_n("question_names")] = [name]
+                        o = json.loads(handle_viewanswer(c)[2])
+                        ll = context[_n("last_log")]
+                        newstate["answer_viewed"] = ll.get("answer_viewed", set())
+                        newstate["explanation_viewed"] = ll.get(
+                            "explanation_viewed", set()
+                        )
+                        outdict[name].update(o[name])
         elif grading_mode == "manual":
             # submitted for manual grading.
             out["message"] = "Submission received for manual grading."
@@ -1184,8 +1193,7 @@ def handle_submit(context):
             newstate["cached_responses"][name] = out["message"]
         else:
             out["message"] = (
-                '<font color="red">Unknown grading mode: %s.  Please contact staff.</font>'
-                % grading_mode
+                '<font color="red">Unknown grading mode: %s.</font>' % grading_mode
             )
             out["score_display"] = context["csm_tutor"].make_score_display(
                 context,
@@ -1225,10 +1233,10 @@ def handle_submit(context):
         newstate,
     )
 
-    # if this was using the "legacy" grading mode and we're using LTI, send the
-    # result to the LTI consumer
+    # if this was using the synchronous auto-grading mode and we're using LTI,
+    # send the result to the LTI consumer
     try:
-        if grading_mode == "legacy":
+        if grading_mode == "auto" and (not async_):
             session = context["cs_session_data"]
             if "cs_lti_config" in context and session.get("is_lti_user"):
                 lti_handler = context["csm_lti"].lti4cs_response(

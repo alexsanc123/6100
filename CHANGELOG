@@ -42,6 +42,9 @@ CHANGED:
 
   * Changed the location of the default remote sandbox for running Python code
 
+  * Replaced csq_grading_mode="legacy" with csq_autograder_async flag, and made
+    synchronous checking the default
+
 DEPRECATED:
 
 REMOVED:
