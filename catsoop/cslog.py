@@ -104,6 +104,9 @@ if ENCRYPT_PASS is not None:
 
 
 def log_lock(path):
+    db_name, *path, lockname = path
+    db_name, path, lockname = _transform_log_info(db_name, path, lockname)
+    path = [db_name, *path, lockname]
     lock_loc = os.path.join(base_context.cs_data_root, "_locks", *path) + ".lock"
     os.makedirs(os.path.dirname(lock_loc), exist_ok=True)
     return FileLock(lock_loc)
@@ -150,6 +153,15 @@ def _e(x, person):
     )
 
 
+def _transform_log_info(db_name, path, logname):
+    if ENCRYPT_KEY is not None:
+        seed = path[0] if path else db_name
+        path = [_e(p, seed + repr(path[:ix])) for ix, p in enumerate(path)]
+        db_name = _e(db_name, seed + db_name)
+        logname = _e(logname, seed + repr(path))
+    return db_name, path, logname
+
+
 def get_log_filename(db_name, path, logname):
     """
     Helper function, returns the filename where a given log is stored on disk.
@@ -160,11 +172,7 @@ def get_log_filename(db_name, path, logname):
     * `path`: the path to the page associated with the log
     * `logname`: the name of the log
     """
-    if ENCRYPT_KEY is not None:
-        seed = path[0] if path else db_name
-        path = [_e(p, seed + repr(path[:ix])) for ix, p in enumerate(path)]
-        db_name = _e(db_name, seed + db_name)
-        logname = _e(logname, seed + repr(path))
+    db_name, path, logname = _transform_log_info(db_name, path, logname)
     if path:
         course = path[0]
         return os.path.join(

@@ -67,7 +67,10 @@ SECURITY:
 
   * Logs are now encrypted by default
 
-  * Remove information about the Python version from the default footer
+  * Removed information about the Python version from the default footer
+
+  * Prevented lock file locations from leaking information when logs are
+    encrypted
 
 DOCUMENTATION:
 
