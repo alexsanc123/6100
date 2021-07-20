@@ -59,6 +59,8 @@ FIXED:
   * Attempted fix for rendering of the catsoop logo in the footer on
     iOS/Safari
 
+  * Fixed a potential race condition in cslog.most_recent
+
 SECURITY:
 
   * Logs are now encrypted by default

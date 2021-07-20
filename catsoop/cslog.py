@@ -303,16 +303,17 @@ def most_recent(db_name, path, logname, default=None, lock=True):
     the log.
     """
     fname = get_log_filename(db_name, path, logname)
-    if not os.path.isfile(fname):
-        return default
     # get an exclusive lock on this file before reading it
     cm = log_lock([db_name] + path + [logname]) if lock else passthrough()
     with cm:
-        with open(fname, "rb") as f:
-            f.seek(-8, os.SEEK_END)
-            length = struct.unpack("<Q", f.read(8))[0]
-            f.seek(-length - 8, os.SEEK_CUR)
-            return unprep(f.read(length))
+        try:
+            with open(fname, "rb") as f:
+                f.seek(-8, os.SEEK_END)
+                length = struct.unpack("<Q", f.read(8))[0]
+                f.seek(-length - 8, os.SEEK_CUR)
+                return unprep(f.read(length))
+        except FileNotFoundError:
+            return default
 
 
 def modify_most_recent(
