@@ -72,19 +72,22 @@ def get_api_tokens(context, username):
     ]
 
 
-def username_from_token(context, tok):
+def userinfo_from_token(context, tok):
     """
-    Given an API token, return the associated user's username.
+    Given an API token, return the associated user's user info.
 
     **Parameters:**
 
     * `context`: the context associated with this request
     * `tok`: an API token
 
-    **Returns:** a string containing the associated user's username.  Returns
+    **Returns:** a dictionary containing basic user information.  Returns
     `None` if the given token is invalid.
     """
-    return context["csm_cslog"].most_recent("_api_tokens", [], str(tok), None)
+    uname = context["csm_cslog"].most_recent("_api_tokens", [], str(tok), None)
+    if uname is None:
+        return
+    return {"username": uname}
 
 
 def get_logged_in_user(context):
