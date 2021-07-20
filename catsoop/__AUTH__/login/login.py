@@ -17,12 +17,11 @@
 import os
 import re
 import struct
-import random
-import string
 import hashlib
+import secrets
 
 
-def user_menu_options(context):
+def user_settings_links(context):
     url = _get_base_url(context)
     return [{"text": "Change Password", "link": "%s?loginaction=change_password" % url}]
 
@@ -566,15 +565,7 @@ def check_password(context, provided, uname, iterations=500000):
 
 
 def get_new_password_salt(length=128):
-    """
-    Generate a new salt of length length.  Tries to use os.urandom, and
-    falls back on random if that doesn't work for some reason.
-    """
-    try:
-        out = os.urandom(length)
-    except:
-        out = "".join(chr(random.randint(1, 127)) for i in range(length)).encode()
-    return out
+    return secrets.token_bytes(length)
 
 
 def _ensure_bytes(x):
@@ -600,9 +591,8 @@ def compute_password_hash(
     return hash_
 
 
-def generate_confirmation_token(n=20):
-    chars = string.ascii_uppercase + string.digits
-    return "".join(random.choice(chars) for i in range(n))
+def generate_confirmation_token():
+    return secrets.token_urlsafe(40)
 
 
 def _get_base_url(context):

@@ -72,6 +72,8 @@ SECURITY:
   * Prevented lock file locations from leaking information when logs are
     encrypted
 
+  * Switched to using the "secrets" module to generate secure tokens
+
 DOCUMENTATION:
 
 VENDORED SOFTWARE:
