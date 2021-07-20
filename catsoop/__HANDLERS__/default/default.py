@@ -2073,7 +2073,6 @@ def default_javascript(context):
 // @license magnet:?xt=urn:btih:0b31508aeb0634b347b8270c7bee4d411b5d4109&dn=agpl-3.0.txt AGPL-v3
 catsoop.all_questions = %(allqs)r;
 catsoop.username = %(uname)s;
-catsoop.api_token = %(secret)s;
 catsoop.this_path = %(path)r;
 catsoop.path_info = %(pathinfo)r;
 catsoop.course = %(course)s;
@@ -2088,11 +2087,7 @@ catsoop.viewans_confirm = "Are you sure?  Viewing the answer will prevent any fu
     out += "\n// @license-end"
     out += "</script>"
 
-    api_tok = "null"
     uname = "null"
-    given_tok = context.get("cs_user_info", {}).get("api_token", None)
-    if given_tok is not None:
-        api_tok = repr(given_tok)
     given_uname = context.get("cs_user_info", {}).get("username", None)
     if given_uname is not None:
         uname = repr(given_uname)
@@ -2103,7 +2098,6 @@ catsoop.viewans_confirm = "Are you sure?  Viewing the answer will prevent any fu
         "user": context[_n("real_uname")],
         "path": "/".join([context["cs_url_root"]] + context["cs_path_info"]),
         "imp": context[_n("uname")] if context[_n("impersonating")] else "",
-        "secret": api_tok,
         "course": repr(context["cs_course"]) if context["cs_course"] else "null",
         "pathinfo": context["cs_path_info"],
         "root": context["cs_url_root"],
