@@ -27,13 +27,13 @@ about CAT-SOOP at [this page](COURSE/docs/about).
 **Information:**
 
 * Web Site:
-    * <https://catsoop.org>
+    * <https://catsoop.mit.edu>
     * Tor onion service: <http://wjglyvalrulqaelaptda3pni6lcap46exxsnbiijocrk2guz3nr7dxqd.onion>
 
 * Contact:
     * `catsoop-users@mit.edu`, low-volume list for announcements and discussion (subscribe [here](http://mailman.mit.edu/mailman/listinfo/catsoop-users))
     * `catsoop-dev@mit.edu` for development-related discussion (subscribe [here](http://mailman.mit.edu/mailman/listinfo/catsoop-dev))
-    * Community Forum <https://catsoop.org/community>
+    * Community Forum <https://catsoop.mit.edu/community>
 
 * Code:
     * Git repository: `@{TOR_STRING('git')} clone git://@{cs_url_root.split('/', 2)[-1]}/catsoop.git`

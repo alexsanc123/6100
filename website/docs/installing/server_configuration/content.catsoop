@@ -223,7 +223,7 @@ cd /home/catsoop/.local/share/catsoop/_logs;
 hg addremove .;
 hg commit -m "$(date +'%Y-%m-%d:%H:%M')";
 hg push /storage2/backup;
-hg push ssh://catsoop@catsoop.org/backups/py;
+hg push ssh://catsoop@catsoop.mit.edu/backups/py;
 ```
 
 It can then be configured to run, for example, every hour at xx:05 and xx:35
@@ -237,7 +237,7 @@ with the following crontab entry:
 
 By default, Python code that needs to be sandboxed (for example, student code
 from the `pythonic` or `pythoncode` question types) will be sent to
-`catsoop.org` to be run.
+`catsoop.mit.edu` to be run.
 
 It is fine to leave things this way if you'd like.  I will keep that service up
 as long as is feasible, and the sandbox doesn't log anything about the code it
