@@ -1,0 +1,13 @@
+[Unit]
+Description=CAT-SOOP
+After=multi-user.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/catsoop start
+User=catsoop
+KillMode=mixed
+TimeoutSec=10
+
+[Install]
+WantedBy=multi-user.target
