@@ -18,70 +18,71 @@ Methods related to authentication for API access
 """
 
 import os
-import uuid
 import random
-import string
+import secrets
 
 _nodoc = {"CHARACTERS"}
-
-CHARACTERS = string.ascii_letters + string.digits
 
 
 def new_api_token(context, username):
     """
-    Generate a new API token for the given user.
-
-    **Parameters**:
-
-    * `context`: the context associated with this request
-    * `username`: the username for which a new API token should be generated
-
-
-    **Returns:** a new API token for the given user, with length as given by
-    `cs_api_token_length`.
-    """
-    length = context.get("cs_api_token_length", 70)
-    seed = username + uuid.uuid4().hex
-    r = random.Random()
-    r.seed(seed)
-    return "".join(r.choice(CHARACTERS) for i in range(length))
-
-
-def initialize_api_token(context, user_info):
-    """
-    Intialize an API token for a user, and store the association in the
-    database.
+    Create an API token for a user, and store the association in the database.
 
     **Parameters:**
 
     * `context`: the context associated with this request
-    * `user_info`: the user_info dictionary associated with this request
-        (should ideally contain `'username'`, `'name'`, and `'email'` keys).
+    * `username`: the user for whom a key should be generated
 
     **Returns:** the newly-generated API token
     """
-    user_info = {
-        k: v for (k, v) in user_info.items() if k in {"username", "name", "email"}
-    }
-    token = new_api_token(context, user_info["username"])
-    context["csm_cslog"].overwrite_log("_api_tokens", [], str(token), user_info)
-    context["csm_cslog"].update_log("_api_users", [], user_info["username"], token)
+    token = secrets.token_hex(secrets.choice(range(40, 46)))
+    context["csm_cslog"].overwrite_log("_api_tokens", [], token, username)
+    context["csm_cslog"].update_log("_api_users", [], username, token)
     return token
 
 
-def userinfo_from_token(context, tok):
+def delete_api_token(context, token):
     """
-    Given an API token, return the associated user's information.
+    Render an API token unusable
+
+    **Parameters:**
+
+    * `context`: the context associated with this request
+    * `username`: the user for whom a key should be generated
+    """
+    context["csm_cslog"].delete_log("_api_tokens", [], token)
+
+
+def get_api_tokens(context, username):
+    """
+    List the API tokens currently usable by the given user.
+
+    **Parameters:**
+
+    * `context`: the context associated with this request
+    * `username`: the user whose keys we want
+
+    **Returns:** a (possibly empty) list of API tokens available to the given
+    user
+    """
+    return [
+        token
+        for token in context["csm_cslog"].read_log("_api_users", [], username)
+        if context["csm_cslog"].most_recent("_api_tokens", [], token) is not None
+    ]
+
+
+def username_from_token(context, tok):
+    """
+    Given an API token, return the associated user's username.
 
     **Parameters:**
 
     * `context`: the context associated with this request
     * `tok`: an API token
 
-    **Returns:** a dictionary containing the information associated with the
-    user who holds the given API token; it will contain some subset of the keys
-    `'username'`, `'name'`, and `'email'`.  Returns `None` if the given token
-    is invalid.
+    **Returns:** a string containing the associated user's username.  Returns
+    `None` if the given token is invalid.
     """
     return context["csm_cslog"].most_recent("_api_tokens", [], str(tok), None)
 
