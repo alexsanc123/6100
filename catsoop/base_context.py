@@ -146,7 +146,7 @@ cs_attributions = set()
 Special: additional attributions, displayed just above the footer.
 """
 
-cs_top_menu = ""
+cs_top_menu = []
 """
 Special: Navigation menu.
 

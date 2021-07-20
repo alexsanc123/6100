@@ -786,6 +786,12 @@ def main(environment, return_context=False, form_data=None):
                 else:
                     menu_entry = {"text": uname, "link": []}
                     auth_method = auth.get_auth_type(context)
+                    menu_entry["link"].append(
+                        {
+                            "text": "Settings",
+                            "link": "%s/_util/user_settings" % context["cs_url_root"],
+                        }
+                    )
                     for i in auth_method.get("user_menu_options", lambda c: [])(
                         context
                     ):
