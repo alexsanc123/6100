@@ -18002,7 +18002,7 @@ var renderToHTMLTree = function renderToHTMLTree(expression, options) {
   /**
    * Current KaTeX version
    */
-  version: "0.13.11",
+  version: "0.13.12",
 
   /**
    * Renders the given LaTeX into an HTML+MathML combination, and adds
