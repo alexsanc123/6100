@@ -19,6 +19,9 @@ ADDED:
 
   * Added a delete_log function to the cslog module
 
+  * Added a "user settings" page for managing user information, API tokens,
+    look-and-feel, and more.
+
 CHANGED:
 
   * On the main page, links are now shown even to courses that can't be
@@ -73,6 +76,9 @@ SECURITY:
     encrypted
 
   * Switched to using the "secrets" module to generate secure tokens
+
+  * API tokens are no longer generated automatically for users, and are no
+    longer present in the source of exercises.
 
 DOCUMENTATION:
 
