@@ -19,12 +19,6 @@ ADDED:
 
 CHANGED:
 
-  * Upgraded KaTeX to version 0.13.12
-
-  * Upgraded Twemoji to v13.1.0
-
-  * Upgraded CodeMirror to v5.62.2
-
   * On the main page, links are now shown even to courses that can't be
     properly loaded, so that the underlying issue is easier to find (clicking
     on the link shows a more detailed error message)
@@ -72,6 +66,14 @@ SECURITY:
   * Remove information about the Python version from the default footer
 
 DOCUMENTATION:
+
+VENDORED SOFTWARE:
+
+  * Upgraded KaTeX to version 0.13.13
+
+  * Upgraded Twemoji to v13.1.0
+
+  * Upgraded CodeMirror to v5.62.2
 
 
 ####################
