@@ -465,7 +465,7 @@ def _breadcrumbs_html(context):
         )
         name = language.source_transform_string(context, name)
         elements.append('<span class="line"><a href="%s">%s</a></span>' % (link, name))
-    if context.get("cs_course", None) == "_util":
+    if elements and context.get("cs_course", None) == "_util":
         elements.pop(0)
     return ' <span class="cs_nav_separator">/</span> '.join(elements)
 
