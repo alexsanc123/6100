@@ -174,6 +174,9 @@ def _get_user_information(context, into, course, username, do_preload=False):
     else:
         LOGGER.error("[auth] missing user definition file %s" % fname)
 
+    if str(username) == "None":
+        into["role"] = "Unauthenticated"
+
     # permissions handling
     if "permissions" not in into:
         if "role" not in into:
