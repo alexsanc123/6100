@@ -30,6 +30,10 @@ def command_line_interface(args=None, arglist=None):
     """
 
     raw_version = pkg_resources.require("catsoop")[0].version
+    _major, _minor, *_ = raw_version.lstrip("v").split()[0].split(".")
+    if _minor == "9" and int(_major) % 2:
+        raw_version += " LTS"
+
     version = '%s ("%s")' % (raw_version, codename)
     if "dev" in version:
         gitfile = os.path.join(os.path.dirname(__file__), "dev.hash")

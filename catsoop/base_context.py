@@ -45,6 +45,9 @@ _nodoc = {
 }
 
 cs_version = __version__
+_major, _minor, *_ = cs_version.lstrip("v").split()[0].split(".")
+if _minor == "9" and int(_major) % 2:
+    cs_version += " LTS"
 """
 CAT-SOOP's version number
 """
