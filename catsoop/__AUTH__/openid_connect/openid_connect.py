@@ -24,7 +24,7 @@ def get_logged_in_user(context):
     logintype = context["csm_auth"].get_auth_type_by_name(context, "login")
 
     def generate_token():
-        return logintype["generate_confirmation_token"](50)
+        return logintype["generate_confirmation_token"]()
 
     _get_base_url = logintype["_get_base_url"]
 
