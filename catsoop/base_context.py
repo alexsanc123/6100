@@ -46,15 +46,16 @@ _nodoc = {
 
 cs_version = __version__
 _major, _minor, *_ = cs_version.lstrip("v").split()[0].split(".")
-if _minor == "9" and int(_major) % 2:
-    cs_version += " LTS"
 """
 CAT-SOOP's version number
 """
 
+_lts_marker = " (LTS)" if _minor == "9" and int(_major) % 2 else ""
 cs_version_codename = (
-    '"%s"' if "dev" not in __version__ else '"%s" development snapshot'
-) % __codename__
+    '"%s"%s (development snapshot)'
+    if "dev" in __version__
+    else '"%s"%s'
+) % (__codename__, _lts_marker)
 """
 The codename for this version
 """

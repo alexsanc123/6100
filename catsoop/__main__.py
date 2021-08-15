@@ -20,7 +20,7 @@ import pkg_resources
 
 # -----------------------------------------------------------------------------
 
-from catsoop import __codename__ as codename
+from .base_context import cs_version, cs_version_codename
 
 
 def command_line_interface(args=None, arglist=None):
@@ -29,21 +29,15 @@ def command_line_interface(args=None, arglist=None):
     args, arglist are used for unit testing
     """
 
-    raw_version = pkg_resources.require("catsoop")[0].version
-    _major, _minor, *_ = raw_version.lstrip("v").split()[0].split(".")
-    if _minor == "9" and int(_major) % 2:
-        raw_version += " LTS"
-
-    version = '%s ("%s")' % (raw_version, codename)
+    version = f"{cs_version} {cs_version_codename}"
     if "dev" in version:
         gitfile = os.path.join(os.path.dirname(__file__), "dev.hash")
         if os.path.isfile(gitfile):
             with open(gitfile, "r") as f:
                 try:
                     vcs, hash_, date = f.read().split("|")
-                    version = '%s ("%s" Development Snapshot)\n%s revision: %s\n%s' % (
-                        raw_version,
-                        codename,
+                    version = "%s\n%s revision: %s\n%s" % (
+                        version,
                         vcs,
                         hash_,
                         date,
