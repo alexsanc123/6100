@@ -63,6 +63,7 @@ if error is None:
             "redirect_uri": redir_url,
             "client_id": id,
             "client_secret": secret,
+            "code_verifier": session["_openid_verifier"],
         }
     ).encode()
     request = urllib.request.Request(

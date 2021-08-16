@@ -83,6 +83,8 @@ SECURITY:
   * API tokens are no longer generated automatically for users, and are no
     longer present in the source of exercises.
 
+  * OpenID Connect auth type now implements PKCE.
+
 DOCUMENTATION:
 
 VENDORED SOFTWARE:

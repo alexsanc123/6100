@@ -15,6 +15,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import json
+import base64
+import secrets
 import urllib.parse, urllib.request
 
 
@@ -74,6 +76,10 @@ def get_logged_in_user(context):
         scope = context.get("cs_openid_scope", "openid profile email")
         state = generate_token()
         nonce = generate_token()
+        verifier = secrets.token_urlsafe(96).encode("ascii")
+        challenge = base64.urlsafe_b64encode(hashlib.sha256(verifier).digest()).rstrip(
+            b"="
+        )
         get_data = {
             "redirect_uri": redir_url,
             "state": state,
@@ -81,6 +87,8 @@ def get_logged_in_user(context):
             "scope": scope,
             "client_id": context.get("cs_openid_client_id", None),
             "response_type": "code",
+            "code_challenge_method": "S256",
+            "code_challenge": challenge.decode("ascii"),
         }
         openid_url = context.get("cs_openid_server", None)
 
@@ -94,6 +102,8 @@ def get_logged_in_user(context):
         session["_openid_nonce"] = nonce
         session["_openid_state"] = state
         session["_openid_config"] = resp
+        session["_openid_verifier"] = verifier
+        session["_openid_challenge"] = challenge
 
         qstring = urllib.parse.urlencode(get_data)
 
