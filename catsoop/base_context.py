@@ -52,9 +52,7 @@ CAT-SOOP's version number
 
 _lts_marker = " (LTS)" if _minor == "9" and int(_major) % 2 else ""
 cs_version_codename = (
-    '"%s"%s (development snapshot)'
-    if "dev" in __version__
-    else '"%s"%s'
+    '"%s"%s (development snapshot)' if "dev" in __version__ else '"%s"%s'
 ) % (__codename__, _lts_marker)
 """
 The codename for this version

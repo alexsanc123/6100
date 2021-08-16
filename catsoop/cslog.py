@@ -389,31 +389,36 @@ def clear_old_logs(db_name, path, expire):
 
 
 def store_upload(username, data, filename):
-    data = compress_encrypt(data)
     content_hash = hashlib.blake2b(data).hexdigest()
+    data = compress_encrypt(data)
     info = {
         "filename": filename,
         "username": username,
         "time": cstime.detailed_timestamp(cstime.now()),
         "hash": content_hash,
     }
+    info_hash = hashlib.blake2b(pickle.dumps(info)).hexdigest()
     info = prep(info)
-    info_hash = hashlib.blake2b(info).hexdigest()
 
-    for (id_, content) in ((info_hash, info), (content_hash, data)):
+    for (id_, name, content) in (
+        (info_hash, "info", info),
+        (content_hash, "data", data),
+    ):
         dir_ = os.path.join(
-            base_context.cs_data_root, "_logs", "_uploads", id_[0], id_[1]
+            base_context.cs_data_root, "_logs", "_uploads", name, id_[0], id_[1]
         )
         os.makedirs(dir_, exist_ok=True)
-        with open(os.path.join(dir_, id_), "wb") as f:
-            f.write(content)
+        fname = os.path.join(dir_, id_)
+        if not os.path.isfile(fname):
+            with open(fname, "wb") as f:
+                f.write(content)
 
     return info_hash
 
 
 def retrieve_upload(id_):
     info_file = os.path.join(
-        base_context.cs_data_root, "_logs", "_uploads", id_[0], id_[1], id_
+        base_context.cs_data_root, "_logs", "_uploads", "info", id_[0], id_[1], id_
     )
     try:
         with open(info_file, "rb") as f:
@@ -423,6 +428,7 @@ def retrieve_upload(id_):
             base_context.cs_data_root,
             "_logs",
             "_uploads",
+            "data",
             content_hash[0],
             content_hash[1],
             content_hash,
