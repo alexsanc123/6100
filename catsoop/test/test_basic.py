@@ -52,7 +52,7 @@ class Test_Basic(CATSOOPTest):
         env = {"PATH_INFO": "/%s/structure" % self.cname}
         context = dispatch.main(env, return_context=True)
         cui = context["cs_user_info"]
-        assert cui["role"] == "Guest"
+        assert cui["role"] == "Unauthenticated"
 
 
 if __name__ == "__main__":
