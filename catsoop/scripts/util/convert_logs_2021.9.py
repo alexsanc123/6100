@@ -104,8 +104,12 @@ for root, dirs, files in os.walk(log_backup_loc):
 
     for f in files:
         full = os.path.join(root, f)
-        relative = full[len(log_backup_loc) :].split(os.sep)[1:]
+        relative = full[len(log_backup_loc) :].split(os.sep)
 
+        if not relative:
+            continue
+        if relative[0] == "":
+            relative = relative[1:]
         logname = relative.pop().rsplit(".", 1)[0]
         if not relative:
             continue
