@@ -101,8 +101,7 @@ def get_logged_in_user(context):
 
     **Returns:** a dictionary containing the information associated with the
     user who is currently logged in.  If a user is logged in, it will contain
-    the key `api_token`, as well as some subset of the keys `'username'`,
-    `'name'`, and `'email'`.
+    some subset of the keys `'username'`, `'name'`, and `'email'`.
     """
     # handle auto-login for LTI users
     lti_data = context["cs_session_data"].get("lti_data")
@@ -207,7 +206,6 @@ def _get_user_information(context, into, course, username, do_preload=False):
         into["username"] = into["name"] = context["cs_username"]
         into["role"] = None
         into["permissions"] = []
-        into["api_token"] = old["api_token"]
         into = get_user_information(context)
     cslog = context["csm_cslog"]
     if "username" in into:
