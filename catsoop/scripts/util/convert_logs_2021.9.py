@@ -171,7 +171,7 @@ if os.path.isdir(checker_dir):
 
     for ix, r in enumerate(results):
         with open(os.path.join(checker_dir, r), "rb") as f:
-            result = pickle.load(f)
+            result = pickle.loads(pickle.load(f)["data"])
 
         _, __, magic = r.split("_")
 
