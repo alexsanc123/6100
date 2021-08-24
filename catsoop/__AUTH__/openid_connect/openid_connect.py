@@ -16,6 +16,7 @@
 
 import json
 import base64
+import hashlib
 import secrets
 import urllib.parse, urllib.request
 
