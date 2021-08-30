@@ -199,13 +199,16 @@ def _get_user_information(context, into, course, username, do_preload=False):
     if ("as" in context.get("cs_form", {})) and ("real_user" not in into):
         if "impersonate" not in into["permissions"]:
             return into
+        into["preserve_permissions"] = context.get("cs_form", {}).get(
+            "preserve_permissions", "f"
+        ).lower() in {"true", "t", "1", "yes", "y"}
         old = dict(into)
         old["p"] = into["permissions"]
         context["cs_username"] = context["cs_form"]["as"]
         into["real_user"] = old
         into["username"] = into["name"] = context["cs_username"]
         into["role"] = None
-        into["permissions"] = []
+        del into["permissions"]
         into = get_user_information(context)
     cslog = context["csm_cslog"]
     if "username" in into:

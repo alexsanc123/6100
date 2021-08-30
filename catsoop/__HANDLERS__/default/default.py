@@ -1963,9 +1963,10 @@ def pre_handle(context):
     user_info = context.get("cs_user_info", {})
     uname = user_info.get("username", "None")
     real = user_info.get("real_user", user_info)
-    context[_n("role")] = real.get("role", "None")
-    context[_n("section")] = real.get("section", None)
-    context[_n("perms")] = real.get("permissions", [])
+    perms_from = user_info if user_info.get("preserve_permissions", True) else real
+    context[_n("role")] = perms_from.get("role", "None")
+    context[_n("section")] = perms_from.get("section", None)
+    context[_n("perms")] = perms_from.get("permissions", [])
     context[_n("orig_perms")] = user_info.get("permissions", [])
     context[_n("uname")] = uname
     context[_n("real_uname")] = real.get("username", uname)
