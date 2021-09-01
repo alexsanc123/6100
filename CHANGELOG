@@ -1,8 +1,6 @@
-########################
-# Current Developments #
-########################
-
-(Work toward next release. Currently under development.)
+####################
+# Version 2021.9.0 #
+####################
 
 ADDED:
 
@@ -52,8 +50,6 @@ CHANGED:
   * Replaced csq_grading_mode="legacy" with csq_autograder_async flag, and made
     synchronous checking the default
 
-DEPRECATED:
-
 REMOVED:
 
   * Removed PostgreSQL as a logging mechanism
@@ -87,8 +83,6 @@ SECURITY:
     longer present in the source of exercises.
 
   * OpenID Connect auth type now implements PKCE.
-
-DOCUMENTATION:
 
 VENDORED SOFTWARE:
 
