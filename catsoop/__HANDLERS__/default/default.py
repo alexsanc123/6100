@@ -1155,7 +1155,7 @@ def handle_submit(context):
                     o = json.loads(handle_lock(c)[2])
                     ll = context[_n("last_log")]
                     newstate["locked"] = ll.get("locked", set())
-                    outdict[name].update(o[name])
+                    out.update(o[name])
 
                 # auto view answer if the option is set
                 if "submit_all" not in context[_n("orig_perms")]:
@@ -1176,7 +1176,7 @@ def handle_submit(context):
                         newstate["explanation_viewed"] = ll.get(
                             "explanation_viewed", set()
                         )
-                        outdict[name].update(o[name])
+                        out.update(o[name])
         elif grading_mode == "manual":
             # submitted for manual grading.
             out["message"] = "Submission received for manual grading."
