@@ -29,18 +29,37 @@ def handle_submission(submissions, **info):
     tok, un = submissions[info["csq_name"]]["data"].split(",")
     i = csm_api.userinfo_from_token(info, tok)
     new = dict(info)
+    new["cs_form"] = {}
+    new["cs_username"] = (i or {}).get("username", "None")
+    try:
+        del new["permissions"]
+    except:
+        pass
+    try:
+        del new["role"]
+    except:
+        pass
     uinfo = info["csm_auth"]._get_user_information(
-        new, new, info["cs_course"], (i or {}).get("username", "None"), True
+        new, new, info["cs_course"], (i or {}).get("username", "None"), False
     )
     if "impersonate" not in uinfo.get("permissions", []):
         percent = 0
-        msg = "You must receive this checkoff from a staff member."
+        msg = "You must receive this checkoff from a staff member. %r" % uinfo
         l = False
     else:
         new = dict(info)
+        new["cs_username"] = un
         new["cs_form"] = {}
+        try:
+            del new["permissions"]
+        except:
+            pass
+        try:
+            del new["role"]
+        except:
+            pass
         uinfo = info["csm_auth"]._get_user_information(
-            new, new, info["cs_course"], un, True
+            new, new, info["cs_course"], un, False
         )
         if "checkoff" not in uinfo.get("permissions", []):
             percent = 0
