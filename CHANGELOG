@@ -16,6 +16,9 @@ FIXED:
 
   * Fixed an issue with autolocking and auto answer viewing.
 
+  * Fixed an issue with checkoff question type not understanding who has
+    permissions to submit checkoffs.
+
 SECURITY:
 
 DOCUMENTATION:
