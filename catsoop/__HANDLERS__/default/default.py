@@ -727,9 +727,9 @@ def handle_grade(context):
         npoints = float(q["total_points"](**args))
         try:
             f = context[_n("form")]
-            rawscore = f.get("%s_grading_score" % name, "")
-            comments = f.get("%s_grading_comments" % name, "")
-            score = float(rawscore)
+            rawscore = f.get("%s_grading_score" % name, {"data": ""})
+            comments = f.get("%s_grading_comments" % name, {"data": ""})["data"]
+            score = float(rawscore["data"])
         except:
             outdict[name] = {
                 "error_msg": "Invalid score: %s\n%s" % (rawscore, comments)
