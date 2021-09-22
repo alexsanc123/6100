@@ -19,6 +19,8 @@ FIXED:
   * Fixed an issue with checkoff question type not understanding who has
     permissions to submit checkoffs.
 
+  * Fixed an issue with storage of manual grades.
+
 SECURITY:
 
 DOCUMENTATION:
