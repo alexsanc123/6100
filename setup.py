@@ -44,7 +44,14 @@ ORIGINAL_VERSION = None
 def dev_number():
     try:
         last_version = subprocess.check_output(
-            ["git", "describe", "--tags", "--match", "v*", "dev"]
+            [
+                "git",
+                "describe",
+                "--tags",
+                "--match",
+                "v*",
+                subprocess.check_output("git branch").decode("ascii"),
+            ]
         ).decode("ascii")
     except Exception:
         print("failed to find git tags", file=sys.stderr)
