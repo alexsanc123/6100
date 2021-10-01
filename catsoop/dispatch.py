@@ -748,7 +748,9 @@ def main(environment, return_context=False, form_data=None):
                 LOGGER.info("[dispatch.main] user_info=%s" % user_info)
                 context["cs_user_info"] = user_info
                 context["cs_username"] = str(user_info.get("username", None))
-                if user_info.get("cs_render_now", False):
+                if user_info.get("cs_render_now", False) and not context.get(
+                    "cs_skip_auth_rendering", False
+                ):
                     session.set_session_data(
                         context, context["cs_sid"], context["cs_session_data"]
                     )

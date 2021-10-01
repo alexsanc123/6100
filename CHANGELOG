@@ -23,6 +23,8 @@ FIXED:
 
 SECURITY:
 
+  * Don't allow fresh logins on user settings pages.
+
 DOCUMENTATION:
 
 
