@@ -1,4 +1,27 @@
 ####################
+# Version 2021.9.2 #
+####################
+
+SECURITY:
+
+  * BACKPORT: Don't allow fresh logins on user settings pages
+
+
+####################
+# Version 2021.9.1 #
+####################
+
+FIXED:
+
+  * BACKPORT: Fixed an issue with autolocking and auto answer viewing
+
+  * BACKPORT: Fixed an issue with checkoff question type not understanding who
+    has permissions to submit checkoffs
+
+  * BACKPORT: Fixed an issue with storage of manual grades
+
+
+####################
 # Version 2021.9.0 #
 ####################
 
