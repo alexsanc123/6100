@@ -50,7 +50,9 @@ def dev_number():
                 "--tags",
                 "--match",
                 "v*",
-                subprocess.check_output("git branch").decode("ascii"),
+                subprocess.check_output(["git", "branch", "--show-current"])
+                .decode("ascii")
+                .strip(),
             ]
         ).decode("ascii")
     except Exception:
@@ -58,6 +60,7 @@ def dev_number():
         return
     if len(last_version.strip().split("-")) != 3:
         # if this is just a tag name, that tells us we're at that tag
+        print("WHA")
         return
     else:
         N = int(last_version.strip().split("-")[1])
@@ -68,6 +71,7 @@ def dev_number():
             .strip()
         )
     except:
+        print("WHA 2")
         return
     try:
         dirty = len(
@@ -77,6 +81,7 @@ def dev_number():
             .splitlines()
         )
     except:
+        print("WHA 3")
         return
     try:
         _cmd = ["git", "show", "-s", "--format=%cD", sha]
