@@ -263,9 +263,9 @@ All development happens on the `dev` branch in the Git repository.
 Each version of catsoop has a separate branch in the repository, named like
 `v20YY.M` (for regular versions) or `v20YY.M-lts` (for LTS versions), where
 bugfixes and other changes are backported from the `dev` branch.  Generally,
-new features and bugfixes only make their way into non-`default` branches by
-way of backporting changes to those branches; that is to say, changes should
-always happen on `dev` first.
+new features and bugfixes only make their way into release branches by way of
+backporting changes from `dev`; that is to say, changes should always happen on
+`dev` first, except in rare cases.
 
 Each release is tagged with a version number `v20YY.M.V`.  Additionally, the
 current release and the current LTS release are tagged with `current_release`
