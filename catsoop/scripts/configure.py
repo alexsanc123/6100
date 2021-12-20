@@ -255,6 +255,7 @@ def configure_local():
     # write config file
     config_file_content = """cs_data_root = %r
 
+cs_auth_type = 'dummy'
 cs_dummy_username = %r
 
 cs_wsgi_server_port = %r

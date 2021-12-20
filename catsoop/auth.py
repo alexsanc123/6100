@@ -52,7 +52,7 @@ def get_auth_type(context):
     **Returns:** a dictionary containing the variables defined in the
     authentication type specified by `context['cs_auth_type']`.
     """
-    auth_type = context["cs_auth_type"]
+    auth_type = context["csm_base_context"].cs_auth_type
     return get_auth_type_by_name(context, auth_type)
 
 

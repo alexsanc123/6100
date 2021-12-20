@@ -25,6 +25,9 @@ SECURITY:
 
   * Don't allow fresh logins on user settings pages.
 
+  * cs_auth_type is now only read from config.py (course-level preload.py files
+    cannot change it)
+
 DOCUMENTATION:
 
 
