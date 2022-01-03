@@ -1,4 +1,13 @@
 ####################
+# Version 2021.9.3 #
+####################
+
+SECURITY:
+
+  * BACKPORT: Only allow changing cs_auth_type at the top level config.py
+
+
+####################
 # Version 2021.9.2 #
 ####################
 
