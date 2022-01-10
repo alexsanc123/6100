@@ -13,6 +13,9 @@ CHANGED:
   * cs_local_python_import now raises a more meaningful exception when the
     given filename is incorrect
 
+  * Replaced hacky import mechanism for custom question types with access to
+    cs_local_python_import
+
 DEPRECATED:
 
 REMOVED:

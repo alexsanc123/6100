@@ -390,14 +390,9 @@ def question(context, qtype, **kwargs):
         fname = os.path.join(loc, "%s.py" % qtype)
     new = dict(context)
     new["csm_base_context"] = new["base_context"] = base_context
-    pre_code = (
-        "import sys\n"
-        "_orig_path = sys.path\n"
-        "if %r not in sys.path:\n"
-        "    sys.path = [%r] + sys.path\n\n"
-    ) % (loc, loc)
+    new["cs_local_python_import"] = loader._make_file_importer(loc)
     new["qtype"] = qtype
-    x = loader.cs_compile(fname, pre_code=pre_code, post_code="sys.path = _orig_path")
+    x = loader.cs_compile(fname)
     exec(x, new)
     for i in {
         "total_points",
