@@ -31,7 +31,6 @@ defaults.update(
         "csq_soln_filename": "solution.txt",
         "csq_allow_save": False,
         "csq_soln_type": "string",
-        "csq_extract_data": True,
     }
 )
 
