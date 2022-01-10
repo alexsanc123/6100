@@ -11,7 +11,10 @@ emoji_text = "{%s}" % emoji_text.split("{", 1)[1].rsplit("}", 1)[0]
 
 EMOJI_NAME_MAPS = ast.literal_eval(emoji_text)
 
-emoji_map = {}
+emoji_map = {
+    "slight_smile": "🙂",
+    "water_wave": "🌊",
+}
 
 for k, v in EMOJI_NAME_MAPS.items():
     codepoints = k.split("-")
