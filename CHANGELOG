@@ -10,6 +10,9 @@ ADDED:
 
 CHANGED:
 
+  * cs_local_python_import now raises a more meaningful exception when the
+    given filename is incorrect
+
 DEPRECATED:
 
 REMOVED:

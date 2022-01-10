@@ -269,6 +269,8 @@ def generate_context(path):
 def _make_file_importer(base_dir):
     def _import_from_file(filename, name=None):
         filename = os.path.abspath(os.path.join(base_dir, filename))
+        if not os.path.isfile(filename):
+            raise FileNotFoundError("no such file: %r" % filename)
         if name is None:
             name = os.path.basename(filename).rsplit(".", 1)[0].replace(".", "_")
         spec = importlib.util.spec_from_file_location(name, filename)
