@@ -107,7 +107,10 @@ def log_lock(path):
     db_name, *path, lockname = path
     db_name, path, lockname = _transform_log_info(db_name, path, lockname)
     path = [db_name, *path, lockname]
-    lock_loc = os.path.join(base_context.cs_data_root, "_locks", *path) + ".lock"
+    log_lock_location = getattr(
+        base_context, "cs_log_lock_location", None
+    ) or os.path.join(base_context.cs_data_root, "_locks")
+    lock_loc = os.path.join(log_lock_location, *path) + ".lock"
     os.makedirs(os.path.dirname(lock_loc), exist_ok=True)
     return FileLock(lock_loc)
 

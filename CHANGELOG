@@ -6,6 +6,8 @@
 
 ADDED:
 
+  * Added cs_log_lock_location to control where locks for log files are written
+
 CHANGED:
 
 DEPRECATED:
@@ -14,16 +16,16 @@ REMOVED:
 
 FIXED:
 
-  * Fixed an issue with autolocking and auto answer viewing.
+  * Fixed an issue with autolocking and auto answer viewing
 
   * Fixed an issue with checkoff question type not understanding who has
-    permissions to submit checkoffs.
+    permissions to submit checkoffs
 
-  * Fixed an issue with storage of manual grades.
+  * Fixed an issue with storage of manual grades
 
 SECURITY:
 
-  * Don't allow fresh logins on user settings pages.
+  * Don't allow fresh logins on user settings pages
 
   * cs_auth_type is now only read from config.py (course-level preload.py files
     cannot change it)

@@ -116,6 +116,8 @@ class CSLogBackend:
             self.assertEqual(self.cslog.read_log(users[0], path2, n), [0, 1, 2])
             self.assertEqual(self.cslog.read_log(users[1], path2, n), [0, 1, 2])
 
+        self.assertTrue(os.path.isdir(self.lock_loc))
+
     def test_logging_stress_update(self):
         user = "testuser"
         path1 = ["test_subject", "some", "page"]
@@ -219,5 +221,24 @@ class TestFS(CATSOOPTest, CSLogBackend):
         loader.load_global_data(context)
         self.cslog = cslog
 
-        _logs_dir = os.path.join(context["cs_data_root"], "_logs")
-        shutil.rmtree(_logs_dir, ignore_errors=True)  # start with fresh logs each time
+        self.log_loc = os.path.join(context["cs_data_root"], "_logs")
+        self.lock_loc = os.path.join(context["cs_data_root"], "_locks")
+        shutil.rmtree(self.log_loc, ignore_errors=True)
+        shutil.rmtree(self.lock_loc, ignore_errors=True)
+
+
+class TestFSTempDir(CATSOOPTest, CSLogBackend):
+    def setUp(
+        self,
+    ):
+        CATSOOPTest.setUp(self)
+
+        context = {}
+        loader.load_global_data(context)
+        self.cslog = cslog
+        self.log_loc = os.path.join(context["cs_data_root"], "_logs")
+        self.lock_loc = "/tmp/catsoop_locks"
+        context["csm_base_context"].cs_log_lock_location = self.lock_loc
+
+        shutil.rmtree(self.log_loc, ignore_errors=True)
+        shutil.rmtree(self.lock_loc, ignore_errors=True)
