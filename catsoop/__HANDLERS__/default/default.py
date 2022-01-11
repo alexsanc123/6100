@@ -380,7 +380,8 @@ def handle_view(context):
     perms = context[_n("perms")]
 
     lastlog = context[_n("last_log")]
-    lastsubmit = lastlog.get("last_submit", {})
+    # lastsubmit = lastlog.get("last_submit", {})
+    lastprocessed = lastlog.get("last_processed", {})
 
     if (
         _get(context, "cs_auth_required", True, bool)
@@ -424,7 +425,7 @@ def handle_view(context):
             page += elt
         else:
             # this is a question
-            page += render_question(elt, context, lastsubmit)
+            page += render_question(elt, context, lastprocessed)
 
             # handle javascript if necessary
             if "extra_headers" in elt[0]:
@@ -913,8 +914,14 @@ def handle_check(context):
 
     newstate = dict(lastlog)
     newstate["timestamp"] = context["cs_timestamp"]
-    if "last_submit" not in newstate:
-        newstate["last_submit"] = {}
+    newstate["last_check_times"] = newstate.get("last_check_times", {})
+
+    # if "last_submit" not in newstate:
+    #     newstate["last_submit"] = {}
+    if "last_check" not in newstate:
+        newstate["last_check"] = {}
+    if "last_processed" not in newstate:
+        newstate["last_processed"] = {}
 
     names_done = set()
     outdict = {}  # dictionary containing the responses for each question
@@ -922,10 +929,8 @@ def handle_check(context):
     entry_ids = {}
     if "checker_ids" not in newstate:
         newstate["checker_ids"] = {}
-    if "last_submit" not in newstate:
-        newstate["last_submit"] = {}
-    if "last_submit_id" not in newstate:
-        newstate["last_submit_id"] = {}
+    # if "last_check_id" not in newstate:
+    #     newstate["last_check_id"] = {}
     if "cached_responses" not in newstate:
         newstate["cached_responses"] = {}
     if "extra_data" not in newstate:
@@ -948,7 +953,10 @@ def handle_check(context):
             continue
 
         # if we are here, no errors occurred.  go ahead with checking.
-        newstate["last_submit"][name] = sub
+        newstate["last_check"][name] = sub
+        newstate["last_check_times"][name] = context["cs_timestamp"]
+
+        newstate["last_processed"][name] = sub  # the user has most recently checked this question
         question, args = namemap[name]
 
         async_ = _get(args, "csq_autograder_async", False, bool)
@@ -957,6 +965,7 @@ def handle_check(context):
 
             entry_ids[name] = entry_id = magic
 
+            # newstate["last_check_time"] = context["cs_timestamp"]
             rerender = args.get("csq_rerender", question.get("always_rerender", False))
             if rerender is True:
                 out["rerender"] = context["csm_language"].source_transform_string(
@@ -983,6 +992,7 @@ def handle_check(context):
             out["magic"] = entry_id
             # cache responses
             newstate["checker_ids"][name] = entry_id
+            # newstate["last_check_id"][name] = entry_id
             newstate["score_displays"][name] = ""
             if name in newstate.get("cached_responses", {}):
                 del newstate["cached_responses"][name]
@@ -991,6 +1001,8 @@ def handle_check(context):
                 msg = question["handle_check"](context[_n("form")], **args)
             except:
                 msg = exc_message(context)
+            else:  # don't show the below line if an error is thrown
+                msg += '<b><font color="red">Please remember to submit your response after checking.</font></b>'
             out["score_display"] = ""
             out["message"] = context["csm_language"].handle_custom_tags(context, msg)
             if name in newstate.get("checker_ids", {}):
@@ -998,6 +1010,10 @@ def handle_check(context):
 
             newstate["cached_responses"][name] = out["message"]
             newstate["score_displays"][name] = ""
+
+        # TODO: address this
+        if "scores" in newstate and name in newstate["scores"]:
+            del newstate["scores"][name]
 
         outdict[name] = out
 
@@ -1084,6 +1100,8 @@ def handle_submit(context):
             continue
         newstate["last_submit"][name] = sub
         newstate["last_submit_times"][name] = context["cs_timestamp"]
+
+        newstate["last_processed"][name] = sub  # the user has most recently submitted this question
 
         # if we are here, no errors occurred.  go ahead with submitting.
         nsubmits_used[name] = nsubmits_used.get(name, 0) + 1
@@ -1214,6 +1232,7 @@ def handle_submit(context):
             out["rerender"] = context["csm_language"].source_transform_string(
                 context, args.get("csq_prompt", "")
             )
+            # TODO: do we need to change last_submit to last_processed here for rerendering?
             out["rerender"] += question["render_html"](newstate["last_submit"], **args)
         elif rerender:
             out["rerender"] = rerender
