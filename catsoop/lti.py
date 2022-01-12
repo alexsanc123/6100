@@ -27,8 +27,6 @@ import pylti.common
 from lxml import etree
 from lxml.builder import ElementMaker
 
-from datetime import datetime
-
 from oauthlib.oauth1 import Client
 
 from . import auth
@@ -37,18 +35,7 @@ from . import debug_log
 
 LOGGER = debug_log.LOGGER
 
-DEBUG = True
-
-
-def log(msg):
-    if not DEBUG:
-        return
-    dt = datetime.now()
-    omsg = "[checker:%s]: %s" % (dt, msg)
-    LOGGER.info(omsg)
-
-
-_nodoc = {"Client", "ElementMaker", "etree", "LOGGER", "DEBUG", "datetime", "log"}
+_nodoc = {"Client", "ElementMaker", "etree", "LOGGER"}
 
 
 class lti4cs(pylti.common.LTIBase):
@@ -103,7 +90,7 @@ class lti4cs(pylti.common.LTIBase):
                     if m:
                         LOGGER.info(
                             "[lti.lti4cs.verify_request] params %s=%s",
-                            key,
+                            prop,
                             params.get(key, None),
                         )
                         self.lti_data[key] = params[key]
@@ -125,9 +112,11 @@ class lti4cs(pylti.common.LTIBase):
         Save LTI data locally (e.g. so that the checker can send grades back to the LTI tool consumer)
         """
         logging = context["csm_cslog"]
-        uname = context["cs_user_info"]["username"]
+        uname = context.get("cs_user_info", {}).get("username", "None")
         db_name = "_lti_data"
         logging.overwrite_log(db_name, [], uname, self.lti_data)
+        lfn = logging.get_log_filename(db_name, [], uname)
+        LOGGER.info("[lti] saved lti_data for user %s in file %s" % (uname, lfn))
 
 
 class lti4cs_response(object):
@@ -338,40 +327,55 @@ def serve_lti(context, path_info, environment, params, dispatch_main, return_con
     LOGGER.info("[lti] lti_action=%s, path_info=%s" % (lti_action, path_info))
 
     session_data = context["cs_session_data"]
+    force_load_lti_data = True
     if "is_lti_user" in session_data:  # needed to handle form POSTS to _lti/course/...
         lti_ok = True  # already authenticated
         l4c = None
-    else:
+        force_load_lti_data = False  # no need to load LTI data again, if it wasn't provided in session_data
+        if params.get("oauth_signature_method", None) and params.get(
+            "lti_message_type", None
+        ):
+            # re-generate lti data, because it may have changed, e.g. due to LTI user visiting from new LTI consumer page
+            force_load_lti_data = True
+
+    if force_load_lti_data:
         l4c = lti4cs(context, session_data, {}, {})  # not yet authenticated; check now
         lti_ok = l4c.verify_request(params, environment)
+
     if not lti_ok:
         msg = "LTI verification failed"
     elif l4c is not None:
         lti_data = session_data["lti_data"]
         lup = context["cs_lti_config"].get("lti_username_prefix", "lti_")
+
         if "lti_username_function" in context["cs_lti_config"]:
             lti_uname = context["cs_lti_config"]["lti_username_function"](lti_data)
         else:
             default_user_id_field = "user_id"  # used by OpenEdX
-
-            if "canvas" in lti_data.get("tool_consumer_info_product_family_code", ""):
+            is_canvas = "canvas" in lti_data.get(
+                "tool_consumer_info_product_family_code", ""
+            )
+            if is_canvas:
                 default_user_id_field = (
                     "custom_canvas_user_login_id"  # used by Canvas LMS
                 )
-
             lti_user_id_field = context["cs_lti_config"].get(
                 "lti_user_id_field", default_user_id_field
             )  # allow config to override LTI field to use for uname
 
-            lti_uname = lti_data[lti_user_id_field]
-
-            if context["cs_lti_config"].get("prefer_username_to_userid", True):
+            lti_uname = lti_data.get(
+                lti_user_id_field, lti_data.get("lti_user_id_field", "unknown")
+            )
+            if context["cs_lti_config"].get("force_username_from_sourcedid"):
                 lti_uname = lti_data.get(
                     "lis_person_sourcedid", lti_uname
                 )  # prefer username to user_id
-
         uname = "%s%s" % (lup, lti_uname)
-
+        if is_canvas:
+            if ("@" in uname) and (
+                not context["cs_lti_config"].get("ok_to_have_at_sign_in_username")
+            ):
+                uname = uname.split("@")[0]
         email = lti_data.get("lis_person_contact_email_primary", "%s@unknown" % uname)
         name = lti_data.get("lis_person_name_full", uname)
         lti_data["cs_user_info"] = {

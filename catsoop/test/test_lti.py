@@ -109,13 +109,13 @@ class Test_LTI(CATSOOPTest):
 
         context = dispatch.main(env, return_context=True)
         cui = context["cs_user_info"]
-        assert cui["username"] == "lti_anltiuser"
+        assert cui["username"] == "lti_anltiuser__LTI__1234"
 
         # ensure lti_username_prefix can be set to empty string
         self.cs_lti_config["lti_username_prefix"] = ""
         context = dispatch.main(env, return_context=True)
         cui = context["cs_user_info"]
-        assert cui["username"] == "anltiuser"
+        assert cui["username"] == "anltiuser__LTI__1234"
 
     def test_lti_auth3(self):
         """
