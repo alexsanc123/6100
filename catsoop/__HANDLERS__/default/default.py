@@ -1070,6 +1070,8 @@ def handle_submit(context):
         newstate["extra_data"] = {}
     if "score_displays" not in newstate:
         newstate["score_displays"] = {}
+    if "last_processed" not in newstate:
+        newstate["last_processed"] = {}  # TODO: is this a suitable replacement for newstate.setdefault(name, {})?
 
     names_done = set()
     outdict = {}  # dictionary containing the responses for each question
