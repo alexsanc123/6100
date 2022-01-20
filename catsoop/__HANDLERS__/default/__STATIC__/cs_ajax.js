@@ -239,6 +239,7 @@ catsoop.callbacks = {};
 for (var i of [
   "submit",
   "check",
+  "clearcheck",
   "viewanswer",
   "clearanswer",
   "viewexplanation",
@@ -302,6 +303,9 @@ catsoop.submit = function (name) {
 };
 catsoop.check = function (name) {
   catsoop.ajaxrequest([name], "check");
+};
+catsoop.clearcheck = function (name) {
+  catsoop.ajaxrequest([name], "clearcheck");
 };
 catsoop.viewanswernow = function (name) {
   catsoop.ajaxrequest([name], "viewanswer");

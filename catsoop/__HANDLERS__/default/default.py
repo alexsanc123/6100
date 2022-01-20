@@ -31,6 +31,8 @@ import collections.abc
 
 from bs4 import BeautifulSoup
 
+from catsoop.time import from_detailed_timestamp
+
 _prefix = "cs_defaulthandler_"
 
 
@@ -97,6 +99,7 @@ def handle(context):
         "view": handle_view,
         "submit": handle_submit,
         "check": handle_check,
+        "clearcheck": handle_clearcheck,
         "save": handle_save,
         "viewanswer": handle_viewanswer,
         "clearanswer": handle_clearanswer,
@@ -161,12 +164,13 @@ def handle_get_state(context):
 
 def handle_single_question(context):
     lastlog = context[_n("last_log")]
-    lastsubmit = lastlog.get("last_submit", {})
+    # lastsubmit = lastlog.get("last_submit", {})
 
     qname = context["cs_form"].get("name", None)
     elt = context[_n("name_map")][qname]
 
-    o = render_question(elt, context, lastsubmit, wrap=False)
+    # o = render_question(elt, context, lastprocessed, wrap=False)
+    o = render_question(elt, context, wrap=False)
     return ("200", "OK"), {"Content-type": "text/html"}, o
 
 
@@ -268,7 +272,7 @@ def handle_raw_html(context):
     perms = context[_n("perms")]
 
     lastlog = context[_n("last_log")]
-    lastsubmit = lastlog.get("last_submit", {})
+    # lastsubmit = lastlog.get("last_submit", {})
 
     if (
         _get(context, "cs_auth_required", True, bool)
@@ -311,7 +315,8 @@ def handle_raw_html(context):
             page += elt
         else:
             # this is a question
-            page += render_question(elt, context, lastsubmit)
+            # page += render_question(elt, context, lastprocessed)
+            page += render_question(elt, context)
 
     page += default_javascript(context)
     page += default_timer(context)
@@ -324,7 +329,7 @@ def handle_content_only(context):
     perms = context[_n("perms")]
 
     lastlog = context[_n("last_log")]
-    lastsubmit = lastlog.get("last_submit", {})
+    # lastsubmit = lastlog.get("last_submit", {})
 
     if (
         _get(context, "cs_auth_required", True, bool)
@@ -367,7 +372,8 @@ def handle_content_only(context):
             page += elt
         else:
             # this is a question
-            page += render_question(elt, context, lastsubmit)
+            # page += render_question(elt, context, lastprocessed)
+            page += render_question(elt, context)
 
     page += default_javascript(context)
     page += default_timer(context)
@@ -381,7 +387,7 @@ def handle_view(context):
 
     lastlog = context[_n("last_log")]
     # lastsubmit = lastlog.get("last_submit", {})
-    lastprocessed = lastlog.get("last_processed", {})
+    # lastprocessed = get_last_processed(lastlog)
 
     if (
         _get(context, "cs_auth_required", True, bool)
@@ -425,7 +431,8 @@ def handle_view(context):
             page += elt
         else:
             # this is a question
-            page += render_question(elt, context, lastprocessed)
+            page += render_question(elt, context)
+            # page += render_question(elt, context, lastprocessed)
 
             # handle javascript if necessary
             if "extra_headers" in elt[0]:
@@ -831,16 +838,21 @@ def handle_save(context):
 
     newstate = dict(lastlog)
     newstate["timestamp"] = context["cs_timestamp"]
-    if "last_submit" not in newstate:
-        newstate["last_submit"] = {}
+    newstate["last_submit_times"] = newstate.get("last_submit_times", {})
+    # if "last_submit" not in newstate:
+    #     newstate["last_submit"] = {}
+    if "last_check" not in newstate:
+        newstate["last_check"] = {}
 
     outdict = {}  # dictionary containing the responses for each question
     saved_names = []
     for name in names:
         sub = context[_n("form")].get(name, "")
+        sub["is_save"] = True
         out = {}
         if name.startswith("__"):
-            newstate["last_submit"][name] = sub
+            # newstate["last_submit"][name] = sub
+            newstate["last_check"][name] = sub
             continue
 
         error = save_msg(context, context[_n("perms")], name)
@@ -854,14 +866,18 @@ def handle_save(context):
         saved_names.append(name)
 
         # if we are here, no errors occurred.  go ahead with checking.
-        newstate["last_submit"][name] = sub
+        # newstate["last_submit"][name] = sub
+        # newstate["last_submit_times"][name] = context["cs_timestamp"]  # TODO
+        newstate["last_check"][name] = sub
+        newstate["last_check_times"][name] = context["cs_timestamp"]  # TODO
 
         rerender = args.get("csq_rerender", question.get("always_rerender", False))
         if rerender is True:
             out["rerender"] = context["csm_language"].source_transform_string(
                 context, args.get("csq_prompt", "")
             )
-            out["rerender"] += question["render_html"](newstate["last_submit"], **args)
+            # out["rerender"] += question["render_html"](newstate["last_submit"], **args)
+            out["rerender"] += question["render_html"](newstate["last_check"], **args)
         elif rerender:
             out["rerender"] = rerender
 
@@ -905,6 +921,195 @@ def handle_save(context):
     return make_return_json(context, outdict)
 
 
+# TODO: fix this!
+def handle_clearcheck(context):
+    # names = context[_n("question_names")]
+    # due = context[_n("due")]
+    #
+    # lastlog = context[_n("last_log")]
+    # namemap = context[_n("name_map")]
+    #
+    # newstate = dict(lastlog)
+    # newstate["timestamp"] = context["cs_timestamp"]
+    # # newstate["last_check_times"] = newstate.get("last_check_times", {})
+    #
+    # if "last_submit" not in newstate:
+    #     newstate["last_submit"] = {}
+    # if "last_check" not in newstate:
+    #     newstate["last_check"] = {}
+    #
+    # names_done = set()
+    # outdict = {}  # dictionary containing the responses for each question
+    #
+    # entry_ids = {}
+    # if "checker_ids" not in newstate:
+    #     newstate["checker_ids"] = {}
+    # # if "last_check_id" not in newstate:
+    # #     newstate["last_check_id"] = {}
+    # if "cached_responses" not in newstate:
+    #     newstate["cached_responses"] = {}
+    # if "extra_data" not in newstate:
+    #     newstate["extra_data"] = {}
+    # if "score_displays" not in newstate:
+    #     newstate["score_displays"] = {}
+    #
+    # for name in names:
+    #     if name.startswith("__"):
+    #         name = name[2:].rsplit("_", 1)[0]
+    #     if name in names_done:
+    #         continue
+    #     out = {}
+    #     sub = context[_n("form")].get(name, "")
+    #     error = check_msg(context, context[_n("perms")], name)
+    #     if error is not None:
+    #         out["error_msg"] = error
+    #         outdict[name] = out
+    #         submit_succeeded = False
+    #         continue
+    #
+    #     # # if we are here, no errors occurred.  go ahead with checking.
+    #     # newstate["last_check"][name] = sub
+    #     # newstate["last_check_times"][name] = context["cs_timestamp"]
+    #
+    #     question, args = namemap[name]
+    #
+    #     async_ = _get(args, "csq_autograder_async", False, bool)
+    #     if async_:
+    #         magic = new_entry(context, name, "check")
+    #
+    #         entry_ids[name] = entry_id = magic
+    #
+    #         # newstate["last_check_time"] = context["cs_timestamp"]
+    #         rerender = args.get("csq_rerender", question.get("always_rerender", False))
+    #         if rerender is True:
+    #             out["rerender"] = context["csm_language"].source_transform_string(
+    #                 context, args.get("csq_prompt", "")
+    #             )
+    #             out["rerender"] += question["render_html"](
+    #                 newstate["last_submit"], **args
+    #             )
+    #         elif rerender:
+    #             out["rerender"] = rerender
+    #
+    #         out["score_display"] = ""
+    #         out["message"] = WEBSOCKET_RESPONSE % {
+    #             "name": name,
+    #             "magic": entry_id,
+    #             "websocket": context["cs_checker_websocket"],
+    #             "loading": context["cs_loading_image"],
+    #             "id_css": (
+    #                 ' style="display:none;"'
+    #                 if context.get("cs_show_submission_id", True)
+    #                 else ""
+    #             ),
+    #         }
+    #         out["magic"] = entry_id
+    #         # cache responses
+    #         newstate["checker_ids"][name] = entry_id
+    #         # newstate["last_check_id"][name] = entry_id
+    #         newstate["score_displays"][name] = ""
+    #         if name in newstate.get("cached_responses", {}):
+    #             del newstate["cached_responses"][name]
+    #     else:
+    #         try:
+    #             msg = question["handle_check"](context[_n("form")], **args)
+    #         except:
+    #             msg = exc_message(context)
+    #         else:  # don't show the below line if an error is thrown
+    #             msg += '<b><font color="red">Please remember to submit your response after checking.</font></b>'
+    #         out["score_display"] = ""
+    #         out["message"] = context["csm_language"].handle_custom_tags(context, msg)
+    #         if name in newstate.get("checker_ids", {}):
+    #             del newstate["checker_ids"][name]
+    #
+    #         newstate["cached_responses"][name] = out["message"]
+    #         newstate["score_displays"][name] = ""
+    #
+    #     outdict[name] = out
+    #
+    # # update problemstate log
+    # uname = context[_n("uname")]
+    # context["csm_cslog"].overwrite_log(
+    #     uname,
+    #     context["cs_path_info"],
+    #     "problemstate",
+    #     newstate,
+    # )
+    #
+    # # log submission in problemactions
+    # duetime = context["csm_time"].detailed_timestamp(due)
+    # subbed = {n: context[_n("form")].get(n, "") for n in names}
+    # log_action(
+    #     context,
+    #     {
+    #         "action": "check",
+    #         "names": names,
+    #         "submitted": subbed,
+    #         "checker_ids": entry_ids,
+    #         "due_date": duetime,
+    #     },
+    # )
+    #
+    # return make_return_json(context, outdict)
+    names = context[_n("question_names")]
+    due = context[_n("due")]
+    lastlog = context[_n("last_log")]
+    # answerviewed = context[_n("answer_viewed")]
+    # explanationviewed = context[_n("explanation_viewed")]
+
+    newstate = dict(lastlog)
+    newstate["timestamp"] = context["cs_timestamp"]
+    # if "last_submit" not in newstate:
+    #     newstate["last_submit"] = {}
+
+    outdict = {}  # dictionary containing the responses for each question
+    # for name in names:
+    #     if name.startswith("__"):
+    #         continue
+    #     out = {}
+    #
+    #     error = clearcheck_msg(context, context[_n("perms")], name)
+    #     if error is not None:
+    #         out["error_msg"] = error
+    #         outdict[name] = out
+    #         continue
+    #
+    #     q, args = context[_n("name_map")][name]
+    #
+    #     out["clear"] = True
+    #     outdict[name] = out
+    #
+    #     answerviewed.discard(name)
+    #     explanationviewed.discard(name)
+    #
+    # newstate["answer_viewed"] = answerviewed
+    # newstate["explanation_viewed"] = explanationviewed
+    #
+    # # update problemstate log
+    # uname = context[_n("uname")]
+    # context["csm_cslog"].overwrite_log(
+    #     uname,
+    #     context["cs_path_info"],
+    #     "problemstate",
+    #     newstate,
+    # )
+    #
+    # # log submission in problemactions
+    # duetime = context["csm_time"].detailed_timestamp(due)
+    # log_action(
+    #     context,
+    #     {
+    #         "action": "clearcheck",
+    #         "names": names,
+    #         "score": newstate.get("score", 0.0),
+    #         "response": outdict,
+    #         "due_date": duetime,
+    #     },
+    # )
+
+    return make_return_json(context, outdict)
+
+
 def handle_check(context):
     names = context[_n("question_names")]
     due = context[_n("due")]
@@ -916,12 +1121,10 @@ def handle_check(context):
     newstate["timestamp"] = context["cs_timestamp"]
     newstate["last_check_times"] = newstate.get("last_check_times", {})
 
-    # if "last_submit" not in newstate:
-    #     newstate["last_submit"] = {}
+    if "last_submit" not in newstate:
+        newstate["last_submit"] = {}
     if "last_check" not in newstate:
         newstate["last_check"] = {}
-    if "last_processed" not in newstate:
-        newstate["last_processed"] = {}
 
     names_done = set()
     outdict = {}  # dictionary containing the responses for each question
@@ -956,7 +1159,6 @@ def handle_check(context):
         newstate["last_check"][name] = sub
         newstate["last_check_times"][name] = context["cs_timestamp"]
 
-        newstate["last_processed"][name] = sub  # the user has most recently checked this question
         question, args = namemap[name]
 
         async_ = _get(args, "csq_autograder_async", False, bool)
@@ -1010,10 +1212,6 @@ def handle_check(context):
 
             newstate["cached_responses"][name] = out["message"]
             newstate["score_displays"][name] = ""
-
-        # TODO: address this
-        if "scores" in newstate and name in newstate["scores"]:
-            del newstate["scores"][name]
 
         outdict[name] = out
 
@@ -1070,8 +1268,6 @@ def handle_submit(context):
         newstate["extra_data"] = {}
     if "score_displays" not in newstate:
         newstate["score_displays"] = {}
-    if "last_processed" not in newstate:
-        newstate["last_processed"] = {}  # TODO: is this a suitable replacement for newstate.setdefault(name, {})?
 
     names_done = set()
     outdict = {}  # dictionary containing the responses for each question
@@ -1102,8 +1298,6 @@ def handle_submit(context):
             continue
         newstate["last_submit"][name] = sub
         newstate["last_submit_times"][name] = context["cs_timestamp"]
-
-        newstate["last_processed"][name] = sub  # the user has most recently submitted this question
 
         # if we are here, no errors occurred.  go ahead with submitting.
         nsubmits_used[name] = nsubmits_used.get(name, 0) + 1
@@ -1234,7 +1428,6 @@ def handle_submit(context):
             out["rerender"] = context["csm_language"].source_transform_string(
                 context, args.get("csq_prompt", "")
             )
-            # TODO: do we need to change last_submit to last_processed here for rerendering?
             out["rerender"] += question["render_html"](newstate["last_submit"], **args)
         elif rerender:
             out["rerender"] = rerender
@@ -1492,13 +1685,18 @@ def save_msg(context, perms, name):
     return error
 
 
-def check_msg(context, perms, name):
+def check_msg(context, perms, name, is_check_clear_msg=False):
     namemap = context[_n("name_map")]
     timing = context[_n("timing")]
     i = context[_n("impersonating")]
+    # lastlog = context[_n("last_log")]  # TODO: this is stale for the first check
     _, qargs = namemap[name]
     error = None
-    if "submit" not in perms and "submit_all" not in perms:
+    if (
+        is_check_clear_msg and get_last_processed(context, name)[1] != "check"
+    ):  # the user's last action was not a check
+        error = "You have not checked this answer; thus, it cannot be cleared."
+    elif "submit" not in perms and "submit_all" not in perms:
         error = "You are not allowed to check answers to this question."
     elif name not in namemap:
         error = (
@@ -1523,6 +1721,10 @@ def check_msg(context, perms, name):
         elif not _get(qargs, "csq_allow_check", True, bool):
             error = "Checking is not allowed for this question."
     return error
+
+
+def clearcheck_msg(context, perms, name):
+    return check_msg(context, perms, name, is_check_clear_msg=True)
 
 
 def grade_msg(context, perms, name):
@@ -1595,7 +1797,7 @@ def submit_msg(context, perms, name):
                     "You have used all of your allowed "
                     "submissions for this question."
                 )
-    return error
+    return error  # None otherwise
 
 
 def log_action(context, log_entry):
@@ -1634,10 +1836,72 @@ def make_return_json(context, ret, names=None):
     return simple_return_json(ret)
 
 
-def render_question(elt, context, lastsubmit, wrap=True):
+def get_last_processed(context, question_name):
+    """
+    Returns:
+         The last processed response for question_name
+         Last processed action to this question - "check", "save", "submit", or None for otherwise
+    """
+    # force grab the most recent log if initialized
+    if "csm_cslog" not in context:
+        return {}, None
+
+    lastlog = context["csm_cslog"].most_recent(
+        context[_n("uname")],
+        context["cs_path_info"],
+        "problemstate",
+        {},
+    )
+
+    lastsubmit = lastlog.get("last_submit", {})
+    lastcheck = lastlog.get("last_check", {})
+
+    lastsubmit_to_question = lastsubmit.get(question_name, {})
+    lastcheck_to_question = lastcheck.get(question_name, {})
+
+    if not (
+        lastsubmit_to_question or lastcheck_to_question
+    ):  # never submitted nor checked to this question before
+        return {}, None
+
+    # either submitted or checked
+    if not lastcheck_to_question:
+        return lastsubmit, "submit"
+
+    if not lastsubmit_to_question:
+        return (
+            lastcheck,
+            "save" if lastcheck_to_question.get("is_save", False) else "check",
+        )
+
+    # has both submitted and checked - find the most recent of the two
+    lastcheck_timestamp = lastlog.get("last_check_times", {}).get(question_name, "")
+    lastsubmit_timestamp = lastlog.get("last_submit_times", {}).get(question_name, "")
+
+    # default to last submission if either timestamps is invalid
+    if not (lastsubmit_timestamp and lastcheck_timestamp):
+        return lastsubmit, "submit"
+
+    if from_detailed_timestamp(lastsubmit_timestamp) >= from_detailed_timestamp(
+        lastcheck_timestamp
+    ):  # the most recent of the submits and checks
+        return lastsubmit, "submit"
+    else:
+        return (
+            lastcheck,
+            "save" if lastcheck_to_question.get("is_save", False) else "check",
+        )
+
+
+# def render_question(elt, context, lastsubmit, wrap=True, show_grade=True):
+def render_question(elt, context, wrap=True):
     q, args = elt
     name = args["csq_name"]
     lastlog = context[_n("last_log")]
+    last_processed, question_action = get_last_processed(context, name)
+    # last_processed =  lastlog.get("last_submit", {})
+    # a = True
+
     answer_viewed = context[_n("answer_viewed")]
     if wrap:
         out = "\n<!--START question %s -->" % (name)
@@ -1653,7 +1917,7 @@ def render_question(elt, context, lastsubmit, wrap=True):
     out += context["csm_language"].source_transform_string(
         context, args.get("csq_prompt", "")
     )
-    out += q["render_html"](lastsubmit, **args)
+    out += q["render_html"](last_processed, **args)
     out += "\n</div>"
 
     out += "<div>"
@@ -1663,13 +1927,18 @@ def render_question(elt, context, lastsubmit, wrap=True):
         '\n<span id="%s_loading" style="display:none;"><img src="%s"/>'
         "</span>\n</span>"
     ) % (name, name, context["cs_loading_image"])
-    out += (
-        ('\n<span id="%s_score_display">' % args["csq_name"])
-        + context["csm_tutor"].make_score_display(
-            context, args, name, None, last_log=context[_n("last_log")]
+    if question_action == "submit":
+        out += (
+            ('\n<span id="%s_score_display">' % args["csq_name"])
+            + context["csm_tutor"].make_score_display(
+                context, args, name, None, last_log=context[_n("last_log")]
+            )
+            + "</span>"
         )
-        + "</span>"
-    )
+    else:
+        out += (
+            '\n<span id="%s_score_display">' % args["csq_name"]
+        ) + "</span>"  # do not display the previous score after checking
     out += (
         ('\n<div id="%s_nsubmits_left" class="nsubmits_left">' % name)
         + nsubmits_left(context, name)[1]
@@ -1833,6 +2102,7 @@ _button_map = {
     "clearanswer": (clearanswer_msg, "Clear Answer"),
     "viewexplanation": (viewexp_msg, "View Explanation"),
     "check": (check_msg, True),
+    "clearcheck": (clearcheck_msg, "Clear Check"),
 }
 
 
@@ -1873,7 +2143,8 @@ def make_buttons(context, name):
 
     aout = ""
     if i:
-        for k in {"submit", "check", "save"}:
+        for k in {"submit", "check", "clearcheck", "save"}:
+            # for k in {"submit", "check", "save"}:
             if buttons[k] is not None:
                 abuttons[k] = None
             elif abuttons[k] is not None:
@@ -1888,6 +2159,7 @@ def make_buttons(context, name):
             "copy",
             "copy_seed",
             "check",
+            "clearcheck",
             "save",
             "submit",
             "viewanswer",
@@ -1943,6 +2215,7 @@ def make_buttons(context, name):
     out = ""
     for k in (
         "check",
+        "clearcheck",
         "save",
         "submit",
         "viewanswer",
