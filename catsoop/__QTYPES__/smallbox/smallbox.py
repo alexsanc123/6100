@@ -24,6 +24,8 @@ defaults = {
     "csq_show_check": False,
 }
 
+allow_save = False
+
 
 def escape(s):
     return s.replace("&", "&amp;").replace('"', "&quot;")

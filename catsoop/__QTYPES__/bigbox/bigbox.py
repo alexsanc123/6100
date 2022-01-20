@@ -34,6 +34,8 @@ total_points = smbox["total_points"]
 answer_display = smbox["answer_display"]
 handle_submission = smbox["handle_submission"]
 
+allow_save = False
+
 
 def render_html(last_log, **info):
     if last_log is None:

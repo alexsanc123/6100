@@ -9,7 +9,11 @@ ADDED:
   * Added cs_log_lock_location to control where locks for log files are written
 
   * Added csq_renderer option to pythonic qtype, to allow choosing between
-    bigbox and smallbox renderers.
+    bigbox and smallbox renderers
+
+  * Questions with a "Check" button now have a "Revert to Prior Submission"
+    button
+
 
 CHANGED:
 
@@ -18,6 +22,8 @@ CHANGED:
 
   * Replaced hacky import mechanism for custom question types with access to
     cs_local_python_import
+
+  * Questions with a "Check" button no longer also have a "Save" button
 
 DEPRECATED:
 

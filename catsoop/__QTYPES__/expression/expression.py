@@ -71,6 +71,8 @@ def _render_dot(x):
 
 smallbox, _ = csm_tutor.question("smallbox")
 
+allow_save = False
+
 defaults = {
     "csq_error_on_unknown_variable": False,
     "csq_input_check": lambda raw, tree: None,

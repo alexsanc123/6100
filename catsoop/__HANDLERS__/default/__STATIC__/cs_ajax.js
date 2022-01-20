@@ -196,6 +196,9 @@ catsoop.ajaxDoneCallback = function (data, path, count) {
           if (thisone["val"] !== undefined) {
             document.getElementById(name).value = thisone["val"];
           }
+          if ("last_submit" in thisone) {
+            document.getElementById(name).value = thisone["last_submit"]["data"]; // change the text box contents to the most recent submission ("" if none exists)
+          }
           catsoop.render_all_math(document.getElementById("cs_qdiv_" + name));
           catsoop.switch_buttons(name, true);
         }
@@ -239,7 +242,7 @@ catsoop.callbacks = {};
 for (var i of [
   "submit",
   "check",
-  "clearcheck",
+  "revert",
   "viewanswer",
   "clearanswer",
   "viewexplanation",
@@ -304,8 +307,8 @@ catsoop.submit = function (name) {
 catsoop.check = function (name) {
   catsoop.ajaxrequest([name], "check");
 };
-catsoop.clearcheck = function (name) {
-  catsoop.ajaxrequest([name], "clearcheck");
+catsoop.revert = function (name) {
+  catsoop.ajaxrequest([name], "revert");
 };
 catsoop.viewanswernow = function (name) {
   catsoop.ajaxrequest([name], "viewanswer");
