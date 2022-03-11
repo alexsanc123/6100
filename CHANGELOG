@@ -8,6 +8,9 @@ ADDED:
 
   * Added cs_log_lock_location to control where locks for log files are written
 
+  * Added csq_renderer option to pythonic qtype, to allow choosing between
+    bigbox and smallbox renderers.
+
 CHANGED:
 
   * cs_local_python_import now raises a more meaningful exception when the

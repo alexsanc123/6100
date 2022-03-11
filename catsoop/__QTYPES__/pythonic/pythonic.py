@@ -22,7 +22,9 @@ import collections.abc
 LOGGER = logging.getLogger(__name__)
 
 tutor.qtype_inherit("smallbox")
-base1, _ = tutor.question("pythoncode")
+bigbox, _ = tutor.question("bigbox")
+smallbox, _ = tutor.question("smallbox")
+pythoncode, _ = tutor.question("pythoncode")
 
 defaults.update(
     {
@@ -60,7 +62,7 @@ checktext = "Check Formatting"
 
 
 def handle_check(submissions, **info):
-    base1["get_sandbox"](info)
+    pythoncode["get_sandbox"](info)
     code = info["csq_code_pre"]
     code += "\n%s" % submissions[info["csq_name"]]["data"].strip()
     sub = info["sandbox_run_code"](
@@ -80,7 +82,7 @@ def handle_submission(submissions, **info):
     if inp is not None:
         return {"score": 0.0, "msg": '<font color="red">%s</font>' % inp}
 
-    base1["get_sandbox"](info)
+    pythoncode["get_sandbox"](info)
     if info["csq_mode"] == "raw":
         soln = info["csq_soln"]
     else:
@@ -164,6 +166,13 @@ def handle_submission(submissions, **info):
     response += msg
 
     return {"score": percent, "msg": response}
+
+
+def render_html(last_log, **info):
+    if info.get("csq_renderer", "smallbox") == "bigbox":
+        return bigbox["render_html"](last_log, **info)
+    else:
+        return smallbox["render_html"](last_log, **info)
 
 
 def answer_display(**info):
