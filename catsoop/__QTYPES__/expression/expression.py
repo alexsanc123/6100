@@ -20,7 +20,8 @@ import imp
 import math
 import cmath
 import random
-from collections import Sequence, defaultdict
+from collections import defaultdict
+from collections.abc import Sequence
 
 from ply import lex, yacc
 import mpmath
