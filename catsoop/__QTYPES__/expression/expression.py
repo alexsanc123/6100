@@ -63,9 +63,9 @@ def _render_norm(x):
 
 def _render_dot(x):
     if len(x) == 0:
-        return "\cdot", "dot takes exactly two arguments"
+        return r"\cdot", "dot takes exactly two arguments"
     if len(x) != 2:
-        return "\cdot ".join(x), "dot takes exactly two arguments"
+        return r"\cdot ".join(x), "dot takes exactly two arguments"
     return r"\left(%s\right)\cdot \left(%s\right)" % (x[0], x[1])
 
 
