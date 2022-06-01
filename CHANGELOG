@@ -49,6 +49,8 @@ DOCUMENTATION:
 
 VENDORED SOFTWARE:
 
+  * Upgraded KaTeX to v0.15.6
+
   * Upgraded Twemoji to v14.0.2
 
 
