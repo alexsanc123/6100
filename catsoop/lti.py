@@ -247,12 +247,12 @@ class LTI_Consumer(object):
         secret: (str) shared secret with the LTI tool provder
         """
         body = {
-            "tool_consumer_instance_guid": u"lti_test_%s" % self.lti_url,
+            "tool_consumer_instance_guid": "lti_test_%s" % self.lti_url,
             "user_id": self.username + "__LTI__1234",
-            "roles": u"[student]",
-            "context_id": u"catsoop_test",
+            "roles": "[student]",
+            "context_id": "catsoop_test",
             "lti_url": self.lti_url,
-            "lti_version": u"LTI-1p0",
+            "lti_version": "LTI-1p0",
             "lis_result_sourcedid": self.username,
             "lis_person_sourcedid": self.username,
             "lis_outcome_service_url": self.service_url,
@@ -285,7 +285,7 @@ class LTI_Consumer(object):
 
         __, headers, __ = client.sign(
             url,
-            http_method=u"POST",
+            http_method="POST",
             body=body,
             headers={"Content-Type": "application/x-www-form-urlencoded"},
         )

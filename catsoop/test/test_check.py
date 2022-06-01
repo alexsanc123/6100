@@ -116,7 +116,7 @@ class TestCheckers(CATSOOPTest):
         self.assertFalse(check.list_all_unordered()(x, y[::-1] + [y[-1]]))
 
     def test_dict_all(self):
-        a = {"cat": [7, 8, 9], "coca": "cola", "thing": lambda x: x ** 3}
+        a = {"cat": [7, 8, 9], "coca": "cola", "thing": lambda x: x**3}
         b = {k: v for k, v in reversed(list(a.items()))}
         self.assertTrue(check.dict_all()(a, b))
 
