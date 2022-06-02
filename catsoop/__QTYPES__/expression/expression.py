@@ -251,7 +251,7 @@ _eval_map = {
     "*": eval_binop(lambda x, y: x * y),
     "/": eval_binop(_div),
     "@": eval_binop(lambda x, y: x @ y, match_shapes=False),
-    "^": eval_binop(lambda x, y: x ** y, match_shapes=False),
+    "^": eval_binop(lambda x, y: x**y, match_shapes=False),
     "u-": eval_uminus,
     "u+": eval_uplus,
     "CALL": eval_call,
@@ -276,7 +276,7 @@ def _run_one_test(context, sub, soln, funcs, ratio_threshold, absolute_threshold
                 try:
                     return numpy.linalg.norm(x)
                 except:
-                    return (x.real ** 2 + x.imag ** 2) ** 0.5
+                    return (x.real**2 + x.imag**2) ** 0.5
 
         try:
             r = ratio_threshold is not None
