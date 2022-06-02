@@ -50,7 +50,7 @@ def prep_code(code, test, **kwargs):
             "pass",
             kwargs["csq_code_post"],
             test["code"],
-            footer,
+            footer or "",
         )
     )
     return code
@@ -128,7 +128,7 @@ def fix_error_msg(fname, err, offset, sub):
 DEFAULT_OPTIONS = {
     "CPUTIME": 1,
     "CLOCKTIME": 1,
-    "MEMORY": 32 * 1024**2,
+    "MEMORY": 32 * 1024 ** 2,
     "FILESIZE": 0,
     "BADIMPORT": [],
     "BADVAR": [],
