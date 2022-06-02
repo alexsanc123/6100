@@ -249,6 +249,7 @@ def handle_submission(submissions, **info):
             default_checker = _default_simple_check_function
     else:
         default_checker = _default_check_function
+    default_checker = info.get("csq_check_function", default_checker)
     tests = [dict(test_defaults) for i in info["csq_tests"]]
     for (i, j) in zip(tests, info["csq_tests"]):
         i.update(info["csq_test_defaults"])
