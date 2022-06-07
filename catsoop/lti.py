@@ -348,13 +348,14 @@ def serve_lti(context, path_info, environment, params, dispatch_main, return_con
         lti_data = session_data["lti_data"]
         lup = context["cs_lti_config"].get("lti_username_prefix", "lti_")
 
+        is_canvas = "canvas" in lti_data.get(
+            "tool_consumer_info_product_family_code", ""
+        )
+
         if "lti_username_function" in context["cs_lti_config"]:
             lti_uname = context["cs_lti_config"]["lti_username_function"](lti_data)
         else:
             default_user_id_field = "user_id"  # used by OpenEdX
-            is_canvas = "canvas" in lti_data.get(
-                "tool_consumer_info_product_family_code", ""
-            )
             if is_canvas:
                 default_user_id_field = (
                     "custom_canvas_user_login_id"  # used by Canvas LMS
