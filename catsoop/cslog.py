@@ -24,10 +24,10 @@ strings starting with a course name), and a `logname` (a string).
 On disk, each log is a file containing one or more entries, where each entry
 consists of:
 
-* 8 bits representing the length of the entry
+* 8 bytes representing the length of the entry
 * a binary blob (pickled Python object, potentially encrypted and/or
     compressed)
-* the 8-bit length repeated
+* the 8-byte length repeated
 
 This module provides functions for interacting with and modifying those logs.
 In particular, it provides ways to retrieve the Python objects in a log, or to
