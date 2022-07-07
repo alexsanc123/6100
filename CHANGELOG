@@ -41,6 +41,8 @@ FIXED:
 
   * Fixed an issue with storage of manual grades
 
+  * Fixed an error with certain LTI integrations
+
 SECURITY:
 
   * Don't allow fresh logins on user settings pages
