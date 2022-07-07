@@ -11,6 +11,9 @@ ADDED:
   * Added csq_renderer option to pythonic qtype, to allow choosing between
     bigbox and smallbox renderers
 
+  * The pythonic qtype now respects the csq_check_function variable (which can
+    still be overridden by specifying check functions for individual tests).
+
   * Questions with a "Check" button now have a "Revert to Prior Submission"
     button
 
