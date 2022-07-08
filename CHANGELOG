@@ -31,6 +31,8 @@ CHANGED:
 
   * Questions with a "Check" button no longer also have a "Save" button
 
+  * Added error reporting on failed <include> tags.
+
 DEPRECATED:
 
 REMOVED:
@@ -45,6 +47,9 @@ FIXED:
   * Fixed an issue with storage of manual grades
 
   * Fixed an error with certain LTI integrations
+
+  * Fixed an incorrect check for whether the target(s) of <include> tags are
+    within the tree
 
 SECURITY:
 

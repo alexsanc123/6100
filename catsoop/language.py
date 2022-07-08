@@ -26,27 +26,24 @@ translated to Python.  The overall flow when parsing a page is:
     appropriate calls to `catsoop.tutor.question`).
 """
 
-import os
-import re
 import ast
-import sys
 import copy
-import json
-import random
-import string
 import hashlib
+import json
+import os
+import random
+import re
+import string
+import sys
 import traceback
-
-from io import StringIO
 from collections import OrderedDict
-
-from . import tutor
-from . import dispatch
-from . import markdown
-from .errors import html_format, clear_info
+from io import StringIO
 
 from bs4 import BeautifulSoup, Comment, Doctype
 from unidecode import unidecode
+
+from . import dispatch, markdown, tutor
+from .errors import clear_info, html_format
 
 _nodoc = {
     "BeautifulSoup",
@@ -693,6 +690,10 @@ def handle_includes(context, text):
     def _include_handler(match):
         base_dir = dispatch.content_file_location(context, context["cs_path_info"])
         base_dir = os.path.realpath(os.path.dirname(base_dir))
+        course_root_dir = dispatch.content_file_location(
+            context, [context["cs_course"]]
+        )
+        course_root_dir = os.path.realpath(os.path.dirname(course_root_dir))
         b = match.groupdict()["body"]
         replacements = []
         for fname in b.splitlines():
@@ -701,10 +702,25 @@ def handle_includes(context, text):
                 continue  # skip blank lines
             fname = os.path.join(base_dir, fname)
             fname = os.path.realpath(fname)
-            if os.path.commonprefix([fname, base_dir]) != base_dir:
+            if not os.path.commonpath([fname, base_dir]).startswith(course_root_dir):
+                print(f"course_root_dir {course_root_dir}")
                 # tried to escape the course
+                msg = (
+                    "<div><font color='red'><b>An &lt;include&gt; tag Error Occurred:</b></font>"
+                    "<p><pre>"
+                    "%s is outside the course root folder"
+                    "</pre></p></div>"
+                ) % (fname)
+                replacements.append(msg)
                 continue
             if not os.path.isfile(fname):
+                msg = (
+                    "<div><font color='red'><b>An &lt;include&gt; tag Error Occurred:</b></font>"
+                    "<p><pre>"
+                    "%s is not a file"
+                    "</pre></p></div>"
+                ) % (fname)
+                replacements.append(msg)
                 continue
             with open(fname) as f:
                 replacements.append(f.read())
