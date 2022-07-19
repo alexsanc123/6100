@@ -17,7 +17,6 @@ ADDED:
   * Questions with a "Check" button now have a "Revert to Prior Submission"
     button
 
-
 CHANGED:
 
   * cs_local_python_import now raises a more meaningful exception when the
@@ -54,7 +53,7 @@ DOCUMENTATION:
 
 VENDORED SOFTWARE:
 
-  * Upgraded KaTeX to v0.15.6
+  * Upgraded KaTeX to v0.16.0
 
   * Upgraded Twemoji to v14.0.2
 
