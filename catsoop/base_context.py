@@ -310,6 +310,13 @@ Special: The maximum number of worker processes the UWSGI server should have
 running
 """
 
+cs_wsgi_server_worker_max_requests = None
+"""
+Special: Force UWSGI to restart workers after serving this many requests.
+Defaults to None (the option is not set when starting UWSGI), but can be set to
+an integer instead.
+"""
+
 # user interface configuration flags
 
 cs_ui_config_flags = {

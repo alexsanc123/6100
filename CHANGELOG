@@ -17,6 +17,10 @@ ADDED:
   * Questions with a "Check" button now have a "Revert to Prior Submission"
     button
 
+  * Added cs_wsgi_server_worker_max_requests option to provide --max-requests
+    option to uWSGI, to force workers to be killed and restarted after that
+    many requests.
+
 CHANGED:
 
   * cs_local_python_import now raises a more meaningful exception when the

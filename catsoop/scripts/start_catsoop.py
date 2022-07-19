@@ -146,18 +146,28 @@ def main(options=[]):
                     str(base_context.cs_wsgi_server_min_processes),
                 ]
 
-            uwsgi_opts = [
-                "--http",
-                ":%s" % base_context.cs_wsgi_server_port,
-                "-b",
-                "65535",
-                "--thunder-lock",
-                "--lazy",
-                "--wsgi-file",
-                "wsgi.py",
-                "--touch-reload",
-                "wsgi.py",
-            ] + uwsgi_opts
+            _max_requests = base_context.cs_wsgi_server_worker_max_requests
+
+            uwsgi_opts = (
+                [
+                    "--http",
+                    ":%s" % base_context.cs_wsgi_server_port,
+                    "-b",
+                    "65535",
+                    "--thunder-lock",
+                    "--lazy",
+                    "--wsgi-file",
+                    "wsgi.py",
+                    "--touch-reload",
+                    "wsgi.py",
+                ]
+                + (
+                    []
+                    if _max_requests is None
+                    else ["--max-requests", str(_max_requests)]
+                )
+                + uwsgi_opts
+            )
 
             procs.append((base_dir, ["uwsgi"] + uwsgi_opts, 0.1, "WSGI Server"))
         else:
