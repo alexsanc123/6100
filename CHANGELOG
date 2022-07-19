@@ -19,7 +19,7 @@ ADDED:
 
   * Added cs_wsgi_server_worker_max_requests option to provide --max-requests
     option to uWSGI, to force workers to be killed and restarted after that
-    many requests.
+    many requests
 
 CHANGED:
 
@@ -56,6 +56,9 @@ SECURITY:
 DOCUMENTATION:
 
 VENDORED SOFTWARE:
+
+  * Upgraded Codemirror to v5.65.6 (upgrating to Codemirror v6 will happen in a
+    later catsoop version)
 
   * Upgraded KaTeX to v0.16.0
 
