@@ -51,6 +51,8 @@ FIXED:
   * Fixed an incorrect check for whether the target(s) of <include> tags are
     within the tree
 
+  * Fixed an issue with checker_local's multiprocessing on MacOS
+
 SECURITY:
 
   * Don't allow fresh logins on user settings pages

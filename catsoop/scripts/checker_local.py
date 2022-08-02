@@ -78,7 +78,7 @@ def exc_message(context):
     return ('<p><font color="red"><b>CAT-SOOP ERROR:</b><pre>%s</pre></font>') % exc
 
 
-def do_check(row):
+def do_check(row, is_remote, remote_url, my_id, my_url):
     """
     Check submission, dispatching to appropriate question handler
 
@@ -178,12 +178,12 @@ def do_check(row):
         row["response"] = language.handle_custom_tags(context, msg)
         row["extra_data"] = extra
 
-        if REMOTE:
+        if is_remote:
             data = util.remote_checker_encode(
-                {"id": MY_ID, "action": "check_done", "row": row, "url": MY_URL}
+                {"id": my_id, "action": "check_done", "row": row, "url": my_url}
             )
             try:
-                req = urllib.request.Request(REMOTE_URL, data=data)
+                req = urllib.request.Request(remote_url, data=data)
                 resp = json.loads(urllib.request.urlopen(req, timeout=3).read())
             except:
                 pass
@@ -237,22 +237,24 @@ if __name__ == "__main__":
         log("starting main loop")
     nrunning = None
 
-    REMOTE = base_context.cs_remote_checker_for is not None
-    if REMOTE:
-        MY_ID = None
-        REMOTE_URL = "%s/_util/remote_checker" % base_context.cs_remote_checker_for
-        MY_URL = "%s/_util/remote_checker" % base_context.cs_url_root
+    my_id = remote_url = my_url = None
+
+    is_remote = base_context.cs_remote_checker_for is not None
+    if is_remote:
+        my_id = None
+        remote_url = "%s/_util/remote_checker" % base_context.cs_remote_checker_for
+        my_url = "%s/_util/remote_checker" % base_context.cs_url_root
         last_checkin = time.time()
 
         import atexit
 
         def say_goodbye():
-            if MY_ID is not None:
+            if my_id is not None:
                 data = util.remote_checker_encode(
-                    {"id": MY_ID, "action": "goodbye", "url": MY_URL}
+                    {"id": my_id, "action": "goodbye", "url": my_url}
                 )
                 try:
-                    req = urllib.request.Request(REMOTE_URL, data=data)
+                    req = urllib.request.Request(remote_url, data=data)
                     resp = json.loads(urllib.request.urlopen(req, timeout=3).read())
                 except:
                     pass
@@ -273,13 +275,13 @@ if __name__ == "__main__":
     # those back to queued to force them to run again (put them at the front of the
     # queue).
     for f in os.listdir(RUNNING):
-        if REMOTE:
+        if is_remote:
             os.unlink(os.path.join(RUNNING, f))
         else:
             shutil.move(os.path.join(RUNNING, f), os.path.join(QUEUED, "0_%s" % f))
 
     while True:
-        if REMOTE:
+        if is_remote:
             # a bunch of logic here for remote checkers only (local checkers will
             # skip)
             courses_to_update = {}
@@ -292,14 +294,14 @@ if __name__ == "__main__":
                 t = action["action"]
                 print("ACTION!", t)
                 if t == "connected":
-                    MY_ID = action["id"]
+                    my_id = action["id"]
                 elif t == "do_check":
                     checks_to_do.append(action)
                 elif t == "update_course":
-                    if MY_ID is not None:
+                    if my_id is not None:
                         courses_to_update[action["course"]] = action["hash"]
                 elif t == "unknown":
-                    MY_ID = None
+                    my_id = None
 
             courses_to_update = list(courses_to_update.items())
             new_hashes = {}
@@ -312,18 +314,18 @@ if __name__ == "__main__":
                     .decode("utf-8")
                 )
 
-            if MY_ID is None:
+            if my_id is None:
                 data = util.remote_checker_encode(
                     {
                         "action": "hello",
-                        "url": MY_URL,
+                        "url": my_url,
                         "parallel_checks": base_context.cs_checker_parallel_checks,
                         "courses": COURSE_GIT_HASHES,
                     }
                 )
-                print("TRYING TO CONNECT", data, REMOTE_URL)
+                print("TRYING TO CONNECT", data, remote_url)
                 try:
-                    req = urllib.request.Request(REMOTE_URL, data=data)
+                    req = urllib.request.Request(remote_url, data=data)
                     resp = json.loads(urllib.request.urlopen(req, timeout=3).read())
                     assert resp["ok"]
                 except:
@@ -337,14 +339,14 @@ if __name__ == "__main__":
                 if courses_to_update:
                     data = util.remote_checker_encode(
                         {
-                            "id": MY_ID,
+                            "id": my_id,
                             "action": "courses_updated",
                             "courses": courses_to_update,
-                            "url": MY_URL,
+                            "url": my_url,
                         }
                     )
                     try:
-                        req = urllib.request.Request(REMOTE_URL, data=data)
+                        req = urllib.request.Request(remote_url, data=data)
                         resp = json.loads(urllib.request.urlopen(req, timeout=3).read())
                         assert resp["ok"]
                     except:
@@ -362,14 +364,14 @@ if __name__ == "__main__":
                 if t - last_checkin > 10:
                     print("time to check in")
                     data = util.remote_checker_encode(
-                        {"id": MY_ID, "action": "checkin", "url": MY_URL}
+                        {"id": my_id, "action": "checkin", "url": my_url}
                     )
                     try:
-                        req = urllib.request.Request(REMOTE_URL, data=data)
+                        req = urllib.request.Request(remote_url, data=data)
                         resp = json.loads(urllib.request.urlopen(req, timeout=3).read())
                         assert resp["ok"]
                     except:
-                        MY_ID = None
+                        my_id = None
                     last_checkin = t
         # check for dead processes
         dead = set()
@@ -395,18 +397,18 @@ if __name__ == "__main__":
                             "<font color='red'><b>An unknown error occurred when "
                             "processing your submission</b></font>"
                         )
-                    if REMOTE:
+                    if is_remote:
                         print("try dead process")
                         data = util.remote_checker_encode(
                             {
-                                "id": MY_ID,
+                                "id": my_id,
                                 "action": "check_done",
                                 "row": row,
-                                "url": MY_URL,
+                                "url": my_url,
                             }
                         )
                         try:
-                            req = urllib.request.Request(REMOTE_URL, data=data)
+                            req = urllib.request.Request(remote_url, data=data)
                             resp = json.loads(
                                 urllib.request.urlopen(req, timeout=3).read()
                             )
@@ -456,7 +458,9 @@ if __name__ == "__main__":
 
                 # start a worker for it
                 log("Starting checker with row=%s" % row)
-                p = multiprocessing.Process(target=do_check, args=(row,))
+                p = multiprocessing.Process(
+                    target=do_check, args=(row, is_remote, remote_url, my_id, my_url)
+                )
                 running.append((magic, row, p))
                 p.start()
                 p._started = time.time()
