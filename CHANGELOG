@@ -33,8 +33,6 @@ CHANGED:
 
   * Added error reporting on failed <include> tags.
 
-  * Every page now loads the CodeMirror base code.
-
 DEPRECATED:
 
 REMOVED:
@@ -54,6 +52,10 @@ FIXED:
     within the tree
 
   * Fixed an issue with checker_local's multiprocessing on MacOS
+
+  * Every page now loads the CodeMirror base code, to fix an error caused by
+    multiple code-like questions using different CodeMirror modes but bringing
+    in a completely fresh codemirror.js for each one (overriding the old modes)
 
 SECURITY:
 
