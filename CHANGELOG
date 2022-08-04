@@ -33,6 +33,8 @@ CHANGED:
 
   * Added error reporting on failed <include> tags.
 
+  * Every page now loads the CodeMirror base code.
+
 DEPRECATED:
 
 REMOVED:

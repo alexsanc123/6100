@@ -69,6 +69,14 @@
         catsoop.diagram_sources = {{}};
     </script>
 
+    <!-- CodeMirror -->
+    <script type="text/javascript" src="BASE/scripts/codemirror/codemirror.js"></script>
+    <script type="text/javascript" src="BASE/scripts/codemirror/addon/fold/foldcode.js"></script>
+    <script type="text/javascript" src="BASE/scripts/codemirror/addon/fold/foldgutter.js"></script>
+    <script type="text/javascript" src="BASE/scripts/codemirror/addon/fold/indent-fold.js"></script>
+    <link rel="stylesheet" href="BASE/scripts/codemirror/codemirror.css" />
+    <link rel="stylesheet" href="BASE/scripts/codemirror/addon/fold/foldgutter.css" />
+
     <!-- Syntax Highlighting -->
     <script type="text/javascript" src="BASE/scripts/highlight/highlight.min.js"></script>
     <script type="text/javascript" src="BASE/scripts/highlightjs-line-numbers.js"></script>

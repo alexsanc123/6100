@@ -45,15 +45,8 @@ def get_sandbox(context):
     _execfile(base, context)
 
 
-SCRIPTS = """<!-- CodeMirror -->
-<script type="text/javascript" src="BASE/scripts/codemirror/codemirror.js"></script>
+SCRIPTS = """
 <script type="text/javascript" src="BASE/scripts/codemirror/mode/python/python.js"></script>
-<script type="text/javascript" src="BASE/scripts/codemirror/addon/fold/foldcode.js"></script>
-<script type="text/javascript" src="BASE/scripts/codemirror/addon/fold/foldgutter.js"></script>
-<script type="text/javascript" src="BASE/scripts/codemirror/addon/fold/indent-fold.js"></script>
-<link rel="stylesheet" href="BASE/scripts/codemirror/codemirror.css" />
-<link rel="stylesheet" href="BASE/scripts/codemirror/addon/fold/foldgutter.css" />
-
 """
 
 
