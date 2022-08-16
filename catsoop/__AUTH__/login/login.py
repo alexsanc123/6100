@@ -1189,7 +1189,7 @@ def _submit_button(fields, username, preserve, form, value="Submit"):
 LOGIN_BOX = """
 <div class="response" id="catsoop_login_box">
 <b><center>You are not logged in.</center></b><br/>
-If you are a current student, please <a href="%s?loginaction=login">Log In</a> for full access to this page.
+Please <a href="%s?loginaction=login">Log In</a> for full access to this page.
 </div>
 """
 

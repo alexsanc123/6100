@@ -98,7 +98,7 @@ href="%s?loginaction=login">Log In</a> to continue.
 LOGIN_BOX = """
 <div class="response" id="catsoop_login_box">
 <b><center>You are not logged in.</center></b><br/>
-If you are a current student, please <a href="%s?loginaction=login">Log
+Please <a href="%s?loginaction=login">Log
 In</a> with a certificate for full access to the web site.
 </div>
 """

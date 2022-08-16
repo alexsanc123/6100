@@ -12,7 +12,7 @@ ADDED:
     bigbox and smallbox renderers
 
   * The pythonic qtype now respects the csq_check_function variable (which can
-    still be overridden by specifying check functions for individual tests).
+    still be overridden by specifying check functions for individual tests)
 
   * Questions with a "Check" button now have a "Revert to Prior Submission"
     button
@@ -31,7 +31,9 @@ CHANGED:
 
   * Questions with a "Check" button no longer also have a "Save" button
 
-  * Added error reporting on failed <include> tags.
+  * Added error reporting on failed <include> tags
+
+  * Changed default message for when users are not logged in
 
 DEPRECATED:
 

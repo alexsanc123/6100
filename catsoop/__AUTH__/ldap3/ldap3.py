@@ -212,7 +212,7 @@ LOGIN_PAGE = """
 LOGIN_BOX = """
 <div class="response" id="catsoop_login_box">
     <b><center>You are not logged in.</center></b><br/>
-    If you are a current student, please <a href="{}?loginaction=login">Log In
+    Please <a href="{}?loginaction=login">Log In
     </a> for full access to the web site.
 </div>
 """

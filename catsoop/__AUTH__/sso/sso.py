@@ -114,8 +114,8 @@ will be redirected back to this page.
 LOGIN_BOX = """
 <div class="response" id="catsoop_login_box">
 <b><center>You are not logged in.</center></b><br/>
-If you are a current student, please <a href="%s?loginaction=login">Log
-In</a> for full access to the web site.<br/>Note that this link will take you to
+Please <a href="%s?loginaction=login">log
+in</a> for full access to the web site.<br/>Note that this link will take you to
 an external site (<tt>%s</tt>) to authenticate, and then you will be redirected
 back to this page.
 </div>
