@@ -1,8 +1,6 @@
-########################
-# Current Developments #
-########################
-
-(Work toward next release. Currently under development.)
+####################
+# Version 2022.9.0 #
+####################
 
 ADDED:
 
@@ -74,8 +72,6 @@ SECURITY:
 
   * cs_auth_type is now only read from config.py (course-level preload.py files
     cannot change it)
-
-DOCUMENTATION:
 
 VENDORED SOFTWARE:
 
