@@ -23,6 +23,8 @@ ADDED:
 
 CHANGED:
 
+  * catsoop now requires Python 3.7 or newer
+
   * cs_local_python_import now raises a more meaningful exception when the
     given filename is incorrect
 
@@ -35,9 +37,8 @@ CHANGED:
 
   * Changed default message for when users are not logged in
 
-DEPRECATED:
-
-REMOVED:
+  * Due to build issues on some platforms, catsoop no longer depends on uwsgi
+    unless [server] is specified when installing
 
 FIXED:
 

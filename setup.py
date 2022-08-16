@@ -60,7 +60,6 @@ def dev_number():
         return
     if len(last_version.strip().split("-")) != 3:
         # if this is just a tag name, that tells us we're at that tag
-        print("WHA")
         return
     else:
         N = int(last_version.strip().split("-")[1])
@@ -71,7 +70,6 @@ def dev_number():
             .strip()
         )
     except:
-        print("WHA 2")
         return
     try:
         dirty = len(
@@ -81,7 +79,6 @@ def dev_number():
             .splitlines()
         )
     except:
-        print("WHA 3")
         return
     try:
         _cmd = ["git", "show", "-s", "--format=%cD", sha]
@@ -120,8 +117,8 @@ def dirty_version():
 
 
 def main():
-    if sys.version_info[:2] < (3, 6):
-        sys.exit("catsoop currently requires Python 3.6+")
+    if sys.version_info[:2] < (3, 7):
+        sys.exit("catsoop currently requires Python 3.7+")
 
     if "--name" not in sys.argv:
         print(logo)
@@ -156,7 +153,7 @@ def main():
                 "console_scripts": ["catsoop = catsoop.__main__:command_line_interface"]
             },
             install_requires=requirements,
-            extras_require={"postgres": ["psycopg2"], "test": ["pytest"]},
+            extras_require={"server": ["uwsgi"], "test": ["pytest"]},
             package_dir={"catsoop": "catsoop"},
             package_data={"catsoop": ["scripts/*"]},
             classifiers=[

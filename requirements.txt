@@ -6,7 +6,6 @@ mistletoe
 mpmath
 ply
 pynacl
-uwsgi
 websockets
 lxml
 pylti
