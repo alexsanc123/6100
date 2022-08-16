@@ -20,6 +20,7 @@ Utilities for managing courses (questions, handlers, statistics, etc)
 import os
 import random
 import string
+import secrets
 import importlib
 import collections.abc
 
@@ -569,10 +570,7 @@ def handle_page(context):
 
 
 def _new_random_seed(n=100):
-    try:
-        return os.urandom(n)
-    except:
-        return "".join(random.choice(string.ascii_letters) for i in range(n))
+    return secrets.token_bytes(n)
 
 
 def _get_random_seed(context, n=100, force_new=False):
@@ -619,7 +617,10 @@ def init_random(context):
 
     **Returns:** `None`
     """
-    seed = "/".join([context["cs_username"], *context["cs_path_info"]])
+    try:
+        seed = _get_random_seed(context)
+    except:
+        seed = "___".join([context["cs_username"]] + context["cs_path_info"])
     context["cs_random_seed"] = seed
     context["cs_random"].seed(seed)
     context["cs_random_inited"] = True

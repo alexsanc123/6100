@@ -274,18 +274,6 @@ cs_checker_parallel_checks = 1
 Special: The number of checks the checker should run simultaneously.
 """
 
-cs_remote_checker_shared_secret = None
-"""
-Special: Shared secret for remote checkers (if not set, will use local checkers
-instead)
-"""
-
-cs_remote_checker_for = None
-"""
-Special: The URL of the catsoop instance for which this catsoop instance is a
-checker, if any
-"""
-
 # UWSGI Server
 
 cs_wsgi_server = "cheroot"
@@ -479,11 +467,3 @@ if not os.path.isdir(cs_data_root):
 else:
     if not os.access(cs_data_root, os.W_OK):
         _cs_config_errors.append("the web server must be able to write to cs_data_root")
-
-
-# check that, if we're using remote checkers, we're storing file uploads in the
-# logs
-if cs_remote_checker_shared_secret is not None and cs_upload_management != "db":
-    _cs_config_errors.append(
-        "if cs_remote_checker_shared_secret is specified, cs_upload_management must be 'db'"
-    )

@@ -62,26 +62,14 @@ def main(options=[]):
 
     procs = []
     if "checker" in options:
-        local_only = base_context.cs_remote_checker_shared_secret is None
-        remote_for = base_context.cs_remote_checker_for is not None
-        if local_only or remote_for:
-            procs.append(
-                (
-                    scripts_dir,
-                    [sys.executable, "checker_local.py"],
-                    0.1,
-                    "Local Checker",
-                ),
-            )
-        else:
-            procs.append(
-                (
-                    scripts_dir,
-                    [sys.executable, "checker_remote.py"],
-                    0.1,
-                    "Remote Checker Manager",
-                ),
-            )
+        procs.append(
+            (
+                scripts_dir,
+                [sys.executable, "checker.py"],
+                0.1,
+                "Local Checker",
+            ),
+        )
 
     if "reporter" in options:
         procs.append((scripts_dir, [sys.executable, "reporter.py"], 0.1, "Reporter"))
