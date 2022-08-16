@@ -147,15 +147,16 @@ def updater():
     crun = CURRENT["running"]
     if DEBUG and crun:
         log("updater queued=%s" % crun)
-    loop.call_later(0.3, updater)
+    EVENT_LOOP.call_later(0.3, updater)
 
 
 log("Starting reporter on port=%s" % PORTNUM)
 
+EVENT_LOOP = asyncio.new_event_loop()
+asyncio.set_event_loop(EVENT_LOOP)
 start_server = websockets.serve(reporter, "0.0.0.0", PORTNUM)
-loop = asyncio.get_event_loop()
 log("Running start_server")
-loop.run_until_complete(start_server)
-loop.call_soon(updater)
-loop.run_forever()
+EVENT_LOOP.run_until_complete(start_server)
+EVENT_LOOP.call_soon(updater)
+EVENT_LOOP.run_forever()
 log("Reporter exiting")

@@ -59,6 +59,8 @@ FIXED:
     multiple code-like questions using different CodeMirror modes but bringing
     in a completely fresh codemirror.js for each one (overriding the old modes)
 
+  * Replaced deprecated get_event_loop function in reporter.py script
+
 SECURITY:
 
   * Don't allow fresh logins on user settings pages
