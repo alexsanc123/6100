@@ -1,4 +1,13 @@
 ####################
+# Version 2021.9.4 #
+####################
+
+FIXED:
+
+  * BACKPORT: Fixed an issue with "render_escaped_dollar" method not existing
+
+
+####################
 # Version 2021.9.3 #
 ####################
 
