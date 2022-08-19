@@ -14,6 +14,9 @@ REMOVED:
 
 FIXED:
 
+  * Fixed an issue with "render_escaped_dollar" method not existing (triggered
+    by mistletoe update?)
+
 SECURITY:
 
 DOCUMENTATION:
