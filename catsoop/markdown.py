@@ -330,6 +330,9 @@ class CatsoopRenderer(HTMLRenderer):
         rendered_body = "".join(self.render(i) for i in token.children)
         return f'<div class="callout callout-{token.type}">{rendered_title}\n\n{rendered_body}\n</div>'
 
+    def render_escaped_dollar(self, token):
+        return "$"
+
 
 def markdown(x):
     """

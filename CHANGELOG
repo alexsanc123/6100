@@ -1,4 +1,14 @@
 ####################
+# Version 2022.9.1 #
+####################
+
+FIXED:
+
+  * Fixed an issue with "render_escaped_dollar" method not existing (triggered
+    by mistletoe update?)
+
+
+####################
 # Version 2022.9.0 #
 ####################
 
