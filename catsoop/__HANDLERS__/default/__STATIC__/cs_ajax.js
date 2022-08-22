@@ -290,11 +290,11 @@ catsoop.send_request = function (names, action, send, done_function) {
       catsoop.this_path,
       0
     )(request.status, request.response);
-    done_function(true, names);
+    done_function(true, names, request.status, request.response);
   };
   request.onerror = function () {
     catsoop.ajaxErrorCallback(names[0])(request.status, request.response);
-    done_function(false, names);
+    done_function(false, names, request.status, request.response);
   };
   request.open("POST", catsoop.this_path, true);
   request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
