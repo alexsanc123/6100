@@ -18,8 +18,8 @@ import os
 import sys
 import json
 import time
-import logging
 import asyncio
+import logging
 import datetime
 import threading
 
@@ -43,17 +43,7 @@ RESULTS = os.path.join(CHECKER_DB_LOC, "results")
 CURRENT = {"queued": [], "running": set()}
 
 PORTNUM = base_context.cs_checker_server_port
-logging.basicConfig(format="%(asctime)s - %(message)s")
-LOGGER = logging.getLogger("cs")
-WSLOGGER = logging.getLogger("websockets.server")
-WSLOGGER.setLevel(LOGGER.level)
-WSLOGGER.addHandler(logging.StreamHandler())
-
-
-def log(msg):
-    dt = datetime.datetime.now()
-    omsg = "[reporter:%s]: %s" % (dt, msg)
-    LOGGER.info(omsg)
+logging.getLogger("websockets.server").setLevel(logging.CRITICAL)
 
 
 def get_status(magic):
@@ -70,19 +60,12 @@ def get_status(magic):
 
 
 async def reporter(websocket, path):
-    DEBUG = True
-    if DEBUG:
-        LOGGER.error("Waiting for websocket recv")
     magic_json = await websocket.recv()
     magic = json.loads(magic_json)["magic"]
-    if DEBUG:
-        log("Got message magic=%s, json=%s" % (magic, magic_json))
 
     last_ping = time.time()
     last_status = None
     while True:
-        if DEBUG:
-            log("In main loop")
         t = time.time()
 
         # if it's been more than 10 seconds since we've pinged, ping again.
@@ -145,18 +128,12 @@ def updater():
     CURRENT["queued"] = [i.split("_")[1] for i in sorted(os.listdir(QUEUED))]
     CURRENT["running"] = {i.name for i in os.scandir(RUNNING)}
     crun = CURRENT["running"]
-    if DEBUG and crun:
-        log("updater queued=%s" % crun)
     EVENT_LOOP.call_later(0.3, updater)
 
-
-log("Starting reporter on port=%s" % PORTNUM)
 
 EVENT_LOOP = asyncio.new_event_loop()
 asyncio.set_event_loop(EVENT_LOOP)
 start_server = websockets.serve(reporter, "0.0.0.0", PORTNUM)
-log("Running start_server")
 EVENT_LOOP.run_until_complete(start_server)
 EVENT_LOOP.call_soon(updater)
 EVENT_LOOP.run_forever()
-log("Reporter exiting")

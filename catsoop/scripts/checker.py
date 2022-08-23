@@ -19,7 +19,6 @@ import sys
 import time
 import shutil
 import signal
-import logging
 import tempfile
 import traceback
 import collections
@@ -49,18 +48,9 @@ STAGING = os.path.join(CHECKER_DB_LOC, "staging")
 
 REAL_TIMEOUT = base_context.cs_checker_global_timeout
 
-DEBUG = True
-
-LOGGER = logging.getLogger("cs")
-
-
-def log(msg):
-    if not DEBUG:
-        return
-    dt = datetime.now()
-    omsg = "[checker:%s]: %s" % (dt, msg)
-    LOGGER.info(omsg)
-
+_pid = os.getpid()
+def _log(*args, **kwargs):
+    print(f'[checker.py {_pid}]', *args, **kwargs)
 
 def exc_message(context):
     exc = traceback.format_exc()
@@ -91,9 +81,7 @@ def do_check(row):
         lti_handler = lti.lti4cs_response(
             context, lti_data
         )  # LTI response handler, from row['lti_data']
-        log("lti_handler.have_data=%s" % lti_handler.have_data)
         if lti_handler.have_data:
-            log("lti_data=%s" % lti_handler.lti_data)
             if not "cs_session_data" in context:
                 context["cs_session_data"] = {}
             context["cs_session_data"][
@@ -101,9 +89,6 @@ def do_check(row):
             ] = True  # so that course preload.py knows
 
     cfile = dispatch.content_file_location(context, row["path"])
-    log(
-        "Loading grader python code course=%s, cfile=%s" % (context["cs_course"], cfile)
-    )
     loader.load_content(
         context, context["cs_course"], context["cs_path_info"], context, cfile
     )
@@ -124,12 +109,8 @@ def do_check(row):
         names_done.add(name)
         question, args = namemap[name]
         if row["action"] == "submit":
-            if DEBUG:
-                log("submit name=%s, row=%s" % (name, row))
             try:
                 handler = question["handle_submission"]
-                if DEBUG:
-                    log("handler=%s" % handler)
                 resp = handler(row["form"], **args)
                 score = resp["score"]
                 msg = resp["msg"]
@@ -137,13 +118,8 @@ def do_check(row):
             except Exception as err:
                 resp = {}
                 score = 0.0
-                log("Failed to handle submission, err=%s" % str(err))
-                log("Traceback=%s" % traceback.format_exc())
                 msg = exc_message(context)
                 extra = None
-
-            if DEBUG:
-                log("submit resp=%s, msg=%s" % (resp, msg))
 
             score_box = context["csm_tutor"].make_score_display(
                 context, args, name, score, True
@@ -158,9 +134,6 @@ def do_check(row):
             score = None
             score_box = ""
             extra = None
-
-            if DEBUG:
-                log("check name=%s, msg=%s" % (name, msg))
 
         row["score"] = score
         row["score_box"] = score_box
@@ -214,22 +187,13 @@ if __name__ == "__main__":
         shutil.move(os.path.join(RUNNING, f), os.path.join(QUEUED, "0_%s" % f))
 
     # and now actually start running
-    if DEBUG:
-        log("starting main loop")
-    nrunning = None
-
+    _log('ready to go')
     while True:
         # check for dead processes
         dead = set()
-        if DEBUG and not (
-            len(running) == nrunning
-        ):  # output debug message when nrunning changes
-            nrunning = len(running)
-            log("have %d running (%s)" % (nrunning, running))
         for i in range(len(running)):
             id_, row, p = running[i]
             if not p.is_alive():
-                log("    Process %s is dead" % p)
                 if p.exitcode != 0:
                     row["score"] = 0.0
                     row["score_box"] = ""
@@ -249,14 +213,14 @@ if __name__ == "__main__":
                         f.write(cslog.prep(row))
                     # then remove from running
                     os.unlink(os.path.join(RUNNING, row["magic"]))
+                    _log(f"marked {row['magic']} (pid {p.pid}) as done.  removing it.")
                 dead.add(i)
             elif time.time() - p._started > REAL_TIMEOUT:
+                _log(f"check for {row['magic']} (pid {p.pid}) timed out.  killing it.")
                 try:
                     os.killpg(os.getpgid(p.pid), signal.SIGKILL)
                 except:
                     pass
-        if dead:
-            log("Removing %s" % dead)
         for i in sorted(dead, reverse=True):
             running.pop(i)
 
@@ -271,23 +235,17 @@ if __name__ == "__main__":
                     try:
                         row = cslog.unprep(f.read())
                     except Exception as err:
-                        LOGGER.error(
-                            "[checker] failed to read queue log file %s, error=%s, traceback=%s"
-                            % (qfn, err, traceback.format_exc())
-                        )
                         continue
                 _, magic = first.split("_")
                 row["magic"] = magic
                 shutil.move(os.path.join(QUEUED, first), os.path.join(RUNNING, magic))
-                log("Moving from queued to  running: %s " % first)
 
                 # start a worker for it
-                log("Starting checker with row=%s" % row)
                 p = multiprocessing.Process(target=do_check, args=(row,))
+                _log(f'started checker {magic} with PID {p.pid}')
                 running.append((magic, row, p))
                 p.start()
                 p._started = time.time()
                 p._entry = row
-                log("Process pid = %s" % p.pid)
 
         time.sleep(0.1)

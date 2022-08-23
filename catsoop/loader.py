@@ -34,7 +34,6 @@ from collections import OrderedDict
 from . import time
 from . import cslog
 from . import language
-from . import debug_log
 from . import base_context
 
 importlib.reload(base_context)
@@ -177,7 +176,6 @@ def load_global_data(into, check_values=True):
         m = "ERROR while loading global CAT-SOOP configuration:\n\n" + "\n".join(
             base_context._cs_config_errors
         )
-        debug_log.LOGGER.error(m)
         return m
     try:
         thisdir = os.path.dirname(__file__)
@@ -194,13 +192,7 @@ def load_global_data(into, check_values=True):
         into["csm_base_context"] = into["base_context"] = base_context
         clean_builtins(into)
         into["csm_loader"] = sys.modules[__name__]
-        debug_log.setup_logging(into)  # setup global log levels
-        into["cs_debug_logger"] = debug_log.LOGGER
     except Exception as e:
-        debug_log.LOGGER.error(
-            "Exception encountered when trying to load global context: %s" % str(e)
-        )
-        debug_log.LOGGER.error("traceback: %s" % traceback.format_exc())
         return traceback.format_exc(e)
 
 

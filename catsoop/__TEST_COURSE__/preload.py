@@ -5,8 +5,6 @@ preload.py at each level defines special variables and/or functions to be
 inherited by pages farther down the tree.
 """
 
-import logging
-
 # LOOK AND FEEL
 
 cs_base_color = "#A31F34"  # the base color
@@ -205,16 +203,9 @@ from datetime import datetime
 # This function can also be used to gate access.
 #
 def cs_post_load(context):
-
-    LOGGER = context["cs_debug_logger"]
-
     is_lti_user = context.get("cs_session_data", {}).get("is_lti_user")
-    LOGGER.info("[preload.cs_post_load] is_lti_user=%s" % (is_lti_user))
-
     user_role = context.get("cs_user_info", {}).get("role", None)
     is_authorized = user_role in {"Student", "LA", "TA", "UTA", "Admin", "Instructor"}
-    LOGGER.info("[preload.cs_post_load] is_authorized=%s" % (is_authorized))
-
     if "cs_long_name" in context:
         context["cs_content_header"] = context["cs_long_name"]
         try:

@@ -38,12 +38,9 @@ from . import loader
 from . import errors
 from . import session
 from . import language
-from . import debug_log
 from . import base_context
 
-_nodoc = {"CSFormatter", "formatdate", "dict_from_cgi_form", "LOGGER", "md5"}
-
-LOGGER = debug_log.LOGGER
+_nodoc = {"CSFormatter", "formatdate", "dict_from_cgi_form", "md5"}
 
 
 class CSFormatter(string.Formatter):
@@ -613,8 +610,6 @@ def main(environment, return_context=False, form_data=None):
         path_info = environment.get("PATH_INFO", "/")
         context["cs_original_path"] = path_info[1:]
         path_info = [i for i in path_info.split("/") if i != ""]
-        if path_info and not path_info[0] == "_static":
-            LOGGER.info("[dispatch.main] path_info=%s" % path_info)
 
         # RETURN STATIC FILE RESPONSE RIGHT AWAY
         if len(path_info) > 0 and path_info[0] == "_static":
@@ -664,7 +659,6 @@ def main(environment, return_context=False, form_data=None):
 
         # CHECK FOR VALID CONFIGURATION
         if e is not None:
-            LOGGER.error("[dispatch.main] internal server error %s" % e)
             return (
                 ("500", "Internal Server Error"),
                 {"Content-type": "text/plain", "Content-length": str(len(e))},
@@ -678,10 +672,6 @@ def main(environment, return_context=False, form_data=None):
             m += "\n".join(context["_cs_config_errors"])
             out = errors.do_error_message(context, m)
             force_error = True
-            LOGGER.error(
-                "[dispatch.main] global configuration loading error %s"
-                % context["_cs_config_errors"]
-            )
             raise Exception
 
         # LOAD SESSION DATA (if any)
@@ -689,11 +679,7 @@ def main(environment, return_context=False, form_data=None):
         context["cs_sid"] = environment.get(
             "session_id"
         )  # for LTI calling dispatch.main
-        if context["cs_sid"]:
-            LOGGER.info(
-                "[dispatch.main] re-using existing session ID=%s" % context["cs_sid"]
-            )
-        else:
+        if not context["cs_sid"]:
             context["cs_sid"], new = session.get_session_id(environment)
         if new:
             hdr = context["cs_additional_headers"]
@@ -710,19 +696,11 @@ def main(environment, return_context=False, form_data=None):
         try:
             session_data["ip_addr"] = get_client_ipaddr(environment)
         except Exception as err:
-            LOGGER.error(
-                "[dispatch.main] Cannot get IP address of client, err=%s" % str(err)
-            )
+            pass
         context["cs_session_data"] = session_data
-        LOGGER.info(
-            "[dispatch.main] (%s) session_id=%s"
-            % (session_data.get("ip_addr"), context["cs_sid"])
-        )
-        LOGGER.info("[dispatch.main] path_info=%s" % path_info)
 
         # Handle LTI (must be done prior to authentication & other processing)
         if path_info and context["cs_course"] == "_lti":
-            LOGGER.info("[dispatch.main] serving LTI")
             return lti.serve_lti(
                 context, path_info, environment, form_data, main, return_context
             )
@@ -730,12 +708,10 @@ def main(environment, return_context=False, form_data=None):
         # DO PRELOAD FOR THIS REQUEST
         if context["cs_course"] is not None:
             cfile = content_file_location(context, [context["cs_course"]] + path_info)
-            LOGGER.info("[dispatch.main] loading content file for course %s" % cfile)
             x = loader.do_preload(
                 context, context["cs_course"], path_info, context, cfile
             )
             if x == "missing":
-                LOGGER.info("[dispatch.main] preload returned missing")
                 return errors.do_404_message(context)
 
             _set_colors(context)
@@ -745,7 +721,6 @@ def main(environment, return_context=False, form_data=None):
             # on what is in the preload.py files, unfortunately
             if context.get("cs_auth_required", True):
                 user_info = auth.get_logged_in_user(context)
-                LOGGER.info("[dispatch.main] user_info=%s" % user_info)
                 context["cs_user_info"] = user_info
                 context["cs_username"] = str(user_info.get("username", None))
                 if user_info.get("cs_render_now", False) and not context.get(
@@ -811,17 +786,12 @@ def main(environment, return_context=False, form_data=None):
                     return errors.do_404_message(context)
 
             # FINALLY, LOAD CONTENT
-            LOGGER.info("[dispatch.main] loading content with path_info=%s" % path_info)
             loader.load_content(
                 context, context["cs_course"], path_info, context, cfile
             )
 
         else:
             default_course = context.get("cs_default_course", None)
-            LOGGER.info(
-                "[dispatch.main] no course specified, using default course %s"
-                % default_course
-            )
             if default_course is not None:
                 return redirect(
                     "/".join(
@@ -855,10 +825,6 @@ def main(environment, return_context=False, form_data=None):
                 "QUERY_STRING", ""
             )
 
-        LOGGER.info(
-            "[dispatch.main] handing request using tutor.handle_page, cs_handler=%s"
-            % context.get("cs_handler")
-        )
         res = tutor.handle_page(context)
 
         if res is not None:
@@ -881,13 +847,10 @@ def main(environment, return_context=False, form_data=None):
         session_data = context["cs_session_data"]
         session.set_session_data(context, context["cs_sid"], session_data)
     except Exception as err:
-        LOGGER.error("[dispatch.main] error occurred: %s" % str(err))
-        LOGGER.error("[dispatch.main] traceback: %s" % traceback.format_exc())
         if not force_error:
             out = errors.do_error_message(context)
     out = out[:-1] + (out[-1].encode("utf-8"),)
     out[1].update({"Content-length": str(len(out[-1]))})
     if return_context:
-        LOGGER.info("[dispatch.main] Returning context instead of HTML response")
         return context
     return out

@@ -15,11 +15,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import ast
-import logging
 import traceback
 import collections.abc
-
-LOGGER = logging.getLogger(__name__)
 
 tutor.qtype_inherit("smallbox")
 bigbox, _ = tutor.question("bigbox")
@@ -76,8 +73,6 @@ def handle_check(submissions, **info):
 
 def handle_submission(submissions, **info):
     sub = submissions[info["csq_name"]]["data"].strip()
-    LOGGER.error("[qtypes.pythonic] submission: %r" % sub)
-
     inp = info["csq_input_check"](sub)
     if inp is not None:
         return {"score": 0.0, "msg": '<font color="red">%s</font>' % inp}
@@ -96,22 +91,17 @@ def handle_submission(submissions, **info):
         soln = eval(soln, info)
     try:
         if sub == "":
-            LOGGER.debug("[qtypes.pythonic] invalid submission, empty submission")
             return {"score": 0.0, "msg": INVALID_SUBMISSION_MSG}
         ast.parse(sub, mode="eval")
         code = info["csq_code_pre"]
         code += "\n_catsoop_answer = %s" % sub
         opts = info.get("csq_options", {})
-        LOGGER.debug("[qtypes.pythonic] code to run:\n%s" % code)
         sub = info["sandbox_run_code"](
             info, code, opts, result_as_string=info["csq_mode"] != "raw"
         )["info"]["result"]
         if info["csq_mode"] != "raw":
             sub = eval(sub, info)
     except Exception as err:
-        LOGGER.error("[qtypes.pythonic] invalid submission: %r" % sub)
-        LOGGER.error("[qtypes.pythonic] invalid submission exception=%s" % str(err))
-        LOGGER.error("[qtypes.pythonic] traceback: %s" % traceback.format_exc())
         msg = ""
         mfunc = info["csq_msg_function"]
         try:

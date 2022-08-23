@@ -19,7 +19,6 @@ import ast
 import html
 import json
 import base64
-import logging
 import mimetypes
 import traceback
 
@@ -27,8 +26,6 @@ import collections.abc
 
 from base64 import b64encode
 from urllib.parse import urlencode
-
-LOGGER = logging.getLogger("cs")
 
 
 def _execfile(*args):
@@ -462,12 +459,8 @@ def handle_submission(submissions, **info):
         try:
             hint = hint_func(test_results, code, info)
             msg += hint or ""
-            LOGGER.debug("[pythoncode] hint=%s" % hint)
         except Exception as err:
-            LOGGER.warn(
-                "[pythoncode] hint function %s produced error=%s at %s"
-                % (hint_func, err, traceback.format_exc())
-            )
+            pass
     msg = (
         ("\n<br/>&nbsp;Your score on your most recent " "submission was: %01.02f%%")
         % (overall * 100)

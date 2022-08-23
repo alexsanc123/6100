@@ -20,7 +20,6 @@ Requires config to be setup, including cs_unit_test_course
 """
 
 import cgi
-import logging
 import unittest
 
 from .. import loader
@@ -58,8 +57,6 @@ class Test_LTI(CATSOOPTest):
             return ret
 
         loader.load_global_data = mock_load_global_data
-
-        logging.getLogger("pylti.common").setLevel(1)
 
     def skip_test_lti_auth0(self):
         path = "/_lti/%s/structure" % self.cname

@@ -23,15 +23,11 @@ or late loads at lower levels).
 
 import os
 import sys
-import logging
 import traceback
 
 from catsoop import __version__, __codename__
 
-LOGGER = logging.getLogger("cs")
-
 _nodoc = {
-    "LOGGER",
     "config_loc",
     "default_config_location",
     "contents",
@@ -399,13 +395,10 @@ try:
         os.path.join(default_config_location, "catsoop", "config.py")
     )
     config_loc = os.environ.get("CATSOOP_CONFIG", config_loc)
-    LOGGER.info("[base_context] using config file %s" % config_loc)
     with open(config_loc) as f:
         exec(f.read())
 except Exception as e:
     msg = "error in config.py: %s" % (e,)
-    LOGGER.error("[base_context] %s" % msg)
-    LOGGER.error("[base_context] traceback=%s" % traceback.format_exc())
     _cs_config_errors.append(msg)
 
 # Import all CAT-SOOP modules/subpackages
@@ -448,13 +441,10 @@ for i in cs_all_thirdparty:
 # check for valid fs_root
 _fs_root_error = "cs_fs_root must be a directory containing the catsoop source code"
 if not os.path.isdir(cs_fs_root):
-    LOGGER.error("[base_context] %s" % _fs_root_error)
-    LOGGER.error("[base_context] cs_fs_root=%s" % cs_fs_root)
     _cs_config_errors.append(_fs_root_error)
 else:
     root = cs_fs_root
     if not os.path.isdir(root):
-        LOGGER.error("[base_context] %s" % _fs_root_error)
         _cs_config_errors.append(_fs_root_error)
     else:
         contents = os.listdir(root)

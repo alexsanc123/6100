@@ -1,5 +1,4 @@
 import sys
-import logging
 
 from .. import check
 from .. import loader
@@ -8,12 +7,6 @@ from .. import base_context
 from ..test import CATSOOPTest
 
 evaled = check.evaled
-
-LOGGER = logging.getLogger("cs")
-
-# uncomment the following to debug
-# LOGGER.disabled = False
-# LOGGER.setLevel(0)
 
 
 def gd_test(submission, solution):
@@ -103,8 +96,6 @@ class Test_Pythoncode(CATSOOPTest):
         info["csq_python_sandbox"] = "python"
         self.csq = csq
         self.info = info
-        # uncomment the following to debug
-        # LOGGER.setLevel(0)
 
     def test_submit(self):
         # test code submission (and evaluation using local sandbox)

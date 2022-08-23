@@ -31,11 +31,8 @@ from oauthlib.oauth1 import Client
 
 from . import auth
 from . import session
-from . import debug_log
 
-LOGGER = debug_log.LOGGER
-
-_nodoc = {"Client", "ElementMaker", "etree", "LOGGER"}
+_nodoc = {"Client", "ElementMaker", "etree"}
 
 
 class lti4cs(pylti.common.LTIBase):
@@ -64,11 +61,9 @@ class lti4cs(pylti.common.LTIBase):
                 environment["REQUEST_URI"][1:],
             )
             method = environment["REQUEST_METHOD"]
-            LOGGER.info("[lti.lti4cs.verify_request] method=%s, url=%s" % (method, url))
             pylti.common.verify_request_common(
                 self.consumers, url, method, environment, params
             )
-            LOGGER.info("[lti.lti4cs.verify_request] verify_request success")
             extra_fields = [self.config.get("lti_user_id_field")] + [
                 "tool_consumer_info_product_family_code",
                 "tool_consumer_.*",
@@ -78,30 +73,17 @@ class lti4cs(pylti.common.LTIBase):
                 if prop is None:
                     continue
                 if params.get(prop, None):
-                    LOGGER.info(
-                        "[lti.lti4cs.verify_request] params %s=%s",
-                        prop,
-                        params.get(prop, None),
-                    )
                     self.lti_data[prop] = params[prop]
                     continue
                 for key in params:
                     m = re.match(prop, key)
                     if m:
-                        LOGGER.info(
-                            "[lti.lti4cs.verify_request] params %s=%s",
-                            prop,
-                            params.get(key, None),
-                        )
                         self.lti_data[key] = params[key]
 
             self.session["lti_data"] = self.lti_data
             return True
 
         except Exception as err:
-            LOGGER.error(
-                "[lti.lti4cs.verify_request] verify_request failed, err=%s" % str(err)
-            )
             self.session["lti_data"] = {}
             self.session["is_lti_user"] = False
 
@@ -116,7 +98,6 @@ class lti4cs(pylti.common.LTIBase):
         db_name = "_lti_data"
         logging.overwrite_log(db_name, [], uname, self.lti_data)
         lfn = logging.get_log_filename(db_name, [], uname)
-        LOGGER.info("[lti] saved lti_data for user %s in file %s" % (uname, lfn))
 
 
 class lti4cs_response(object):
@@ -156,14 +137,7 @@ class lti4cs_response(object):
         result_sourcedid = self.lti_data.get("lis_result_sourcedid", None)
         consumer_key = self.lti_data.get("oauth_consumer_key")
         xml_body = self.generate_result_xml(result_sourcedid, data)
-        LOGGER.info(
-            "[lti.lti4cs_response.send_outcome] sending grade=%s to %s" % (data, url)
-        )
         success = pylti.common.post_message(self.consumers, consumer_key, url, xml_body)
-        if success:
-            LOGGER.info("[lti.lti4cs_response.send_outcome] outcome sent successfully")
-        else:
-            LOGGER.error("[lti.lti4cs_response.send_outcome] outcome sending FAILED")
 
     def generate_result_xml(self, result_sourcedid, score):
         """
@@ -262,10 +236,6 @@ class LTI_Consumer(object):
         retdat = body.copy()
         key = self.consumer_key
         self._sign_lti_message(body, key, secret, lti_url)
-        LOGGER.info(
-            "[unit_tests] signing OAUTH with key=%s, secret=%s, url=%s"
-            % (key, secret, lti_url)
-        )
         retdat.update(
             dict(
                 lti_url=lti_url,
@@ -319,12 +289,9 @@ def serve_lti(context, path_info, environment, params, dispatch_main, return_con
     """
     if not "cs_lti_config" in context:
         msg = "[lti] LTI not configured - missing cs_lti_config in config.py"
-        LOGGER.error(msg)
         raise Exception(msg)
 
-    LOGGER.info("[lti] parameters=%s" % params)
     lti_action = path_info[0]
-    LOGGER.info("[lti] lti_action=%s, path_info=%s" % (lti_action, path_info))
 
     session_data = context["cs_session_data"]
     force_load_lti_data = True
@@ -393,19 +360,14 @@ def serve_lti(context, path_info, environment, params, dispatch_main, return_con
         user_info = auth.get_logged_in_user(
             context
         )  # saves user_info in context["cs_user_info"]
-        LOGGER.info("[lti] auth user_info=%s" % user_info)
         l4c.save_lti_data(context)  # save lti data, e.g. for later use by the checker
 
     if lti_ok:
 
         uname = session_data["username"]
         if lti_action == "course":
-
-            LOGGER.info("[lti] rendering course page for %s" % uname)
-
             sub_path_info = path_info[1:]  # path without _lti/course prefix
             sub_path = "/".join(sub_path_info)
-            LOGGER.info("[lti] sub_path=%s" % sub_path)
             environment["PATH_INFO"] = sub_path
             environment["session_id"] = context[
                 "cs_sid"
@@ -417,7 +379,6 @@ def serve_lti(context, path_info, environment, params, dispatch_main, return_con
         msg = "Hello LTI"
 
     if return_context:
-        LOGGER.info("[lti] Returning context instead of HTML response")
         return context
 
     return (
@@ -452,7 +413,6 @@ def update_lti_score(lti_handler, problemstate, name_map):
             aggregate_score += score * npoints
         if total_possible_npoints == 0:
             total_possible_npoints = 1.0
-            LOGGER.error("[checker] total_possible_npoints=0 ????")
         aggregate_score_fract = (
             aggregate_score * 1.0 / total_possible_npoints
         )  # LTI wants score in [0, 1.0]
@@ -462,18 +422,11 @@ def update_lti_score(lti_handler, problemstate, name_map):
         )
         score_ok = True
     except Exception as err:
-        LOGGER.error(
-            "[checker] failed to compute score for problem %s, err=%s"
-            % (problemstate, err)
-        )
         score_ok = False
 
     if score_ok:
         try:
             lti_handler.send_outcome(max(0.0, min(1.0, aggregate_score_fract)))
         except Exception as err:
-            LOGGER.error(
-                "[checker] failed to send outcome to LTI consumer, err=%s" % str(err)
-            )
-            LOGGER.error("[checker] traceback=%s" % traceback.format_exc())
+            pass
     return problemstate

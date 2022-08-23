@@ -27,14 +27,11 @@ import importlib
 
 from . import util
 from . import cslog
-from . import debug_log
 from . import base_context
 
 importlib.reload(base_context)
 
-LOGGER = debug_log.LOGGER
-
-_nodoc = {"make_session_dir", "LOGGER"}
+_nodoc = {"make_session_dir"}
 
 VALID_SESSION_RE = re.compile(r"^[A-Fa-f0-9]{32}$")
 """
@@ -86,20 +83,9 @@ def get_session_id(environ):
     try:
         cookie_sid = COOKIE_REGEX.search(environ["HTTP_COOKIE"]).group(1)
         if VALID_SESSION_RE.match(cookie_sid) is None:
-            LOGGER.error(
-                "[session] cookie_sid (%s) session mismatch, generating new sid"
-                % cookie_sid
-            )
             return new_session_id(), True
         return cookie_sid, False
     except Exception as err:
-        LOGGER.error(
-            "[session] Error encountered retrieving session ID with regex, err=%s"
-            % str(err)
-        )
-        LOGGER.error("[session] traceback=%s" % traceback.format_exc())
-        LOGGER.error("[session] HTTP_COOKIE: %r" % environ.get("HTTP_COOKIE", None))
-        LOGGER.error("[session] REGEX: %r" % COOKIE_REGEX)
         return new_session_id(), True
 
 

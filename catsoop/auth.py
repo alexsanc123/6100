@@ -18,7 +18,6 @@ User authentication for normal interactions
 """
 
 import os
-import logging
 import importlib
 
 from . import api
@@ -27,10 +26,6 @@ from . import cslog
 from . import base_context
 
 importlib.reload(base_context)
-
-LOGGER = logging.getLogger("cs")
-
-_nodoc = {"LOGGER"}
 
 
 def _execfile(*args):
@@ -109,7 +104,6 @@ def get_logged_in_user(context):
     if lti_data and not doing_logout:
         cui = lti_data.get("cs_user_info")
         context["cs_user_info"] = cui
-        LOGGER.info("[auth] Allowing in LTI user with cs_user_info=%s" % cui)
         return cui
 
     # if an API token was specified, use the associated information and move on
@@ -169,9 +163,6 @@ def _get_user_information(context, into, course, username, do_preload=False):
             text = f.read()
         exec(text, into)
         loader.clean_builtins(into)
-        LOGGER.warning("[auth] loaded from %s user=%s" % (fname, into))
-    else:
-        LOGGER.error("[auth] missing user definition file %s" % fname)
 
     if str(username) == "None":
         into["role"] = "Unauthenticated"

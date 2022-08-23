@@ -17,9 +17,6 @@
 import ldap3
 from catsoop.__AUTH__.login.login import _get_base_url
 from ldap3.core.exceptions import LDAPException
-import logging
-
-LOGGER = logging.getLogger("ldap_auth")
 
 
 def get_logged_in_user(context):
@@ -96,11 +93,6 @@ def login(context):
             server = ldap3.Server(**ldap3_config["server"])
             conn = ldap3.Connection(server, auto_bind=True)
         except LDAPException as exception:
-            LOGGER.error(
-                "[ldap] Could not create LDAP connection to the server with the"
-                " given configuration. The following exception was thrown:"
-            )
-            LOGGER.exception(exception)
             return login_render(
                 context, username, "Could not connect to login server", login_message
             )

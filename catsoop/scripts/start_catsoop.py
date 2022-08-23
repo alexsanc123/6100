@@ -23,14 +23,11 @@ import time
 import atexit
 import signal
 import getpass
-import logging
 import hashlib
 import sqlite3
 import subprocess
 
 from datetime import datetime
-
-LOGGER = logging.getLogger("cs")
 
 scripts_dir = os.path.abspath(os.path.dirname(__file__))
 base_dir = os.path.abspath(os.path.join(scripts_dir, ".."))
@@ -46,6 +43,9 @@ cs_logo = r"""
   CAT-SOOP
 """
 
+_pid = os.getpid()
+def _log(*args, **kwargs):
+    print(f'[start_catsoop.py {_pid}]', *args, **kwargs)
 
 def main(options=[]):
     import catsoop.base_context as base_context
@@ -70,12 +70,12 @@ def main(options=[]):
                 scripts_dir,
                 [sys.executable, "checker.py"],
                 0.1,
-                "Local Checker",
+                "checker",
             ),
         )
 
     if "reporter" in options:
-        procs.append((scripts_dir, [sys.executable, "reporter.py"], 0.1, "Reporter"))
+        procs.append((scripts_dir, [sys.executable, "reporter.py"], 0.1, "reporter"))
 
     # put plugin autostart scripts into the list
 
@@ -100,7 +100,7 @@ def main(options=[]):
 
     if "web" in options:
         if base_context.cs_wsgi_server == "cheroot":
-            print("[start_catsoop] Using cheroot for web service")
+            _log("using cheroot for web service")
             wsgi_ports = base_context.cs_wsgi_server_port
 
             if not isinstance(wsgi_ports, list):
@@ -112,11 +112,11 @@ def main(options=[]):
                         scripts_dir,
                         [sys.executable, "wsgi_server.py", str(port)],
                         0.1,
-                        "WSGI Server at Port %d" % port,
+                        "cheroot WSGI server"
                     )
                 )
         elif base_context.cs_wsgi_server == "uwsgi":
-            print("[start_catsoop] Using uwsgi for web service")
+            _log("using uWSGI for web service")
             if (
                 base_context.cs_wsgi_server_min_processes
                 >= base_context.cs_wsgi_server_max_processes
@@ -160,22 +160,20 @@ def main(options=[]):
                 + uwsgi_opts
             )
 
-            procs.append((base_dir, ["uwsgi"] + uwsgi_opts, 0.1, "WSGI Server"))
+            procs.append((base_dir, ["uwsgi"] + uwsgi_opts, 0.1, "uWSGI server"))
         else:
-            raise ValueError(
-                "unsupported wsgi server: %r" % base_context.cs_wsgi_server
-            )
+            _log(f'unknown wsgi server {base_context.cs_wsgi_server!r}.  exiting.')
+            sys.exit(1)
 
     running = []
 
     for (ix, (wd, cmd, slp, name)) in enumerate(procs):
-        LOGGER.error("[start_catsoop] Starting %s (cmd=%s, wd=%s)" % (name, cmd, wd))
         running.append(
             subprocess.Popen(
                 cmd, cwd=wd, preexec_fn=set_pdeathsig(signal.SIGTERM), env=os.environ
             )
         )
-        LOGGER.error("[start_catsoop]     %s has pid=%s" % (name, running[-1].pid))
+        _log(f'started {name!r} with pid {running[-1].pid}')
         time.sleep(slp)
 
     def _kill_children():
@@ -190,23 +188,15 @@ def main(options=[]):
         ):  # restart running process if it has died
             if proc.poll() is not None:
                 (wd, cmd, slp, name) = procinfo
-                LOGGER.error(
-                    "[start_catsoop] %s (pid=%s) was killed, restarting it"
-                    % (name, proc.pid)
-                )
+                _log(f'{name}!r (pid {proc.pid}) died.  restarting.')
                 running[idx] = subprocess.Popen(
                     cmd, cwd=wd, preexec_fn=set_pdeathsig(signal.SIGTERM)
-                )
-                LOGGER.error(
-                    "[start_catsoop] Starting %s (cmd=%s, wd=%s) as pid=%s"
-                    % (name, cmd, wd, running[idx].pid)
                 )
         time.sleep(1)
 
 
 def startup_catsoop(config_loc=None, options=[]):
     print(cs_logo)
-    print("Using base_dir=%s" % base_dir)
     if config_loc is None:
         config_loc = os.environ.get(
             "XDG_CONFIG_HOME", os.path.expanduser(os.path.join("~", ".config"))
@@ -219,7 +209,7 @@ def startup_catsoop(config_loc=None, options=[]):
             % config_loc
         )
         sys.exit(1)
-    print("Using catsoop configuration specified by %s" % config_loc)
+    _log(f"using catsoop configuration specified by {config_loc!r}")
     os.environ["CATSOOP_CONFIG"] = config_loc
 
     if base_dir not in sys.path:
