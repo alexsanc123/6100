@@ -167,7 +167,7 @@ def find_editor():
 
 def log_edit(args):
     if len(args) not in {1, 3} or "-h" in args or "--help" in args:
-        print(LOGREAD_USAGE, file=sys.stderr)
+        print(LOGEDIT_USAGE, file=sys.stderr)
         sys.exit(1)
     ed = find_editor()
     if ed is None:

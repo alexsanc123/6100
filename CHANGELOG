@@ -23,6 +23,8 @@ FIXED:
   * Fixed multiple issues with "-c" flag and "CATSOOP_CONFIG" environment
     variable
 
+  * Fixed incorrect help text with "catsoop logedit" command
+
 SECURITY:
 
 DOCUMENTATION:
