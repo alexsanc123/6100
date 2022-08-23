@@ -11,6 +11,8 @@ ADDED:
 
 CHANGED:
 
+  * Suppressed some warnings coming from BeautifulSoup.
+
 DEPRECATED:
 
 REMOVED:

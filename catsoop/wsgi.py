@@ -41,6 +41,10 @@ def application(environ, start_response):
     WSGI application interface for CAT-SOOP, as specified in
     [PEP 3333](http://www.python.org/dev/peps/pep-3333/).
     """
+    from bs4 import BeautifulSoup, MarkupResemblesLocatorWarning
+    import warnings
+
+    warnings.filterwarnings("ignore", category=MarkupResemblesLocatorWarning)
     status, _headers, content = dispatch.main(environ)
     headers = []
     for k, v in _headers.items():
