@@ -17,8 +17,11 @@ REMOVED:
 
 FIXED:
 
-  * Fixed an issue with "render_escaped_dollar" method not existing (triggered
+  * Fixed a crash from "render_escaped_dollar" method not existing (triggered
     by mistletoe update?)
+
+  * Fixed multiple issues with "-c" flag and "CATSOOP_CONFIG" environment
+    variable
 
 SECURITY:
 

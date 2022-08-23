@@ -18,6 +18,7 @@
 
 import os
 import sys
+import imp
 import time
 import atexit
 import signal
@@ -48,6 +49,8 @@ cs_logo = r"""
 
 def main(options=[]):
     import catsoop.base_context as base_context
+
+    imp.reload(base_context)
     import catsoop.loader as loader
     from catsoop.process import set_pdeathsig
 
@@ -168,7 +171,9 @@ def main(options=[]):
     for (ix, (wd, cmd, slp, name)) in enumerate(procs):
         LOGGER.error("[start_catsoop] Starting %s (cmd=%s, wd=%s)" % (name, cmd, wd))
         running.append(
-            subprocess.Popen(cmd, cwd=wd, preexec_fn=set_pdeathsig(signal.SIGTERM))
+            subprocess.Popen(
+                cmd, cwd=wd, preexec_fn=set_pdeathsig(signal.SIGTERM), env=os.environ
+            )
         )
         LOGGER.error("[start_catsoop]     %s has pid=%s" % (name, running[-1].pid))
         time.sleep(slp)
@@ -202,9 +207,12 @@ def main(options=[]):
 def startup_catsoop(config_loc=None, options=[]):
     print(cs_logo)
     print("Using base_dir=%s" % base_dir)
-    config_loc = config_loc or os.environ.get(
-        "CATSOOP_CONFIG", os.path.join(base_dir, "catsoop", "config.py")
-    )
+    if config_loc is None:
+        config_loc = os.environ.get(
+            "XDG_CONFIG_HOME", os.path.expanduser(os.path.join("~", ".config"))
+        )
+        config_loc = os.path.abspath(os.path.join(config_loc, "catsoop", "config.py"))
+        config_loc = os.environ.get("CATSOOP_CONFIG", config_loc)
     if not os.path.isfile(config_loc):
         print(
             "%s does not exist.  Please configure CAT-SOOP first, either by editing that file manually, or by running setup_catsoop.py"

@@ -97,6 +97,7 @@ logedit        : edit the content of a given log in a text editor
     default_config_location = os.path.abspath(
         os.path.join(default_config_location, "catsoop", "config.py")
     )
+    default_config_location = os.environ.get("CATSOOP_CONFIG", default_config_location)
     parser.add_argument(
         "-c",
         "--config-file",
