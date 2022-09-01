@@ -2645,19 +2645,19 @@ WEBSOCKET_RESPONSE = """
 
 <script type="text/javascript">
 // @license magnet:?xt=urn:btih:0b31508aeb0634b347b8270c7bee4d411b5d4109&dn=agpl-3.0.txt AGPL-v3
-var magic_%(name)s = %(magic)r;
-if (typeof ws_%(name)s != 'undefined'){
-    ws_%(name)s.onclose = function(){}
-    ws_%(name)s.onmessage = function(){}
+magic_%(name)s = %(magic)r;
+if (typeof ws_%(name)s !== 'undefined'){
+    ws_%(name)s.onclose = undefined;
+    ws_%(name)s.onmessage = undefined;
     ws_%(name)s.close();
-    var ws_%(name)s = undefined;
+    delete(ws_%(name)s);
 }
 
 document.getElementById('%(name)s_score_display').innerHTML =  '<img src="%(loading)s" style="vertical-align: -6px; margin-left: 5px;"/>';
 
 document.querySelectorAll('#%(name)s_buttons button').forEach(function(b){b.disabled = true});
 
-var ws_%(name)s = new WebSocket(%(websocket)r);
+ws_%(name)s = new WebSocket(%(websocket)r);
 
 ws_%(name)s.onopen = function(){
     ws_%(name)s.send(JSON.stringify({type: "hello", magic: magic_%(name)s}));
@@ -2674,10 +2674,16 @@ ws_%(name)s.onclose = function(){
 var ws_%(name)s_state = -1;
 
 ws_%(name)s.onmessage = function(event){
+    if (magic_%(name)s != %(magic)r) {
+       return;
+    }
     var m = event.data;
     var j = JSON.parse(m);
     var thediv = document.getElementById('cs_partialresults_%(name)s');
     var themessage = document.getElementById('cs_partialresults_%(name)s_message');
+    if (themessage === null){
+        return;
+    }
     if (j.type == 'ping'){
         ws_%(name)s.send(JSON.stringify({type: 'pong'}));
     }else if (j.type == 'inqueue'){

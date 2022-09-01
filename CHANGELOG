@@ -27,6 +27,10 @@ FIXED:
 
   * Fixed incorrect help text with "catsoop logedit" command
 
+  * Fixed an old bug where submitting an asynchronously-checked question while
+    another submission is queued for that same question caused confused results
+    to be displayed
+
 SECURITY:
 
 DOCUMENTATION:
