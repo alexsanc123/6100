@@ -87,6 +87,7 @@ defaults = {
     "csq_test_defaults": {},
     "csq_use_simple_checker": False,
     "csq_result_as_string": False,
+    "csq_show_check": False,
 }
 
 
@@ -461,10 +462,23 @@ def handle_submission(submissions, **info):
             msg += hint or ""
         except Exception as err:
             pass
+    if info["csq_show_check"]:
+        if overall == 1.0:
+            checkimg = '<img src="%s" />' % info["cs_check_image"]
+        elif overall == 0.0:
+            checkimg = '<img src="%s" />' % info["cs_cross_image"]
+        else:
+            checkimg = ""
+    else:
+        checkimg = ""
     msg = (
-        ("\n<br/>&nbsp;Your score on your most recent " "submission was: %01.02f%%")
-        % (overall * 100)
-    ) + msg
+        (
+            ("\n<br/>&nbsp;Your score on your most recent " "submission was: %01.02f%%")
+            % (overall * 100)
+        )
+        + checkimg
+        + msg
+    )
     out = {"score": overall, "msg": msg}
     return out
 
