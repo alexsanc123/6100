@@ -1005,6 +1005,7 @@ EMOJI_MAP = {
     "partly_sunny": "⛅",
     "partly_sunny_with_rain": "🌦",
     "party_ball": "🎊",
+    "party_face": "🥳",
     "pass": "🎫",
     "passenger_ship": "🛳",
     "passport_control": "🛂",
