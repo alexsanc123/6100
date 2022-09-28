@@ -44,8 +44,11 @@ cs_logo = r"""
 """
 
 _pid = os.getpid()
+
+
 def _log(*args, **kwargs):
-    print(f'[start_catsoop.py {_pid}]', *args, **kwargs)
+    print(f"[start_catsoop.py {_pid}]", *args, **kwargs)
+
 
 def main(options=[]):
     import catsoop.base_context as base_context
@@ -112,7 +115,7 @@ def main(options=[]):
                         scripts_dir,
                         [sys.executable, "wsgi_server.py", str(port)],
                         0.1,
-                        "cheroot WSGI server"
+                        "cheroot WSGI server",
                     )
                 )
         elif base_context.cs_wsgi_server == "uwsgi":
@@ -162,7 +165,7 @@ def main(options=[]):
 
             procs.append((base_dir, ["uwsgi"] + uwsgi_opts, 0.1, "uWSGI server"))
         else:
-            _log(f'unknown wsgi server {base_context.cs_wsgi_server!r}.  exiting.')
+            _log(f"unknown wsgi server {base_context.cs_wsgi_server!r}.  exiting.")
             sys.exit(1)
 
     running = []
@@ -173,7 +176,7 @@ def main(options=[]):
                 cmd, cwd=wd, preexec_fn=set_pdeathsig(signal.SIGTERM), env=os.environ
             )
         )
-        _log(f'started {name!r} with pid {running[-1].pid}')
+        _log(f"started {name!r} with pid {running[-1].pid}")
         time.sleep(slp)
 
     def _kill_children():
@@ -188,7 +191,7 @@ def main(options=[]):
         ):  # restart running process if it has died
             if proc.poll() is not None:
                 (wd, cmd, slp, name) = procinfo
-                _log(f'{name}!r (pid {proc.pid}) died.  restarting.')
+                _log(f"{name}!r (pid {proc.pid}) died.  restarting.")
                 running[idx] = subprocess.Popen(
                     cmd, cwd=wd, preexec_fn=set_pdeathsig(signal.SIGTERM)
                 )

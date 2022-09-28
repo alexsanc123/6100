@@ -24,7 +24,7 @@ PORT_NUMBER = int(sys.argv[1])
 
 CATSOOP_LOC = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 
-print(f'[wsgi_server.py {os.getpid()}] starting cheroot server on port {PORT_NUMBER}')
+print(f"[wsgi_server.py {os.getpid()}] starting cheroot server on port {PORT_NUMBER}")
 
 addr = "0.0.0.0", PORT_NUMBER
 server = wsgi.Server(addr, application)

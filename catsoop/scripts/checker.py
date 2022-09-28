@@ -49,8 +49,11 @@ STAGING = os.path.join(CHECKER_DB_LOC, "staging")
 REAL_TIMEOUT = base_context.cs_checker_global_timeout
 
 _pid = os.getpid()
+
+
 def _log(*args, **kwargs):
-    print(f'[checker.py {_pid}]', *args, **kwargs)
+    print(f"[checker.py {_pid}]", *args, **kwargs)
+
 
 def exc_message(context):
     exc = traceback.format_exc()
@@ -187,7 +190,7 @@ if __name__ == "__main__":
         shutil.move(os.path.join(RUNNING, f), os.path.join(QUEUED, "0_%s" % f))
 
     # and now actually start running
-    _log('ready to go')
+    _log("ready to go")
     while True:
         # check for dead processes
         dead = set()
@@ -242,7 +245,7 @@ if __name__ == "__main__":
 
                 # start a worker for it
                 p = multiprocessing.Process(target=do_check, args=(row,))
-                _log(f'started checker {magic} with PID {p.pid}')
+                _log(f"started checker {magic} with PID {p.pid}")
                 running.append((magic, row, p))
                 p.start()
                 p._started = time.time()
