@@ -162,7 +162,7 @@ def get_code(sub, info):
         if code is None:
             code = info["csm_cslog"].retrieve_upload(sub["id"])[1]
         if isinstance(code, bytes):
-            code = code.decode("utf-8")
+            code = code.decode("utf-8-sig")
         return code.replace("\r\n", "\n")
     except:
         return {
