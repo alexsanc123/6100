@@ -153,9 +153,16 @@ def render_html_checkbox(last_log, **info):
             checked.add(_n)
         else:
             _s = ""
-        out += '<input type="checkbox" name="%s" value="%s"%s />' % (_n, ix, _s)
+        out += (
+            '<input type="checkbox" name="%s" value="%s"%s aria-labelledby="%s_opts_%s_label" />'
+            % (_n, ix, _s, name, ix)
+        )
         text = csm_language.source_transform_string(info, i)
-        out += "</td><td>%s</td></tr>" % text
+        out += "</td><td><span id='%s_opts_%s_label'>%s</span></td></tr>" % (
+            name,
+            ix,
+            text,
+        )
     out += "\n</table>"
     out += '<input type="hidden" name="%s" id="%s" value="%s">' % (
         name,
@@ -192,9 +199,16 @@ def render_html_radio(last_log, **info):
             _s = " checked"
         else:
             _s = ""
-        out += '<input type="radio" name="%s_opts" value="%s"%s />' % (name, ix, _s)
+        out += (
+            '<input type="radio" name="%s_opts" value="%s"%s aria-labelledby="%s_opts_%s_label" />'
+            % (name, ix, _s, name, ix)
+        )
         text = csm_language.source_transform_string(info, i)
-        out += "</td><td>%s</td></tr>" % text
+        out += "</td><td><span id='%s_opts_%s_label'>%s</span></td></tr>" % (
+            name,
+            ix,
+            text,
+        )
     out += "\n</table>"
     out += '<input type="hidden" name="%s" id="%s" value="%s">' % (
         name,
