@@ -129,7 +129,7 @@ def render_html_dropdown(last_log, **info):
 def render_html_checkbox(last_log, **info):
     if last_log is None:
         last_log = {}
-    out = '<table border="0">'
+    out = "<fieldset>"
     name = info["csq_name"]
     last = last_log.get(info["csq_name"], None)
     if last is None:
@@ -146,24 +146,27 @@ def render_html_checkbox(last_log, **info):
                 last = {}
     checked = set()
     for (ix, i) in enumerate(info["csq_options"]):
-        out += '\n<tr><td align="center">'
+        out += "\n"
         _n = "%s_opt%d" % (name, ix)
         if last.get(_n, False):
             _s = " checked"
             checked.add(_n)
         else:
             _s = ""
-        out += (
-            '<input type="checkbox" name="%s" value="%s"%s aria-labelledby="%s_opts_%s_label" />'
-            % (_n, ix, _s, name, ix)
+        if ix != 0:
+            out += '<br style="margin-bottom: 10px;"/>'
+        out += '<input type="checkbox" name="%s" id="%s" value="%s"%s />' % (
+            _n,
+            _n,
+            ix,
+            _s,
         )
         text = csm_language.source_transform_string(info, i)
-        out += "</td><td><span id='%s_opts_%s_label'>%s</span></td></tr>" % (
-            name,
-            ix,
+        out += "<label for='%s'>%s</label>" % (
+            _n,
             text,
         )
-    out += "\n</table>"
+    out += "\n</fieldset>"
     out += '<input type="hidden" name="%s" id="%s" value="%s">' % (
         name,
         name,
@@ -190,26 +193,31 @@ def render_html_checkbox(last_log, **info):
 def render_html_radio(last_log, **info):
     if last_log is None:
         last_log = {}
-    out = '<table border="0">'
+    out = "<fieldset>"
     name = info["csq_name"]
     last = last_log.get(info["csq_name"], {"data": None})["data"]
     for (ix, i) in enumerate(info["csq_options"]):
-        out += '\n<tr><td align="center">'
+        out += "\n"
         if last == str(ix):
             _s = " checked"
         else:
             _s = ""
-        out += (
-            '<input type="radio" name="%s_opts" value="%s"%s aria-labelledby="%s_opts_%s_label" />'
-            % (name, ix, _s, name, ix)
+        if ix != 0:
+            out += '<br style="margin-bottom: 10px;"/>'
+        out += '<input type="radio" name="%s_opts" id="%s_opts_%s" value="%s"%s />' % (
+            name,
+            name,
+            ix,
+            ix,
+            _s,
         )
         text = csm_language.source_transform_string(info, i)
-        out += "</td><td><span id='%s_opts_%s_label'>%s</span></td></tr>" % (
+        out += '<label for="%s_opts_%s">%s</label>' % (
             name,
             ix,
             text,
         )
-    out += "\n</table>"
+    out += "\n</fieldset>"
     out += '<input type="hidden" name="%s" id="%s" value="%s">' % (
         name,
         name,

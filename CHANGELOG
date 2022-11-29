@@ -34,9 +34,14 @@ FIXED:
     to be displayed
 
   * Fixed a potential bug in the "pythoncode" question type when decoding
-    submitted files containing a BOM.
+    submitted files containing a BOM
 
 SECURITY:
+
+ACCESSIBILITY:
+
+  * Changed "radio" and "checkbox" multiplechoice variants to use fieldsets and
+    to properly associate labels with inputs
 
 DOCUMENTATION:
 
