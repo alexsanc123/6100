@@ -199,7 +199,9 @@ catsoop.ajaxDoneCallback = function (data, path, count) {
           if ("last_submit" in thisone) {
             document.getElementById(name).value = thisone["last_submit"]["data"]; // change the text box contents to the most recent submission ("" if none exists)
           }
-          catsoop.render_all_math(document.getElementById("cs_qdiv_" + name));
+          try {
+            catsoop.render_all_math(document.getElementById("cs_qdiv_" + name));
+          }catch(e){}
           catsoop.switch_buttons(name, true);
         }
       } else {
