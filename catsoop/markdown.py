@@ -194,7 +194,7 @@ class DisplayMathEnv(SpanToken):
     """
 
     pattern = re.compile(
-        r"\\begin\s*{(?P<env>(?:equation|eqnarray|align)\*?)}(?P<body>(?s).*?)\\end\s*{(?P=env)}",
+        r"\\begin\s*{(?P<env>(?:equation|eqnarray|align)\*?)}(?P<body>.*?)\\end\s*{(?P=env)}",
         re.MULTILINE | re.DOTALL,
     )
     parse_inner = False
