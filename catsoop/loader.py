@@ -29,18 +29,12 @@ import random
 import importlib
 import traceback
 
-from collections import OrderedDict
-
 from . import time
 from . import cslog
 from . import language
 from . import base_context
 
 importlib.reload(base_context)
-
-_nodoc = {
-    "OrderedDict",
-}
 
 
 def clean_builtins(d):
@@ -552,7 +546,7 @@ def load_content(context, course, path, into, content_file=None):
         and (cache is None or last_mod > cache["timestamp"])
         and "cs_problem_spec" in into
     ):
-        qs = OrderedDict()
+        qs = {}
         for i in into["cs_problem_spec"]:
             if isinstance(i, tuple):
                 x = qs[i[1]["csq_name"]] = {}

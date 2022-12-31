@@ -47,7 +47,6 @@ import hashlib
 import importlib
 import contextlib
 
-from collections import OrderedDict
 from datetime import datetime, timedelta
 
 _nodoc = {
@@ -58,7 +57,6 @@ _nodoc = {
     "good_separator",
     "modify_most_recent",
     "NoneType",
-    "OrderedDict",
     "datetime",
     "timedelta",
     "COMPRESS",

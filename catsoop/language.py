@@ -36,7 +36,6 @@ import re
 import string
 import sys
 import traceback
-from collections import OrderedDict
 from io import StringIO
 
 from bs4 import BeautifulSoup, Comment, Doctype
@@ -47,7 +46,6 @@ from .errors import clear_info, html_format
 
 _nodoc = {
     "BeautifulSoup",
-    "OrderedDict",
     "StringIO",
     "clear_info",
     "html_format",
@@ -411,25 +409,21 @@ def _xml_format_string(context, s):
     return handle_custom_tags(context, s)
 
 
-source_formats = OrderedDict(
-    [
-        ("catsoop", md_pre_handle),
-        ("md", md_pre_handle),
-        ("xml", xml_pre_handle),
-        ("py", py_pre_handle),
-    ]
-)
-"""OrderedDict mapping source format names to formatting handlers"""
+source_formats = {
+    "catsoop": md_pre_handle,
+    "md": md_pre_handle,
+    "xml": xml_pre_handle,
+    "py": py_pre_handle,
+}
+"""Dictionary mapping source format names to formatting handlers"""
 
-source_format_string = OrderedDict(
-    [
-        ("catsoop", _md_format_string),
-        ("md", _md_format_string),
-        ("xml", _xml_format_string),
-        ("py", _xml_format_string),
-    ]
-)
-"""OrderedDict mapping source format names to formatters"""
+source_format_string = {
+    "catsoop": _md_format_string,
+    "md": _md_format_string,
+    "xml": _xml_format_string,
+    "py": _xml_format_string,
+}
+"""Dictionary mapping source format names to formatters"""
 
 
 def source_transform_string(context, s):

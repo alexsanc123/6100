@@ -96,7 +96,7 @@ def do_check(row):
         context, context["cs_course"], context["cs_path_info"], context, cfile
     )
 
-    namemap = collections.OrderedDict()
+    namemap = {}
     for elt in context["cs_problem_spec"]:
         if isinstance(elt, tuple):  # each elt is (problem_context, problem_kwargs)
             namemap[elt[1]["csq_name"]] = elt

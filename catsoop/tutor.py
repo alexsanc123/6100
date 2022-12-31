@@ -25,7 +25,6 @@ import importlib
 import collections.abc
 
 from datetime import timedelta
-from collections import OrderedDict
 
 from . import auth
 from . import time
@@ -35,7 +34,7 @@ from . import base_context
 
 importlib.reload(base_context)
 
-_nodoc = {"timedelta", "OrderedDict"}
+_nodoc = {"timedelta"}
 
 
 def _get(context, key, default, cast=lambda x: x):
@@ -217,7 +216,7 @@ def compute_page_stats(context, user, path, keys=None):
     * `'context'`: an approximation of the context the user would see if they
         loaded the page, after the entire page load completes (including the
         handler)
-    * `'questions'`: an `OrderedDict` mapping question names to tuples, in the
+    * `'questions'`: a dictionary mapping question names to tuples, in the
         same order they are specified on the page.  each value is a tuple of
         the form outputted by `catsoop.tutor.question`
     * `'question_info'`: an ordered dictionary mapping question names to
@@ -298,7 +297,7 @@ def compute_page_stats(context, user, path, keys=None):
     if "question_info" in keys:
         keys.remove("question_info")
         items = new["cs_defaulthandler_name_map"].items()
-        out["question_info"] = OrderedDict()
+        out["question_info"] = {}
         for (n, (q, a)) in items:
             qi = out["question_info"][n] = {}
             qi["csq_name"] = n

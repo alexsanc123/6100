@@ -26,7 +26,6 @@ import hashlib
 import urllib.parse
 
 from datetime import datetime, timedelta
-from collections import OrderedDict
 from nacl.bindings import (
     crypto_secretbox,
     crypto_secretbox_open,
@@ -36,7 +35,6 @@ from nacl.bindings import (
 from . import base_context
 
 _nodoc = {
-    "OrderedDict",
     "crypto_secretbox",
     "crypto_secretbox_open",
     "datetime",
@@ -91,7 +89,7 @@ def catsoop_loc_hash():
 
 
 _literal_eval_funcs = {
-    "OrderedDict": OrderedDict,
+    "OrderedDict": dict,
     "frozenset": frozenset,
     "set": set,
     "dict": dict,
@@ -111,8 +109,6 @@ def literal_eval(node_or_string):
     expression.  The string or node provided may only consist of the following
     Python literal structures: strings, bytes, numbers, tuples, lists, dicts,
     sets, booleans, and None.
-
-    Modified for CAT-SOOP to include collections.OrderedDict.
     """
     if isinstance(node_or_string, str):
         node_or_string = ast.parse(node_or_string, mode="eval")

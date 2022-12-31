@@ -2147,7 +2147,7 @@ def make_buttons(context, name):
 
 def pre_handle(context):
     # enumerate the questions in this problem
-    context[_n("name_map")] = collections.OrderedDict()
+    context[_n("name_map")] = {}
     for elt in context["cs_problem_spec"]:
         if isinstance(elt, tuple):
             m = elt[1]
@@ -2370,7 +2370,7 @@ def _get_scores(context):
     ]
 
     questions = context[_n("name_map")]
-    scores = collections.OrderedDict()
+    scores = {}
     for name, question in questions.items():
         if not context.get("cs_whdw_filter", lambda q: True)(question):
             continue
@@ -2408,7 +2408,7 @@ def handle_stats(context):
     )
 
     questions = context[_n("name_map")]
-    stats = collections.OrderedDict()
+    stats = {}
 
     groups = (
         context["csm_groups"]
