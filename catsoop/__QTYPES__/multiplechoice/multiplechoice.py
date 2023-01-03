@@ -30,6 +30,11 @@ def default_checkbox_checker(submission, solution):
     return max(0, correct - incorrect)
 
 
+question_info_fields = [
+    "csq_options",
+    "csq_renderer",
+]
+
 defaults = {
     "csq_soln": "--",
     "csq_npoints": 1,
