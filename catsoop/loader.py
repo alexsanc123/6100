@@ -561,6 +561,9 @@ def load_content(context, course, path, into, content_file=None):
                 x["csq_display_name"] = i[1].get("csq_display_name", x["csq_name"])
                 x["qtype"] = i[0]["qtype"]
                 x["csq_grading_mode"] = i[1].get("csq_grading_mode", "auto")
+                x["csq_prompt"] = i[1].get("csq_prompt", None)
+                for name in i[0].get("question_info_fields", []):
+                    x[name] = i[1].get(name, None)
         into["csm_cslog"].overwrite_log(
             "_question_info",
             [course] + path,
