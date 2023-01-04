@@ -538,7 +538,7 @@ def render_html_upload(last_log, **info):
         init_code = None
     params = {
         "name": name,
-        "aria_label": info.get('csq_aria_label', f'catsoop_prompt_{info["csq_name"]}'),
+        "aria_label": info.get("csq_aria_label", f'catsoop_prompt_{info["csq_name"]}'),
         "init": str(init_code),
         "safeinit": html.escape(init_code or ""),
         "b64init": b64encode(make_initial_display(info).encode()).decode(),

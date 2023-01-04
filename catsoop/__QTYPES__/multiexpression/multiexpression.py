@@ -94,12 +94,12 @@ def escape(s):
 
 def render_html(submissions, **info):
     submissions = submissions or {}
-    out = '<fieldset>'
-    for (ix, (prompt, _)) in enumerate(info["csq_expressions"]):
+    out = "<fieldset>"
+    for ix, (prompt, _) in enumerate(info["csq_expressions"]):
         qbox_name = "__%s_%04d" % (info["csq_name"], ix)
         out += '<label for="%s">' % qbox_name
         out += csm_language.source_transform_string(info, prompt)
-        out += '</label>&nbsp;&nbsp;'
+        out += "</label>&nbsp;&nbsp;"
         out += '<input type="text"'
         if info.get("csq_size", None) is not None:
             out += ' size="%s"' % info["csq_size"]
