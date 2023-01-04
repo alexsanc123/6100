@@ -855,13 +855,19 @@ def handle_save(context):
         newstate["last_action"][name] = "save"
 
         rerender = args.get("csq_rerender", question.get("always_rerender", False))
-        if rerender is True:
-            out["rerender"] = context["csm_language"].source_transform_string(
-                context, args.get("csq_prompt", "")
-            )
-            out["rerender"] += question["render_html"](newstate["last_check"], **args)
-        elif rerender:
-            out["rerender"] = rerender
+        if rerender is not False:
+            if rerender is True:
+                preamble = args.get("csq_preamble", "")
+                if preamble:
+                    pramble = context["csm_language"].source_transform_string(
+                        context, preamble
+                    )
+                prompt = context["csm_language"].source_transform_string(
+                    context, args.get("csq_prompt", "")
+                )
+                prompt = f'<div id="catsoop_preamble_{name}" style="display: inline;">{preamble}</div>\n<div id="catsoop_prompt_{name}" style="display: inline;">{prompt}</div>'
+                rerender = f'{prompt}\n{question["render_html"](newstate["last_check"], **args)}'
+            out["rerender"] = str(rerender)
 
         msg = f'<div id="{name}_check_message"><b><font color="red">This response has not yet been submitted.</font></b></div>'
 
@@ -954,13 +960,19 @@ def handle_revert(context):
         newstate["last_action"][name] = "revert"
 
         rerender = args.get("csq_rerender", question.get("always_rerender", False))
-        if rerender is True:
-            out["rerender"] = context["csm_language"].source_transform_string(
-                context, args.get("csq_prompt", "")
-            )
-            out["rerender"] += question["render_html"](newstate["last_check"], **args)
-        elif rerender:
-            out["rerender"] = rerender
+        if rerender is not False:
+            if rerender is True:
+                preamble = args.get("csq_preamble", "")
+                if preamble:
+                    pramble = context["csm_language"].source_transform_string(
+                        context, preamble
+                    )
+                prompt = context["csm_language"].source_transform_string(
+                    context, args.get("csq_prompt", "")
+                )
+                prompt = f'<div id="catsoop_preamble_{name}">{preamble}</div>\n<div id="catsoop_prompt_{name}" style="display: inline;">{prompt}</div>'
+                rerender = f'{prompt}\n{question["render_html"](newstate["last_check"], **args)}'
+            out["rerender"] = str(rerender)
 
         # cache responses
         if "score_displays" not in newstate:
@@ -1081,10 +1093,15 @@ def handle_check(context):
             rerender = args.get("csq_rerender", question.get("always_rerender", False))
             if rerender is not False:
                 if rerender is True:
+                    preamble = args.get("csq_preamble", "")
+                    if preamble:
+                        pramble = context["csm_language"].source_transform_string(
+                            context, preamble
+                        )
                     prompt = context["csm_language"].source_transform_string(
                         context, args.get("csq_prompt", "")
                     )
-                    prompt = f'<div id="catsoop_prompt_{name}" style="display: inline;">{prompt}</div>'
+                    prompt = f'<div id="catsoop_preamble_{name}">{preamble}</div>\n<div id="catsoop_prompt_{name}" style="display: inline;">{prompt}</div>'
                     rerender = f'{prompt}\n{question["render_html"](newstate["last_check"], **args)}'
                 out["rerender"] = str(rerender)
 
@@ -1336,13 +1353,17 @@ def handle_submit(context):
         if submit_succeeded:
             newstate["last_submit_time"] = context["cs_timestamp"]
         rerender = args.get("csq_rerender", question.get("always_rerender", False))
-        rerender = args.get("csq_rerender", question.get("always_rerender", False))
         if rerender is not False:
             if rerender is True:
+                preamble = args.get("csq_preamble", "")
+                if preamble:
+                    pramble = context["csm_language"].source_transform_string(
+                        context, preamble
+                    )
                 prompt = context["csm_language"].source_transform_string(
                     context, args.get("csq_prompt", "")
                 )
-                prompt = f'<div id="catsoop_prompt_{name}" style="display: inline;">{prompt}</div>'
+                prompt = f'<div id="catsoop_preamble_{name}">{preamble}</div>\n<div id="catsoop_prompt_{name}" style="display: inline;">{prompt}</div>'
                 rerender = f'{prompt}\n{question["render_html"](newstate["last_check"], **args)}'
             out["rerender"] = str(rerender)
 
@@ -1818,10 +1839,16 @@ def render_question(elt, context, wrap=True):
         )
 
     out += '\n<div id="%s_rendered_question">\n' % name
+    preamble = args.get("csq_preamble", "")
+    if preamble:
+        pramble = context["csm_language"].source_transform_string(
+            context, preamble
+        )
     prompt = context["csm_language"].source_transform_string(
         context, args.get("csq_prompt", "")
     )
-    out += f'<div id="catsoop_prompt_{name}" style="display: inline;">{prompt}</div>'
+    out += f'<div id="catsoop_preamble_{name}">{preamble}</div>\n<div id="catsoop_prompt_{name}" style="display: inline;">{prompt}</div>'
+
     out += q["render_html"](last_processed, **args)
     out += "\n</div>"
 
