@@ -94,12 +94,12 @@ def escape(s):
 
 def render_html(submissions, **info):
     submissions = submissions or {}
-    out = '<table border="0">'
-    for ix, (prompt, _) in enumerate(info["csq_expressions"]):
+    out = '<fieldset>'
+    for (ix, (prompt, _)) in enumerate(info["csq_expressions"]):
         qbox_name = "__%s_%04d" % (info["csq_name"], ix)
-        out += '<tr><td align="right">'
+        out += '<label for="%s">' % qbox_name
         out += csm_language.source_transform_string(info, prompt)
-        out += "</td><td>"
+        out += '</label>&nbsp;&nbsp;'
         out += '<input type="text"'
         if info.get("csq_size", None) is not None:
             out += ' size="%s"' % info["csq_size"]
@@ -107,8 +107,8 @@ def render_html(submissions, **info):
         out += ' value="%s"' % escape(submissions.get(qbox_name, {"data": ""})["data"])
         out += ' name="%s"' % qbox_name
         out += ' id="%s"' % qbox_name
-        out += " /></td></tr>"
-    return out + "</table>"
+        out += " /><br/><br/>"
+    return out + "\n</fieldset>"
 
 
 def answer_display(**info):

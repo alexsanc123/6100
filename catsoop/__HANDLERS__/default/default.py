@@ -1079,15 +1079,14 @@ def handle_check(context):
             entry_ids[name] = entry_id = magic
 
             rerender = args.get("csq_rerender", question.get("always_rerender", False))
-            if rerender is True:
-                out["rerender"] = context["csm_language"].source_transform_string(
-                    context, args.get("csq_prompt", "")
-                )
-                out["rerender"] += question["render_html"](
-                    newstate["last_check"], **args
-                )
-            elif rerender:
-                out["rerender"] = rerender
+            if rerender is not False:
+                if rerender is True:
+                    prompt = context["csm_language"].source_transform_string(
+                        context, args.get("csq_prompt", "")
+                    )
+                    prompt = f'<div id="catsoop_prompt_{name}" style="display: inline;">{prompt}</div>'
+                    rerender = f'{prompt}\n{question["render_html"](newstate["last_check"], **args)}'
+                out["rerender"] = str(rerender)
 
             out["score_display"] = ""
             out["message"] = WEBSOCKET_RESPONSE % {
@@ -1337,13 +1336,15 @@ def handle_submit(context):
         if submit_succeeded:
             newstate["last_submit_time"] = context["cs_timestamp"]
         rerender = args.get("csq_rerender", question.get("always_rerender", False))
-        if rerender is True:
-            out["rerender"] = context["csm_language"].source_transform_string(
-                context, args.get("csq_prompt", "")
-            )
-            out["rerender"] += question["render_html"](newstate["last_submit"], **args)
-        elif rerender:
-            out["rerender"] = rerender
+        rerender = args.get("csq_rerender", question.get("always_rerender", False))
+        if rerender is not False:
+            if rerender is True:
+                prompt = context["csm_language"].source_transform_string(
+                    context, args.get("csq_prompt", "")
+                )
+                prompt = f'<div id="catsoop_prompt_{name}" style="display: inline;">{prompt}</div>'
+                rerender = f'{prompt}\n{question["render_html"](newstate["last_check"], **args)}'
+            out["rerender"] = str(rerender)
 
         outdict[name] = out
 
@@ -1817,9 +1818,10 @@ def render_question(elt, context, wrap=True):
         )
 
     out += '\n<div id="%s_rendered_question">\n' % name
-    out += context["csm_language"].source_transform_string(
+    prompt = context["csm_language"].source_transform_string(
         context, args.get("csq_prompt", "")
     )
+    out += f'<div id="catsoop_prompt_{name}" style="display: inline;">{prompt}</div>'
     out += q["render_html"](last_processed, **args)
     out += "\n</div>"
 

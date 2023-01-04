@@ -538,6 +538,7 @@ def render_html_upload(last_log, **info):
         init_code = None
     params = {
         "name": name,
+        "aria_label": info.get('csq_aria_label', f'catsoop_prompt_{info["csq_name"]}'),
         "init": str(init_code),
         "safeinit": html.escape(init_code or ""),
         "b64init": b64encode(make_initial_display(info).encode()).decode(),
@@ -573,7 +574,7 @@ def render_html_upload(last_log, **info):
             html.escape(init["name"]),
         )
     out += (
-        '\n<input type="file" style="display: none" id="%(name)s" name="%(name)s" />'
+        '\n<input type="file" style="display: none" id="%(name)s" name="%(name)s" aria-labelledby="%(aria_label)s"/>'
     ) % params
     out += (
         """\n<button class="btn btn-catsoop" id="%s_select_button">Select File</button>&nbsp;"""

@@ -123,8 +123,9 @@ def render_html_dropdown(last_log, **info):
     if last_log is None:
         last_log = {}
     ll = last_log.get(info["csq_name"], {"data": "-1"})["data"]
-    out = '\n<select id="%s" name="%s" >' % (info["csq_name"], info["csq_name"])
-    for ix, i in enumerate(["--"] + info["csq_options"]):
+    aria_label = info.get('csq_aria_label', f'catsoop_prompt_{info["csq_name"]}')
+    out = '\n<select id="%s" name="%s" aria-labelledby="%s">' % (info["csq_name"], info["csq_name"], aria_label)
+    for (ix, i) in enumerate(["--"] + info["csq_options"]):
         out += '\n<option value="%s" ' % (ix - 1)
         if ll == str(ix - 1):
             out += "selected "
@@ -136,7 +137,8 @@ def render_html_dropdown(last_log, **info):
 def render_html_checkbox(last_log, **info):
     if last_log is None:
         last_log = {}
-    out = "<fieldset>"
+    aria_label = info.get('csq_aria_label', f'catsoop_prompt_{info["csq_name"]}')
+    out = "<fieldset aria-labelledby='%s'>" % aria_label
     name = info["csq_name"]
     last = last_log.get(info["csq_name"], None)
     if last is None:
@@ -200,7 +202,8 @@ def render_html_checkbox(last_log, **info):
 def render_html_radio(last_log, **info):
     if last_log is None:
         last_log = {}
-    out = "<fieldset>"
+    aria_label = info.get('csq_aria_label', f'catsoop_prompt_{info["csq_name"]}')
+    out = "<div role='radiogroup' aria-labelledby='%s'>" % aria_label
     name = info["csq_name"]
     last = last_log.get(info["csq_name"], {"data": None})["data"]
     for ix, i in enumerate(info["csq_options"]):
@@ -224,7 +227,7 @@ def render_html_radio(last_log, **info):
             ix,
             text,
         )
-    out += "\n</fieldset>"
+    out += "\n</div>"
     out += '<input type="hidden" name="%s" id="%s" value="%s">' % (
         name,
         name,

@@ -48,9 +48,11 @@ def handle_submission(submissions, **info):
 
 def render_html(last_log, **info):
     name = info["csq_name"]
-    out = """<input type="file" style="display: none" id=%s name="%s" />""" % (
+    aria_label = info.get('csq_aria_label', f'catsoop_prompt_{info["csq_name"]}')
+    out = """<input type="file" style="display: none" id=%s name="%s" aria-labelledby="%s"/>""" % (
         name,
         name,
+        aria_label,
     )
     out += (
         """<button class="btn btn-catsoop" id="%s_select_button">Select File</button>&nbsp;"""

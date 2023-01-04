@@ -42,7 +42,9 @@ def render_html(last_log, **info):
         last_log = {}
     rows = info["csq_rows"]
     cols = info["csq_cols"]
-    out = '<textarea rows="%d" cols="%d"' % (rows, cols)
+    out = '<textarea rows="%d" cols="%d"' % (rows, cols, )
+    aria_label = info.get('csq_aria_label', f'catsoop_prompt_{info["csq_name"]}')
+    out += ' aria-labelledby="%s"' % aria_label
     out += ' name="%s"' % info["csq_name"]
     out += ' id="%s"' % info["csq_name"]
     out += ">%s</textarea><br>" % escape(
