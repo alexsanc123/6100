@@ -31,6 +31,8 @@ _Work toward next release. Currently under development._
 
 * Fixed a potential bug in the `pythoncode` question type when decoding submitted files containing a BOM
 
+* An empty string is no longer considered to be a well-formed response to a `pythonic` question
+
 **SECURITY:**
 
 **ACCESSIBILITY:**
