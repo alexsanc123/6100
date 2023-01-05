@@ -8,6 +8,8 @@ _Work toward next release. Currently under development._
 
 * The `pythoncode` question type now listens to the `csq_show_check` flag
 
+* Added the `download` and `filename` options to the `raw_response` handler to allow making the responses downloadable (thanks to Shen Shen)
+
 **CHANGED:**
 
 * Suppressed some warnings coming from BeautifulSoup

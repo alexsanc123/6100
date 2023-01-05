@@ -24,7 +24,7 @@ def handle(context):
     headers = {"Content-type": typ, "Content-length": str(len(content))}
     do_download = context.get("download", False)
     if do_download:
-        file_name = context.get("file_name", "_".join(context["cs_path_info"]))
-        headers["Content-Disposition"] = f"attachment; filename={file_name}"
+        filename = context.get("filename", "_".join(context["cs_path_info"]))
+        headers["Content-Disposition"] = f"attachment; filename={filename}"
 
     return ("200", "OK"), headers, content
