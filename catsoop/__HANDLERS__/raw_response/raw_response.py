@@ -20,11 +20,11 @@ def handle(context):
     typ = context.get("content_type", "text/plain")
 
     if isinstance(content, str):
-        content = content.encode('utf-8')
+        content = content.encode("utf-8")
     headers = {"Content-type": typ, "Content-length": str(len(content))}
-
-    if typ.startswith("data:"):
+    do_download = context.get("download", False)
+    if do_download:
         file_name = context.get("file_name", "_".join(context["cs_path_info"]))
-        headers["Content-Disposition"]= f"attachment; filename={file_name}"
+        headers["Content-Disposition"] = f"attachment; filename={file_name}"
 
     return ("200", "OK"), headers, content
