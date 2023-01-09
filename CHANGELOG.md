@@ -14,6 +14,8 @@ _Work toward next release. Currently under development._
 
 * Suppressed some warnings coming from BeautifulSoup
 
+* Changed default session duration to ten days instead of two
+
 **DEPRECATED:**
 
 **REMOVED:**
@@ -32,6 +34,8 @@ _Work toward next release. Currently under development._
 * Fixed a potential bug in the `pythoncode` question type when decoding submitted files containing a BOM
 
 * An empty string is no longer considered to be a well-formed response to a `pythonic` question
+
+* Fixed a potential bug with the length calculation in the `raw_response` header when `response` was given as a string containing unicode characters (thanks to Shen Shen)
 
 **SECURITY:**
 
