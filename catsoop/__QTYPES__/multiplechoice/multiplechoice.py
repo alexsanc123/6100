@@ -35,10 +35,12 @@ question_info_fields = [
     "csq_renderer",
 ]
 
+default_regular_checker = lambda x, y: (x == y) * 1.0
+
 defaults = {
     "csq_soln": "--",
     "csq_npoints": 1,
-    "csq_check_function": lambda x, y: (x == y) * 1.0,
+    "csq_check_function": default_regular_checker,
     "csq_checkbox_check_function": default_checkbox_checker,
     "csq_msg_function": lambda sub: "",
     "csq_options": [],
@@ -66,7 +68,7 @@ def handle_submission(submissions, **info):
             n = "%s_opt%d" % (info["csq_name"], ix)
             _sub.append(sub.get(n, False))
         sub = _sub
-        if check is defaults["csq_check_function"]:
+        if check is default_regular_checker:
             check = defaults["csq_checkbox_check_function"]
     else:
         if len(sub) == 0:
