@@ -242,7 +242,7 @@ def handle_submission(submissions, **info):
         default_checker = _default_check_function
     default_checker = info.get("csq_check_function", default_checker)
     tests = [dict(test_defaults) for i in info["csq_tests"]]
-    for (i, j) in zip(tests, info["csq_tests"]):
+    for i, j in zip(tests, info["csq_tests"]):
         i.update(info["csq_test_defaults"])
         i.update(j)
     show_tests = [i for i in tests if i["include"]]
@@ -486,7 +486,7 @@ def handle_submission(submissions, **info):
 def make_initial_display(info):
     init = info["csq_initial"]
     tests = [dict(test_defaults) for i in info["csq_tests"]]
-    for (i, j) in zip(tests, info["csq_tests"]):
+    for i, j in zip(tests, info["csq_tests"]):
         i.update(j)
     show_tests = [i for i in tests if i["include"]]
     l = len(show_tests) - 1

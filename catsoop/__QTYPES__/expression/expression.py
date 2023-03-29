@@ -406,7 +406,6 @@ def _get_parser(context):
 
 def handle_submission(submissions, **info):
     with mpmath.workdps(info["csq_precision"]):
-
         if len(info["csq_variable_dimensions"]) > 0:
             assert check_numpy()
 

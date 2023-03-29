@@ -1969,7 +1969,7 @@ def nsubmits_left(context, name):
     if "submit" not in perms and "submit_all" not in perms:
         return 0, ""
     nleft = max(0, nsubmits - nused)
-    for (regex, nchecks) in context["cs_user_info"].get("nsubmits_extra", []):
+    for regex, nchecks in context["cs_user_info"].get("nsubmits_extra", []):
         if re.match(regex, ".".join(context["cs_path_info"][1:] + [name])):
             nleft += nchecks
     nmsg = info.get("csq_nsubmits_message", None)
@@ -2033,7 +2033,7 @@ def make_buttons(context, name):
         "lock": None,
         "unlock": None,
     }
-    for (b, (func, text)) in list(_button_map.items()):
+    for b, (func, text) in list(_button_map.items()):
         buttons[b] = button_text(func(context, p, name), text)
         abuttons[b] = button_text(func(context, rp, name), text)
 

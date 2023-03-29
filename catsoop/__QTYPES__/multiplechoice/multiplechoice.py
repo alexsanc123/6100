@@ -124,7 +124,7 @@ def render_html_dropdown(last_log, **info):
         last_log = {}
     ll = last_log.get(info["csq_name"], {"data": "-1"})["data"]
     out = '\n<select id="%s" name="%s" >' % (info["csq_name"], info["csq_name"])
-    for (ix, i) in enumerate(["--"] + info["csq_options"]):
+    for ix, i in enumerate(["--"] + info["csq_options"]):
         out += '\n<option value="%s" ' % (ix - 1)
         if ll == str(ix - 1):
             out += "selected "
@@ -152,7 +152,7 @@ def render_html_checkbox(last_log, **info):
             except:
                 last = {}
     checked = set()
-    for (ix, i) in enumerate(info["csq_options"]):
+    for ix, i in enumerate(info["csq_options"]):
         out += "\n"
         _n = "%s_opt%d" % (name, ix)
         if last.get(_n, False):
@@ -203,7 +203,7 @@ def render_html_radio(last_log, **info):
     out = "<fieldset>"
     name = info["csq_name"]
     last = last_log.get(info["csq_name"], {"data": None})["data"]
-    for (ix, i) in enumerate(info["csq_options"]):
+    for ix, i in enumerate(info["csq_options"]):
         out += "\n"
         if last == str(ix):
             _s = " checked"

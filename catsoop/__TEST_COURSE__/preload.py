@@ -196,6 +196,7 @@ def cs_realize_time(meta, rel):
 import time
 from datetime import datetime
 
+
 # cs_post_load is invoked after the page is loaded but before it is rendered.
 # the example below shows the time at which the current page was last modified
 # (based on the Git history).

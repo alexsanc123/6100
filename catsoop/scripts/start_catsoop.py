@@ -170,7 +170,7 @@ def main(options=[]):
 
     running = []
 
-    for (ix, (wd, cmd, slp, name)) in enumerate(procs):
+    for ix, (wd, cmd, slp, name) in enumerate(procs):
         running.append(
             subprocess.Popen(
                 cmd, cwd=wd, preexec_fn=set_pdeathsig(signal.SIGTERM), env=os.environ

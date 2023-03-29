@@ -30,7 +30,7 @@ def get_parsed_reps(submissions, **info):
     funcs = dict(expression["default_funcs"])
     funcs.update(info.get("csq_funcs", {}))
     parsed = []
-    for (ix, (prompt, solutions)) in enumerate(info["csq_expressions"]):
+    for ix, (prompt, solutions) in enumerate(info["csq_expressions"]):
         osub = sub = submissions.get("__%s_%04d" % (info["csq_name"], ix), "")["data"]
         fprompt = csm_language.source_transform_string(info, prompt)
         try:
@@ -60,7 +60,7 @@ def handle_submission(submissions, **info):
     results = []
     parsed = []
 
-    for (ix, (prompt, solutions)) in enumerate(info["csq_expressions"]):
+    for ix, (prompt, solutions) in enumerate(info["csq_expressions"]):
         sub = submissions.get("__%s_%04d" % (info["csq_name"], ix), {"data": ""})
 
         # check each solution and save the results
@@ -95,7 +95,7 @@ def escape(s):
 def render_html(submissions, **info):
     submissions = submissions or {}
     out = '<table border="0">'
-    for (ix, (prompt, _)) in enumerate(info["csq_expressions"]):
+    for ix, (prompt, _) in enumerate(info["csq_expressions"]):
         qbox_name = "__%s_%04d" % (info["csq_name"], ix)
         out += '<tr><td align="right">'
         out += csm_language.source_transform_string(info, prompt)
@@ -120,7 +120,7 @@ def answer_display(**info):
     funcs = dict(expression["default_funcs"])
     funcs.update(info.get("csq_funcs", {}))
     parsed = []
-    for (ix, (prompt, solutions)) in enumerate(info["csq_expressions"]):
+    for ix, (prompt, solutions) in enumerate(info["csq_expressions"]):
         fprompt = csm_language.source_transform_string(info, prompt)
         if not isinstance(solutions, list):
             solutions = [solutions]

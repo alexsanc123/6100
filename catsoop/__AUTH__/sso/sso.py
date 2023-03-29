@@ -54,7 +54,6 @@ def get_logged_in_user(context):
                     lbox = context["cs_login_box"](context)
 
                 else:
-
                     lbox = LOGIN_BOX % (
                         _get_base_url(context),
                         context["cs_sso_location"],

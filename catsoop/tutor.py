@@ -298,7 +298,7 @@ def compute_page_stats(context, user, path, keys=None):
         keys.remove("question_info")
         items = new["cs_defaulthandler_name_map"].items()
         out["question_info"] = {}
-        for (n, (q, a)) in items:
+        for n, (q, a) in items:
             qi = out["question_info"][n] = {}
             qi["csq_name"] = n
             qi["csq_npoints"] = q["total_points"](**a)

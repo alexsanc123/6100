@@ -512,6 +512,7 @@ _string_regex = re.compile(
 
 def indent_code(c):
     strings = {}
+
     # start by removing strings and replacing them with unique character sequences
     def _replacer(x):
         new_id = None
@@ -680,6 +681,7 @@ def handle_includes(context, text):
     **Returns:** a string representing the updated HTML after includes have
     been handled
     """
+
     # we'll handle paths relative to here unless given an absolute path
     def _include_handler(match):
         base_dir = dispatch.content_file_location(context, context["cs_path_info"])
@@ -921,7 +923,7 @@ def handle_custom_tags(context, text):
     for ix, i in enumerate(tree.find_all("tableofcontents")):
         o_toc_dom = toc_dom = tree.new_tag("ul")
         last_handled_len = 0
-        for (num, ref, elt) in toc_sections:
+        for num, ref, elt in toc_sections:
             n = len(num.strip().split("."))  # number of layers deep
             if n > last_handled_len and last_handled_len != 0:
                 # want a new level of indentation
@@ -966,7 +968,7 @@ def handle_custom_tags(context, text):
         fnote = ""
     else:
         fnote = '<br/>&nbsp;<hr/><b name="cs_footnotes">Footnotes</b>'
-        for (ix, f) in enumerate(footnotes):
+        for ix, f in enumerate(footnotes):
             ix = ix + 1
             fnote += (
                 '<p><a class="anchor" name="catsoop_footnote_%d"></a><sup style="padding-right:0.25em;color:var(--cs-base-bg-color);">%d</sup>'
@@ -981,7 +983,7 @@ def handle_custom_tags(context, text):
 
     URL_FIX_LIST = [("img", "src"), ("a", "href"), ("script", "src"), ("link", "href")]
 
-    for (tag, field) in URL_FIX_LIST:
+    for tag, field in URL_FIX_LIST:
         for i in tree.find_all(tag):
             if field in i.attrs:
                 i.attrs[field] = dispatch.get_real_url(context, i.attrs[field])

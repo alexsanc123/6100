@@ -363,7 +363,6 @@ def serve_lti(context, path_info, environment, params, dispatch_main, return_con
         l4c.save_lti_data(context)  # save lti data, e.g. for later use by the checker
 
     if lti_ok:
-
         uname = session_data["username"]
         if lti_action == "course":
             sub_path_info = path_info[1:]  # path without _lti/course prefix

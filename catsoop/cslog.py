@@ -401,7 +401,7 @@ def store_upload(username, data, filename):
     info_hash = hashlib.blake2b(pickle.dumps(info)).hexdigest()
     info = prep(info)
 
-    for (id_, name, content) in (
+    for id_, name, content in (
         (info_hash, "info", info),
         (content_hash, "data", data),
     ):
