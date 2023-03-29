@@ -4,6 +4,8 @@ _Work toward next release. Currently under development._
 
 **ADDED:**
 
+* `<python>` tags can now be exited using `sys.exit()`, with non-zero "return codes" causing the output to be ignored.
+
 * Added additional arguments to the callback function for `ajaxrequest` in the `default` handler
 
 * The `pythoncode` question type now listens to the `csq_show_check` flag

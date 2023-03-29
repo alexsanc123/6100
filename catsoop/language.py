@@ -590,6 +590,10 @@ def get_python_output(context, code, variables, line_offset=0):
         code = code.replace("tutor.question(", "tutor.question(globals(),")
         exec(code, variables)
         return variables["cs___WEBOUT"].getvalue()
+    except SystemExit as e:
+        if e.code in {0, None}:
+            return variables["cs___WEBOUT"].getvalue()
+        return ""
     except:
         e = sys.exc_info()
         tb_entries = traceback.extract_tb(e[2])
