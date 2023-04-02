@@ -47,6 +47,10 @@ _Work toward next release. Currently under development._
 
 **DOCUMENTATION:**
 
+**VENDORED SOFTWARE:**
+
+* Upgraded [KaTeX](https://katex.org/) to v0.16.4
+
 
 # Version 2022.9.0
 
