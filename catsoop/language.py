@@ -593,6 +593,8 @@ def get_python_output(context, code, variables, line_offset=0):
     except SystemExit as e:
         if e.code in {0, None}:
             return variables["cs___WEBOUT"].getvalue()
+        elif isinstance(e.code, str):
+            return e.code
         return ""
     except:
         e = sys.exc_info()
