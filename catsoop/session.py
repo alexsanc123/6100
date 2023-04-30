@@ -38,10 +38,10 @@ VALID_SESSION_RE = re.compile(r"^[A-Fa-f0-9]{32}$")
 Regular expression matching a valid session id name (32 hexadecimal characters)
 """
 
-EXPIRE = 10 * 24 * 60 * 60
+EXPIRE = 14 * 24 * 60 * 60
 """
 Number of seconds since last action to keep a session as valid.
-Defaults to ten days.
+Defaults to two weeks.
 """
 
 SESSION_DIR = os.path.join(base_context.cs_data_root, "_sessions")
