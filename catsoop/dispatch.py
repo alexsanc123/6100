@@ -498,11 +498,8 @@ def _top_menu_html(topmenu, header=True):
             out += _top_menu_html(link, False)
             out += "</div>"
             out += "</div>"
-    if header:
-        return (
-            out
-            + '<a href="javascript:void(0);" class="icon" onclick="toggleResponsiveHeader()">&#9776;</a>'
-        )
+    if topmenu and header:
+        out += '<a href="javascript:void(0);" class="icon" onclick="toggleResponsiveHeader()">&#9776;</a>'
     return out
 
 

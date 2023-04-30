@@ -39,6 +39,8 @@ _Work toward next release. Currently under development._
 
 * Fixed a potential bug with the length calculation in the `raw_response` header when `response` was given as a string containing unicode characters (thanks to Shen Shen)
 
+* Fixed a display issue causing a "hamburger" to appear on narrow screens even with no menu items present.
+
 **SECURITY:**
 
 **ACCESSIBILITY:**
