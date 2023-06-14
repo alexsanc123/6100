@@ -96,9 +96,9 @@ def handle_submission(submissions, **info):
     percent = float(score)
     if info["csq_show_check"]:
         if percent == 1.0:
-            response = '<img src="%s" />' % info["cs_check_image"]
+            response = '<img src="%s" alt="correct" />' % info["cs_check_image"]
         elif percent == 0.0:
-            response = '<img src="%s" />' % info["cs_cross_image"]
+            response = '<img src="%s" alt="incorrect" />' % info["cs_cross_image"]
         else:
             response = ""
     else:
@@ -265,7 +265,8 @@ def answer_display(**info):
             out += '<tr style="height:30px;"></tr>'
             out += '<tr><td align="center">'
             _im = "check" if c else "cross"
-            out += '<img src="BASE/images/%s.png" />' % _im
+            _alt = "correct" if c else "incorrect"
+            out += '<img src="BASE/images/%s.png" alt="%s" />' % (_im, _alt)
             out += "</td><td>"
             text = csm_language.source_transform_string(info, i)
             out += text
