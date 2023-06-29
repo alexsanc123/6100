@@ -18,6 +18,8 @@ _Work toward next release. Currently under development._
 
 * Changed default session duration to fourteen days instead of two
 
+* Changed location of lock files to (hopefully) prevent the size of the locks directory from growing out of control
+
 **DEPRECATED:**
 
 **REMOVED:**

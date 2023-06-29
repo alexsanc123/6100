@@ -102,13 +102,11 @@ if ENCRYPT_PASS is not None:
 
 
 def log_lock(path):
-    db_name, *path, lockname = path
-    db_name, path, lockname = _transform_log_info(db_name, path, lockname)
-    path = [db_name, *path, lockname]
+    lock_h = hashlib.blake2b(prep(path)).hexdigest()
     log_lock_location = getattr(
         base_context, "cs_log_lock_location", None
     ) or os.path.join(base_context.cs_data_root, "_locks")
-    lock_loc = os.path.join(log_lock_location, *path) + ".lock"
+    lock_loc = os.path.join(log_lock_location, lock_h[0], lock_h[1], f"{lock_h}.lock")
     os.makedirs(os.path.dirname(lock_loc), exist_ok=True)
     return FileLock(lock_loc)
 
@@ -183,11 +181,11 @@ def get_log_filename(db_name, path, logname):
             course,
             db_name,
             *(path[1:]),
-            "%s.log" % logname
+            f"{logname}.log",
         )
     else:
         return os.path.join(
-            base_context.cs_data_root, "_logs", db_name, *path, "%s.log" % logname
+            base_context.cs_data_root, "_logs", db_name, *path, f"{logname}.log"
         )
 
 
