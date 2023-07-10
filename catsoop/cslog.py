@@ -102,11 +102,11 @@ if ENCRYPT_PASS is not None:
 
 
 def log_lock(path):
-    lock_h = hashlib.blake2b(prep(path)).hexdigest()
+    lock_h = hashlib.blake2b(pickle.dumps(path, -1)).hexdigest()
     log_lock_location = getattr(
         base_context, "cs_log_lock_location", None
     ) or os.path.join(base_context.cs_data_root, "_locks")
-    lock_loc = os.path.join(log_lock_location, lock_h[0], lock_h[1], f"{lock_h}.lock")
+    lock_loc = os.path.join(log_lock_location, lock_h[0], lock_h[1], lock_h[2], f"{lock_h}.lock")
     os.makedirs(os.path.dirname(lock_loc), exist_ok=True)
     return FileLock(lock_loc)
 
