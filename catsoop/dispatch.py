@@ -421,6 +421,42 @@ def display_page(context):
     context["cs_footer"] = "<br/>".join(
         [*context["cs_attributions"], context["cs_footer"]]
     )
+
+    # handle dark mode
+    dark_mode_settings = cslog.most_recent(
+        str(context.get("cs_username", "None")), ["_user_settings"], "dark_mode", None
+    )
+    context["cs_rendered_dark_mode_settings"] = (
+        "null" if dark_mode_settings is None else repr(dark_mode_settings)
+    )
+
+    imgselector = (
+        "img:not(.noinvert)" if context["cs_dark_mode_invert_images"] else "img.invert"
+    )
+    videoselector = (
+        "video:not(.noinvert)"
+        if context["cs_dark_mode_invert_videos"]
+        else "video.invert"
+    )
+    context[
+        "cs_dark_mode_javascript"
+    ] = """
+    document.addEventListener("DOMContentLoaded", function(event) {
+        if (DarkReader.isEnabled()) {
+            var invertfilter = 'invert(100%%) hue-rotate(180deg)' +
+                               ' brightness(' + catsoop.dark_mode_settings.brightness + '%%)' +
+                               ' contrast(' + catsoop.dark_mode_settings.contrast + '%%)' +
+                               ' grayscale(' + catsoop.dark_mode_settings.grayscale + '%%)' +
+                               ' sepia(' + catsoop.dark_mode_settings.sepia + '%%)'
+            var inverter = document.createElement('style');
+            inverter.innerText = '%s, %s {filter: ' + invertfilter + ';}\\n\\n'
+            document.head.appendChild(inverter);
+        }
+    });""" % (
+        imgselector,
+        videoselector,
+    )
+
     out = (
         language.handle_custom_tags(context, CSFormatter().format(template, **context))
         + "\n"

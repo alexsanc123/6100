@@ -112,10 +112,33 @@ value is `None`, an appropriate color will be computed based on
 `cs_base_color`.
 """
 
-cs_process_theme = True
+cs_dark_mode_javascript = ""
 """
-Special: Whether the theme should be "processed" by, e.g., evaluating Python
-code
+Special: Javascript code for managing dark mode setting (automatically
+populated, but can be overridden in cs_post_load)
+"""
+
+cs_dark_mode_default_settings = {
+    "mode": "disabled",  # enabled, disabled, auto (respect OS settings)
+    "brightness": 100,
+    "contrast": 90,
+    "sepia": 10,
+    "grayscale": 0,
+}
+"""
+Special: Default values to use for dark mode settings
+"""
+
+cs_dark_mode_invert_images = False
+"""
+Special: Boolean flag controlling whether images are inverted in dark mode by
+default
+"""
+
+cs_dark_mode_invert_videos = False
+"""
+Special: Boolean flag controlling whether videos are inverted in dark mode by
+default
 """
 
 cs_welcome_message = ""

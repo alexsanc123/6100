@@ -32,6 +32,26 @@
     // @license-end
     </script>
 
+    <!-- dark mode -->
+    <script type="text/javascript" src="BASE/scripts/darkreader/darkreader.min.js"></script>
+    <script type="text/javascript">
+    // @license magnet:?xt=urn:btih:0b31508aeb0634b347b8270c7bee4d411b5d4109&dn=agpl-3.0.txt AGPL-v3
+    catsoop.dark_mode_settings = {cs_rendered_dark_mode_settings};
+    if (catsoop.dark_mode_settings === null){{
+        catsoop.dark_mode_settings = JSON.parse(localStorage.getItem('catsoop_dark_mode_settings'));
+        if (catsoop.dark_mode_settings === null){{
+            catsoop.dark_mode_settings = {cs_dark_mode_default_settings!r};
+        }}
+    }}
+    catsoop.dark_mode = catsoop.dark_mode_settings.mode;
+    delete catsoop.dark_mode_settings.mode;
+    if (catsoop.dark_mode === 'enabled' || catsoop.dark_mode === 'auto'){{
+        DarkReader[catsoop.dark_mode == 'enabled' ? 'enable' : 'auto'](catsoop.dark_mode_settings);
+    }}
+    {cs_dark_mode_javascript}
+    // @license-end
+    </script>
+
     <!-- load in katex and CAT-SOOP-specific math rendering  -->
     <script type="text/javascript" src="BASE/scripts/katex/katex.min.js"></script>
     <link rel="stylesheet" type="text/css" href="BASE/scripts/katex/katex.min.css" />
