@@ -844,6 +844,7 @@ def handle_custom_tags(context, text):
             "button",
             onclick="if(this.nextSibling.style.display === 'none'){this.nextSibling.style.display = 'block';}else{this.nextSibling.style.display = 'none';}",
         )
+        button["class"] = ["btn", "btn-catsoop"]
         button.string = i.attrs.get("summary", "Show/Hide")
         i.insert_before(button)
 
