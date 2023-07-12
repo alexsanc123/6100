@@ -45,6 +45,8 @@ _Work toward next release. Currently under development._
 
 * Fixed a display issue causing a "hamburger" to appear on narrow screens even with no menu items present
 
+* Replaced the `<showhide>` implementation so as to avoid broken rendering of `<details>` tags in Chromium/Chrome
+
 **SECURITY:**
 
 **ACCESSIBILITY:**
