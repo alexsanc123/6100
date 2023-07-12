@@ -431,12 +431,14 @@ def display_page(context):
     )
 
     imgselector = (
-        "img:not(.noinvert)" if context["cs_dark_mode_invert_images"] else "img.invert"
+        "img:not(.catsoop-darkmode-noinvert)"
+        if context["cs_dark_mode_invert_images"]
+        else "img.catsoop-darkmode-invert"
     )
     videoselector = (
-        "video:not(.noinvert)"
+        "video:not(.catsoop-darkmode-noinvert)"
         if context["cs_dark_mode_invert_videos"]
-        else "video.invert"
+        else "video.catsoop-darkmode-invert"
     )
     context[
         "cs_dark_mode_javascript"
