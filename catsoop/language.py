@@ -829,19 +829,23 @@ def handle_custom_tags(context, text):
 
     # handle <showhide>
 
-    for i in tree.find_all("showhide"):
-        i.name = "details"
-
-        summ = tree.new_tag("summary")
-        summ.string = i.attrs.get("summary", "Show/Hide")
-        summ["class"] = ["btn", "btn-catsoop"]
-
-        i.insert(0, summ)
-
-        wrapdiv = tree.new_tag("div")
-        wrapdiv["class"] = "response"
-
-        i.wrap(wrapdiv)
+    for i in reversed(tree.find_all("showhide")):
+        i.name = "div"
+        i.attrs["style"] = "display:none;"
+        contents = i.decode_contents()
+        i.clear()
+        i.append(
+            BeautifulSoup(source_transform_string(context, contents), "html.parser")
+        )
+        wrapper = tree.new_tag("div")
+        wrapper["class"] = ["response"]
+        i.wrap(wrapper)
+        button = tree.new_tag(
+            "button",
+            onclick="if(this.nextSibling.style.display === 'none'){this.nextSibling.style.display = 'block';}else{this.nextSibling.style.display = 'none';}",
+        )
+        button.string = i.attrs.get("summary", "Show/Hide")
+        i.insert_before(button)
 
     # handle sections, etc.
 
