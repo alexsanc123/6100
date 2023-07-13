@@ -1827,7 +1827,7 @@ def render_question(elt, context, wrap=True):
     out += ('\n<span id="%s_buttons">' % name) + make_buttons(context, name) + "</span>"
     out += (
         '\n<span id="%s_loading_wrapper">'
-        '\n<span id="%s_loading" style="display:none;"><img src="%s"/>'
+        '\n<span id="%s_loading" style="display:none;"><img src="%s" class="catsoop-darkmode-invert"/>'
         "</span>\n</span>"
     ) % (name, name, context["cs_loading_image"])
     out += (
@@ -2638,7 +2638,7 @@ WEBSOCKET_RESPONSE = """
 <div class="callout callout-default" id="cs_partialresults_%(name)s">
   <div id="cs_partialresults_%(name)s_body">
     <span id="cs_partialresults_%(name)s_message">Looking up your submission (id <code>%(magic)s</code>).  Watch here for updates.</span><br/>
-    <center><img src="%(loading)s"/></center>
+    <center><img src="%(loading)s" class="catsoop-darkmode-invert" /></center>
   </div>
 </div>
 <small%(id_css)s>ID: <code>%(magic)s</code></small>
@@ -2653,7 +2653,7 @@ if (typeof ws_%(name)s !== 'undefined'){
     delete(ws_%(name)s);
 }
 
-document.getElementById('%(name)s_score_display').innerHTML =  '<img src="%(loading)s" style="vertical-align: -6px; margin-left: 5px;"/>';
+document.getElementById('%(name)s_score_display').innerHTML =  '<img src="%(loading)s" class="catsoop-darkmode-invert" style="vertical-align: -6px; margin-left: 5px;"/>';
 
 document.querySelectorAll('#%(name)s_buttons button').forEach(function(b){b.disabled = true});
 
