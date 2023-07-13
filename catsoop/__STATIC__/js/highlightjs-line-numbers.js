@@ -195,6 +195,13 @@
 
         duplicateMultilineNodes(element);
 
+        var showhide = document.createElement('button');
+        showhide.setAttribute('role', 'button');
+        showhide.setAttribute('aria-pressed', 'true');
+        showhide.classList.add("catsoop-code-showhide");
+        showhide.innerText = "Show/Hide Line Numbers";
+        showhide.onclick = function(){toggleAttribute(showhide, "aria-pressed");};
+        element.parentNode.before(showhide);
         return addLineNumbersBlockFor(element.innerHTML, firstLineIndex);
     }
 
@@ -212,14 +219,12 @@
 
             for (var i = 0, l = lines.length; i < l; i++) {
                 html += format(
-                    '<tr>' +
-                        '<td class="{0} {1}" {3}="{5}">' +
-                            '<div class="{2}" {3}="{5}"></div>' +
-                        '</td>' +
-                        '<td class="{0} {4}" {3}="{5}">' +
+                    '<div class="catsoop-code-line">' +
+                        '<span class="{0} {1}" {3}="{5}">{5}</span>' +
+                        '<span class="{0} {4}" {3}="{5}">' +
                             '{6}' +
-                        '</td>' +
-                    '</tr>',
+                        '</span>' +
+                    '</div>',
                 [
                     LINE_NAME,
                     NUMBERS_BLOCK_NAME,
@@ -230,8 +235,8 @@
                     lines[i].length > 0 ? lines[i] : ' '
                 ]);
             }
-
-            return format('<table class="{0}">{1}</table>', [ TABLE_NAME, html ]);
+            var out = format('<div class="catsoop-code-display {0}">{1}</div>', [ TABLE_NAME, html ]);
+            return out;
         }
 
         return inputHtml;

@@ -216,7 +216,8 @@ def render_html_radio(last_log, **info):
             _s = " checked"
         else:
             _s = ""
-        out += '<div style="margin-bottom; 10px;">'
+        if ix != 0:
+            out += '<br style="margin-bottom: 10px;"/>'
         out += '<input type="radio" name="%s_opts" id="%s_opts_%s" value="%s"%s />' % (
             name,
             name,
@@ -230,7 +231,6 @@ def render_html_radio(last_log, **info):
             ix,
             text,
         )
-        out += '</div>'
     out += "\n</div>"
     out += '<input type="hidden" name="%s" id="%s" value="%s">' % (
         name,

@@ -19,6 +19,10 @@
         document.getElementsByTagName('header')[0].classList.toggle('responsive');
     }}
 
+    function toggleAttribute(elt, attr){{
+        elt.setAttribute(attr, elt.getAttribute(attr) === "true" ? "false" : "true");
+    }}
+
     window.addEventListener('DOMContentLoaded', function(){{
         var menu_boxes = document.getElementsByClassName('dropdown-checkbox');
         for(var i=0; i<menu_boxes.length; i++){{
