@@ -263,16 +263,11 @@ def answer_display(**info):
         out = "<b>Solution:</b> \n\n<ul style='display:table; list-style: none; padding-left: 10px;'>"
         for c, i in zip(info["csq_soln"], info["csq_options"]):
             out += '<li style="display: table-row;"><span style="display:table-cell; padding-bottom:20px;" align="center">'
-            _im = "check" if c else "cross"
-            _alt = "True" if c else "False"
-            out += (
-                '<img src="BASE/images/%s.png" alt="%s" style="vertical-align: middle;"/>'
-                % (_im, _alt)
-            )
-            out += "</span><span style='display: table-cell; padding-left: 10px;'>"
+            "<label style='display: table-cell; padding-left: 10px;'>"
             text = csm_language.source_transform_string(info, i)
+            out += '<input type="checkbox" disabled %s /> ' % ("checked" if c else "")
             out += text
-            out += "</span></li>"
+            out += "</label></li>"
         out += "</ul>"
     else:
         soln = info["csq_soln"]
