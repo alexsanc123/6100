@@ -43,7 +43,7 @@ def get_sandbox(context):
 
 
 SCRIPTS = """
-<script type="text/javascript" src="BASE/scripts/codemirror/mode/python/python.js"></script>
+<script type="text/javascript" src="BASE/js/codemirror/mode/python/python.js"></script>
 """
 
 

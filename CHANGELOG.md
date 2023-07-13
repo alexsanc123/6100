@@ -22,6 +22,8 @@ _Work toward next release. Currently under development._
 
 * Changed location of lock files to (hopefully) prevent the size of the locks directory from growing out of control
 
+* Javascript files are now located at /js/ instead of /scripts/
+
 **DEPRECATED:**
 
 **REMOVED:**
