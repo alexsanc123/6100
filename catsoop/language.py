@@ -934,6 +934,8 @@ def handle_custom_tags(context, text):
 
     for ix, i in enumerate(tree.find_all("tableofcontents")):
         o_toc_dom = toc_dom = tree.new_tag("ul")
+        o_toc_dom.attrs["role"] = "navigation"
+        o_toc_dom.attrs["aria-label"] = "Table of Contents"
         last_handled_len = 0
         for num, ref, elt in toc_sections:
             n = len(num.strip().split("."))  # number of layers deep
@@ -956,6 +958,7 @@ def handle_custom_tags(context, text):
 
         toc_sec = tree.new_tag("h2")
         toc_sec.string = "Table of Contents"
+        toc_sec.attrs["aria-hidden"] = "true"
         i.replace_with(toc_sec)
         toc_sec.insert_after(o_toc_dom)
 

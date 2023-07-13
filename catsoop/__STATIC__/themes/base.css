@@ -344,7 +344,7 @@ header .cs_header_text {
   -ms-flex-preferred-size: 33%;
   flex-basis: 33%;
 }
-main {
+.cs_body {
   -webkit-box-flex: 1;
   -ms-flex: 1;
   flex: 1;
