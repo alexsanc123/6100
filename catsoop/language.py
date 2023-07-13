@@ -831,7 +831,6 @@ def handle_custom_tags(context, text):
 
     for i in reversed(tree.find_all("showhide")):
         i.name = "div"
-        i.attrs["style"] = "display:none;"
         contents = i.decode_contents()
         i.clear()
         i.append(
@@ -842,9 +841,11 @@ def handle_custom_tags(context, text):
         i.wrap(wrapper)
         button = tree.new_tag(
             "button",
-            onclick="if(this.nextSibling.style.display === 'none'){this.nextSibling.style.display = 'block';}else{this.nextSibling.style.display = 'none';}",
+            onclick='this.setAttribute("aria-pressed", this.getAttribute("aria-pressed") === "true" ? "false" : "true");',
         )
-        button["class"] = ["btn", "btn-catsoop"]
+        button["class"] = ["btn", "btn-catsoop", "showhide-toggle"]
+        button.attrs["role"] = "button"
+        button.attrs["aria-pressed"] = "false"
         button.string = i.attrs.get("summary", "Show/Hide")
         i.insert_before(button)
 

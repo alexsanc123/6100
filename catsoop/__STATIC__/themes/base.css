@@ -469,6 +469,11 @@ img.emoji {
 a.btn:visited {
   color: var(--cs-base-font-color);
 }
+
+.showhide-toggle[aria-pressed=false] + div {
+    display: none;
+}
+
 /* Modal Dialog */
 .modal-background {
   display: -webkit-box;
