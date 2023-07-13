@@ -178,7 +178,7 @@ def render_html_checkbox(last_log, **info):
             _n,
             text,
         )
-        out += '</div>'
+        out += "</div>"
     out += "\n</fieldset>"
     out += '<input type="hidden" name="%s" id="%s" value="%s">' % (
         name,
@@ -230,7 +230,7 @@ def render_html_radio(last_log, **info):
             ix,
             text,
         )
-        out += '</div>'
+        out += "</div>"
     out += "\n</div>"
     out += '<input type="hidden" name="%s" id="%s" value="%s">' % (
         name,
@@ -260,19 +260,21 @@ _renderers = {
 
 def answer_display(**info):
     if info["csq_renderer"] == "checkbox":
-        out = "Solution: <table>"
+        out = "<b>Solution:</b> \n\n<ul style='display:table; list-style: none; padding-left: 10px;'>"
         for c, i in zip(info["csq_soln"], info["csq_options"]):
-            out += '<tr style="height:30px;"></tr>'
-            out += '<tr><td align="center">'
+            out += '<li style="display: table-row;"><span style="display:table-cell; padding-bottom:20px;" align="center">'
             _im = "check" if c else "cross"
             _alt = "True" if c else "False"
-            out += '<img src="BASE/images/%s.png" alt="%s" />' % (_im, _alt)
-            out += "</td><td>"
+            out += (
+                '<img src="BASE/images/%s.png" alt="%s" style="vertical-align: middle;"/>'
+                % (_im, _alt)
+            )
+            out += "</span><span style='display: table-cell; padding-left: 10px;'>"
             text = csm_language.source_transform_string(info, i)
             out += text
-            out += "</td></tr>"
-        out += "</table>"
+            out += "</span></li>"
+        out += "</ul>"
     else:
         soln = info["csq_soln"]
-        out = "Solution: %s" % (soln,)
+        out = "<b>Solution:</b> %s" % (soln,)
     return out
