@@ -52,21 +52,25 @@
     // @license-end
     </script>
 
-    <!-- load in katex and CAT-SOOP-specific math rendering  -->
-    <script type="text/javascript" src="BASE/js/katex/katex.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="BASE/js/katex/katex.min.css" />
+    <!-- load in mathjax and CAT-SOOP-specific math rendering  -->
     <script type="text/javascript">
     // @license magnet:?xt=urn:btih:0b31508aeb0634b347b8270c7bee4d411b5d4109&dn=agpl-3.0.txt AGPL-v3
-    catsoop.katex_macros = {{}};
+    MathJax = {{
+      startup: {{
+        typeset: false,
+      }}
+    }}
+
     catsoop.render_math = function (elt) {{
-        var tex = elt.innerText; // TeX Source
-        var display = elt.classList.contains('cs_displaymath');
-        try {{
-            katex.render(tex, elt, {{displayMode: display, macros: catsoop.katex_macros}});
-        }}catch(e) {{
-            console.log(e);
-            elt.innerHTML = "<font color='red'><b>Could not parse math:</b> <tt>" + tex + "</tt></font>";
+        if(elt.classList.contains('cs_displaymath')){{
+            var b = "\\[";
+            var e = "\\]";
+        }}else{{
+            var b = "\\(";
+            var e = "\\)";
         }}
+        elt.innerText = b + elt.innerText + e;
+        MathJax.typeset([elt]);
         elt.classList.remove('cs_math_to_render');
     }}
 
@@ -82,6 +86,7 @@
     }});
     // @license-end
     </script>
+    <script id="MathJax-script" src="BASE/js/mathjax/tex-chtml-full-speech.js"></script>
 
     <!-- load in diagram stuff -->
     <script type="text/javascript" src="BASE/js/cs_diagrams.js"></script>
