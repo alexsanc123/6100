@@ -146,7 +146,7 @@
   </head>
   <body style="margin: 0px;">
     <header id="cs_header">
-        <div class="nav-container">
+        <div class="nav-container" aria-role="menubar">
             <div class="cs_header_text"><a href="{cs_home_link}">{cs_header}</a></div>
             {cs_top_menu_html}
         </div>

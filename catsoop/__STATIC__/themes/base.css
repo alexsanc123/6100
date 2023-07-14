@@ -318,7 +318,7 @@ header a {
   color: #000;
   text-decoration: none;
 }
-.dropdown:hover .dropdown-checkbox:checked + .dropdown-content {
+.dropdown-checkbox:checked + .dropdown-content {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -329,9 +329,6 @@ header a {
   -webkit-box-pack: center;
   -ms-flex-pack: center;
   justify-content: center;
-}
-.dropdown-checkbox {
-  display: none;
 }
 header .cs_header_text {
   font-size: 2.5rem;
