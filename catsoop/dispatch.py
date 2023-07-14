@@ -498,10 +498,13 @@ def _breadcrumbs_html(context):
             elt.get("cs_long_name", context["cs_path_info"][ix]) if ix != 0 else "Home"
         )
         name = language.source_transform_string(context, name)
-        elements.append('<span class="line"><a href="%s">%s</a></span>' % (link, name))
+        elements.append(
+            '<li><a href="%s"%s>%s</a></li>'
+            % (link, "" if ix != len(elements) - 1 else ' aria-current="page"', name)
+        )
     if elements and context.get("cs_course", None) == "_util":
         elements.pop(0)
-    return ' <span class="cs_nav_separator">/</span> '.join(elements)
+    return "".join(elements)
 
 
 def md5(x):

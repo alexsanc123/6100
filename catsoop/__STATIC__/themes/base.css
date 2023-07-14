@@ -213,9 +213,22 @@ span.line > a > p {
   padding-right: 2em;
 }
 
-.cs_top_navigation {
+.cs_top_navigation,
+.cs_bottom_navigation {
   border-bottom: 1px solid;
   margin-top: 3em;
+  list-style: none;
+}
+
+.cs_top_navigation li,
+.cs_bottom_navigation li {
+  display: inline;
+}
+
+.cs_top_navigation li + li:before,
+.cs_bottom_navigation li + li:before {
+  padding: 8px;
+  content: ">";
 }
 
 .cs_bottom_navigation {
@@ -764,8 +777,20 @@ span.hl code {
     content: "\a";
     white-space: pre;
   }
-  .cs_top_navigation {
+  .cs_top_navigation,
+  .cs_bottom_navigation {
     margin-top: 0px;
+    list-style: none;
+  }
+  .cs_top_navigation li,
+  .cs_bottom_navigation li {
+    display: block;
+  }
+
+  .cs_top_navigation li:before,
+  .cs_bottom_navigation li:before {
+    padding: 8px;
+    content: ">";
   }
   .nav-container {
     max-width: 100% !important;
