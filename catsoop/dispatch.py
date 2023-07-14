@@ -516,26 +516,34 @@ def _top_menu_html(topmenu, header=True):
         return topmenu
     else:
         out = ""
+    _cls = "menu-toplevel" if header else "menu-submenu"
     for i in topmenu:
         if i == "divider":
             out += '\n<div class="divider"></div>'
             continue
         link = i["link"]
         if isinstance(link, str):
-            out += '\n<a role="menuitem" href="%s" class="cs_top_menu_item">%s</a>' % (
-                link,
-                i["text"],
+            out += (
+                '\n<a role="menuitem" href="%s" class="cs_top_menu_item %s" onblur="catsoop.topMenuFocus(event);">%s</a>'
+                % (
+                    link,
+                    _cls,
+                    i["text"],
+                )
             )
         else:
             menu_id = md5(str(i))
-            out += '\n<div class="dropdown" onmouseleave="clearMenu(this);"">'
+            out += '\n<div class="dropdown" onmouseleave="clearMenu(this);">'
             out += (
                 '\n<label class="dropbtn cs_top_menu_item" for="cs_menu_%s">%s<span class="downarrow" aria-hidden="true">▼</span></label>'
                 % (menu_id, i["text"])
             )
             out += (
-                '\n<input type="checkbox" class="dropdown-checkbox screenreader-only-clip" id="cs_menu_%s" checked="false"/>'
-                % menu_id
+                '\n<input type="checkbox" role="menuitemcheckbox" class="dropdown-checkbox screenreader-only-clip %s" id="cs_menu_%s" checked="false"  onblur="catsoop.topMenuFocus(event);"/>'
+                % (
+                    _cls,
+                    menu_id,
+                )
             )
             out += '\n<div class="dropdown-content">'
             out += _top_menu_html(link, False)

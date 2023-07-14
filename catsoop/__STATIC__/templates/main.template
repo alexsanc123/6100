@@ -23,6 +23,19 @@
         elt.setAttribute(attr, elt.getAttribute(attr) === "true" ? "false" : "true");
     }}
 
+    catsoop.topMenuFocus = function(event) {{
+        var elt = event.target;
+        var target = event.relatedTarget;
+        if (elt.classList.contains('menu-submenu')){{
+            var topmenu = elt.parentNode.parentNode;
+            if (target && !target.classList.contains("menu-submenu") && target !== topmenu.children[1]) {{
+                clearMenu(topmenu);
+            }}
+        }}else if (!target.classList.contains('cs_top_menu_item')){{
+            clearMenu(elt.parentNode);
+        }}
+    }}
+
     window.addEventListener('DOMContentLoaded', function(){{
         var menu_boxes = document.getElementsByClassName('dropdown-checkbox');
         for(var i=0; i<menu_boxes.length; i++){{
