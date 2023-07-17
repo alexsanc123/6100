@@ -2709,6 +2709,7 @@ ws_%(name)s.onmessage = function(event){
         thediv.classList = [];
         thediv.innerHTML = j.response;
         catsoop.render_all_math(thediv);
+        catsoop.syntax_highlighting(thediv);
         catsoop.run_all_scripts('cs_partialresults_%(name)s');
         document.querySelectorAll('#%(name)s_buttons button').forEach(function(b){b.disabled = false;});
     }

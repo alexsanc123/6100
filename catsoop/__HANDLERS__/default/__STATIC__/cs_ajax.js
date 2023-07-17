@@ -23,14 +23,14 @@
 
 catsoop.switch_buttons = function (qname, enabled) {
   for (var b of Array.prototype.slice.call(
-    document.getElementById(qname + "_buttons").getElementsByTagName("button")
+    document.getElementById(qname + "_buttons").getElementsByTagName("button"),
   ))
     b.disabled = !enabled;
 };
 
 document.addEventListener("DOMContentLoaded", function (event) {
   for (var b of Array.prototype.slice.call(
-    document.getElementsByTagName("button")
+    document.getElementsByTagName("button"),
   ))
     b.disabled = false;
 });
@@ -125,7 +125,7 @@ catsoop.ajaxrequest = function (names, action, done_function) {
           catsoop.switch_buttons(name, true);
         }
       }
-    }
+    },
   );
 };
 
@@ -197,9 +197,13 @@ catsoop.ajaxDoneCallback = function (data, path, count) {
             document.getElementById(name).value = thisone["val"];
           }
           if ("last_submit" in thisone) {
-            document.getElementById(name).value = thisone["last_submit"]["data"]; // change the text box contents to the most recent submission ("" if none exists)
+            document.getElementById(name).value =
+              thisone["last_submit"]["data"]; // change the text box contents to the most recent submission ("" if none exists)
           }
           catsoop.render_all_math(document.getElementById("cs_qdiv_" + name));
+          catsoop.syntax_highlighting(
+            document.getElementById("cs_qdiv_" + name),
+          );
           catsoop.switch_buttons(name, true);
         }
       } else {
@@ -278,7 +282,7 @@ catsoop.send_request = function (names, action, send, done_function) {
   var encoded_form_pairs = [];
   for (var name in d) {
     encoded_form_pairs.push(
-      encodeURIComponent(name) + "=" + encodeURIComponent(d[name])
+      encodeURIComponent(name) + "=" + encodeURIComponent(d[name]),
     );
   }
   var form = encoded_form_pairs.join("&").replace(/%20/g, "+");
@@ -288,7 +292,7 @@ catsoop.send_request = function (names, action, send, done_function) {
     catsoop.ajaxDoneCallback(
       d,
       catsoop.this_path,
-      0
+      0,
     )(request.status, request.response);
     done_function(true, names, request.status, request.response);
   };
@@ -322,7 +326,7 @@ catsoop.viewexplanation = function (name) {
 catsoop.grade = function (name) {
   catsoop.ajaxrequest(
     [name, name + "_grading_score", name + "_grading_comments"],
-    "grade"
+    "grade",
   );
 };
 catsoop.lock = function (name) {

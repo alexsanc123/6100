@@ -49,6 +49,8 @@ _Work toward next release. Currently under development._
 
 * Replaced the `<showhide>` implementation so as to avoid broken rendering of `<details>` tags in Chromium/Chrome
 
+* Code blocks within responses to question submissions are now properly highlighted.
+
 **SECURITY:**
 
 **ACCESSIBILITY:**
