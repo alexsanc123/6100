@@ -14,6 +14,8 @@ _Work toward next release. Currently under development._
 
 * Added the `download` and `filename` options to the `raw_response` handler to allow making the responses downloadable (thanks to Shen Shen)
 
+* Updates to the question info cache can now be avoided by setting `cs_update_questions_cache = False`
+
 **CHANGED:**
 
 * Suppressed some warnings coming from BeautifulSoup
@@ -153,8 +155,6 @@ _Work toward next release. Currently under development._
 * Unauthenticated users now receive the `"Unauthenticated"` role, which can be used to control permissions
 
 * Added a way to impersonate a user while preserving their permissions, via the `preserve_permissions` query string parameter
-
-* Updates to the question info cache can now be avoided by setting `cs_update_questions_cache = False`
 
 **CHANGED:**
 
