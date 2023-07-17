@@ -558,9 +558,10 @@ def load_content(context, course, path, into, content_file=None):
                 x["csq_prompt"] = i[1].get("csq_prompt", None)
                 for name in i[0].get("question_info_fields", []):
                     x[name] = i[1].get(name, None)
-        into["csm_cslog"].overwrite_log(
-            "_question_info",
-            [course] + path,
-            "question_info",
-            {"timestamp": last_mod, "questions": qs},
-        )
+        if into.get("cs_update_questions_cache", True):
+            into["csm_cslog"].overwrite_log(
+                "_question_info",
+                [course] + path,
+                "question_info",
+                {"timestamp": last_mod, "questions": qs},
+            )

@@ -49,7 +49,7 @@ _Work toward next release. Currently under development._
 
 * Replaced the `<showhide>` implementation so as to avoid broken rendering of `<details>` tags in Chromium/Chrome
 
-* Code blocks within responses to question submissions are now properly highlighted.
+* Code blocks within responses to question submissions are now properly highlighted
 
 **SECURITY:**
 
@@ -153,6 +153,8 @@ _Work toward next release. Currently under development._
 * Unauthenticated users now receive the `"Unauthenticated"` role, which can be used to control permissions
 
 * Added a way to impersonate a user while preserving their permissions, via the `preserve_permissions` query string parameter
+
+* Updates to the question info cache can now be avoided by setting `cs_update_questions_cache = False`
 
 **CHANGED:**
 
