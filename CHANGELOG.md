@@ -24,7 +24,9 @@ _Work toward next release. Currently under development._
 
 * Changed location of lock files to (hopefully) prevent the size of the locks directory from growing out of control
 
-* Javascript files are now located at /js/ instead of /scripts/
+* Javascript files are now located at `/js/` instead of `/scripts/`
+
+* `<chapter>`, `<section>`, `<subsection>`, and `<subsubsection>` tags have been replaced with `<catsoop-chapter>`, `<catsoop-section>`, etc; and a conversion script has been provided
 
 **DEPRECATED:**
 

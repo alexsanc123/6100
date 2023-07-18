@@ -799,7 +799,10 @@ def handle_custom_tags(context, text):
         text = context["cs_course_handle_custom_tags"](text)
 
     section = r"((?:chapter)|(?:(?:sub){0,2}section))"
-    section_star = r"&lt;(?P<tag>%s)\*&gt;(?P<body>.*?)&lt;/(?P=tag)\*?&gt;" % section
+    section_star = (
+        r"&lt;catsoop-(?P<tag>%s)\*&gt;(?P<body>.*?)&lt;/catsoop-(?P=tag)\*?&gt;"
+        % section
+    )
     section_star = re.compile(section_star, re.MULTILINE | re.DOTALL | re.IGNORECASE)
 
     tag_map = {
@@ -859,20 +862,21 @@ def handle_custom_tags(context, text):
     all_title_links = set()
 
     for i in tree.find_all(re.compile(section)):
-        if i.name == "chapter":
+        tagtype = i.name.removeprefix("catsoop-")
+        if tagtype == "chapter":
             chapter = i.attrs.get("num", "0")
             tag = "h1"
             num = str(chapter)
         else:
-            if i.name == "section":
+            if tagtype == "section":
                 textsections[0] += 1
                 textsections[1] = 0
-            elif i.name == "subsection":
+            elif tagtype == "subsection":
                 textsections[1] += 1
                 textsections[2] = 0
-            elif i.name == "subsubsection":
+            elif tagtype == "subsubsection":
                 textsections[2] += 1
-            tag, lim = tag_map[i.name]
+            tag, lim = tag_map[tagtype]
             to_num = textsections[:lim]
             if chapter is not None:
                 to_num.insert(0, chapter)
@@ -886,7 +890,7 @@ def handle_custom_tags(context, text):
         lbl = i.attrs.get("label", None)
         if lbl is not None:
             labels[lbl] = {
-                "type": i.name,
+                "type": tagtype,
                 "number": num,
                 "title": i.decode_contents(),
                 "link": "#%s" % linkname_2,
