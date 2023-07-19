@@ -61,11 +61,23 @@ _Work toward next release. Currently under development._
 
 * Changed `"radio"` and `"checkbox"` multiplechoice renderers to use fieldsets and to properly associate labels with inputs
 
+* Improved screen-reader-friendliness of solution displays for the `"checkbox"` multiplechoice renderer
+
+* Improved code displays (with and without line numbers) to make them more usable with a screen reader
+
+* Automatically set ARIA labels for built-in question types based on `csq_prompt` (and added the ability to specify a `csq_preamble` that is not included as part of the ARIA label).
+
+* Switched from KaTeX to MathJax for math rendering, for better screen reader support
+
+* Improved keyboard-oriented navigation and screen-reader support for the navigation breadcrumbs and the top menu
+
 **DOCUMENTATION:**
 
 **VENDORED SOFTWARE:**
 
-* Upgraded [KaTeX](https://katex.org/) to v0.16.4
+* Removed [KaTeX](https://katex.org/) from the distribution
+
+* Included [MathJax](https://www.mathjax.org/) (v3.2.2) in the distribution
 
 
 # Version 2022.9.0
