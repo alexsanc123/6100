@@ -24849,8 +24849,11 @@ this.catsoop.codemirror = (function (exports) {
          indentUnit.of(indentString),
          keymap.of([newTabKeymap]),
          bracketMatching(),
+         EditorView.updateListener.of(function(){
+           textarea.value = view.state.doc.toString();
+         }),
      ];
-     let view = new EditorView({doc: textarea.value, extensions});
+     var view = new EditorView({doc: textarea.value, extensions});
      textarea.parentNode.insertBefore(view.dom, textarea);
      textarea.style.display = "none";
      if (textarea.form) textarea.form.addEventListener("submit", () => {
