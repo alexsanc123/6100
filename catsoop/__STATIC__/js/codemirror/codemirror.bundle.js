@@ -1,4 +1,5 @@
-var codemirror = (function (exports) {
+this.catsoop = this.catsoop || {};
+this.catsoop.codemirror = (function (exports) {
    'use strict';
 
    /**
