@@ -1,5 +1,6 @@
 import {EditorView, basicSetup} from "codemirror"
 import { pythonLanguage } from "@codemirror/lang-python"
+import { cpp } from "@codemirror/lang-cpp"
 import { LanguageSupport, indentUnit, bracketMatching } from "@codemirror/language";
 import { indentMore, indentLess } from "@codemirror/commands";
 import { keymap } from "@codemirror/view";
@@ -42,10 +43,16 @@ const newTabKeymap = {
     shift: insertSoftTab,
 };
 
-export function editorFromTextArea(textarea){
+const languages = {
+  python: python,
+  cpp: cpp,
+}
+
+export function editorFromTextArea(textarea, language){
+  language = typeof language === "undefined" ? "python" : language;
   var extensions = [
       basicSetup,
-      python(),
+      languages[language](),
       indentUnit.of(indentString),
       keymap.of([newTabKeymap]),
       bracketMatching(),

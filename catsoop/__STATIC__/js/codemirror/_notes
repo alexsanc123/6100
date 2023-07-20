@@ -1,2 +1,0 @@
-node_modules/.bin/rollup python.mjs -f iife -n codemirror -o codemirror.python.bundle.js -p @rollup/plugin-node-resolve
-node_modules/.bin/uglifyjs --source-map -c -o codemirror.python.bundle.min.js codemirror.python.bundle.js
