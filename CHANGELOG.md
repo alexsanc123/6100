@@ -71,6 +71,8 @@ _Work toward next release. Currently under development._
 
 * Improved keyboard-oriented navigation and screen-reader support for the navigation breadcrumbs and the top menu
 
+* Improved accessibility of modal dialogs from the `cs_modal` javascript function
+
 **DOCUMENTATION:**
 
 **VENDORED SOFTWARE:**
