@@ -23,14 +23,14 @@
 
 catsoop.switch_buttons = function (qname, enabled) {
   for (var b of Array.prototype.slice.call(
-    document.getElementById(qname + "_buttons").getElementsByTagName("button"),
+    document.getElementById(qname + "_buttons").getElementsByTagName("button")
   ))
     b.disabled = !enabled;
 };
 
 document.addEventListener("DOMContentLoaded", function (event) {
   for (var b of Array.prototype.slice.call(
-    document.getElementsByTagName("button"),
+    document.getElementsByTagName("button")
   ))
     b.disabled = false;
 });
@@ -125,7 +125,7 @@ catsoop.ajaxrequest = function (names, action, done_function) {
           catsoop.switch_buttons(name, true);
         }
       }
-    },
+    }
   );
 };
 
@@ -202,7 +202,7 @@ catsoop.ajaxDoneCallback = function (data, path, count) {
           }
           catsoop.render_all_math(document.getElementById("cs_qdiv_" + name));
           catsoop.syntax_highlighting(
-            document.getElementById("cs_qdiv_" + name),
+            document.getElementById("cs_qdiv_" + name)
           );
           catsoop.switch_buttons(name, true);
         }
@@ -282,7 +282,7 @@ catsoop.send_request = function (names, action, send, done_function) {
   var encoded_form_pairs = [];
   for (var name in d) {
     encoded_form_pairs.push(
-      encodeURIComponent(name) + "=" + encodeURIComponent(d[name]),
+      encodeURIComponent(name) + "=" + encodeURIComponent(d[name])
     );
   }
   var form = encoded_form_pairs.join("&").replace(/%20/g, "+");
@@ -292,7 +292,7 @@ catsoop.send_request = function (names, action, send, done_function) {
     catsoop.ajaxDoneCallback(
       d,
       catsoop.this_path,
-      0,
+      0
     )(request.status, request.response);
     done_function(true, names, request.status, request.response);
   };
@@ -326,7 +326,7 @@ catsoop.viewexplanation = function (name) {
 catsoop.grade = function (name) {
   catsoop.ajaxrequest(
     [name, name + "_grading_score", name + "_grading_comments"],
-    "grade",
+    "grade"
   );
 };
 catsoop.lock = function (name) {
@@ -359,82 +359,90 @@ catsoop.modal = function (header, text, input, cancel) {
   input = typeof input === "undefined" ? false : input;
   cancel = typeof cancel === "undefined" ? true : cancel;
   return new Promise(function (resolve, reject) {
-    var background = document.createElement("div");
-    background.addEventListener("click", function () {
-      document.body.removeChild(background);
-      reject(false);
-    });
-    background.classList = ["modal-background"];
-
-    var content = document.createElement("div");
-    content.classList = ["modal-content"];
-    content.addEventListener("click", function (e) {
-      e.stopPropagation();
-    });
-
-    if ("parentIFrame" in window) {
-      var irr = function (x) {
-        // receive parent page position info, including scrollTop
-        var top = x.scrollTop + x.clientHeight - 1000;
-        if (top > window.innerHeight - 400) {
-          top = window.innerHeight - 400;
+    var content = document.createElement("dialog");
+    content.classList = ["catsoop-modal-content"];
+    content.setAttribute("aria-labelledby", "catsoop-dialog-header");
+    content.setAttribute("aria-describedby", "catsoop-dialog-body");
+    content.addEventListener("keydown", function (e) {
+      // this piece traps focus in the dialog while it is open
+      // based on https://hidde.blog/using-javascript-to-trap-focus-in-an-element/
+      if (!content.open) {
+        return;
+      }
+      if (e.key === "Tab" || e.keyCode === 9) {
+        if (e.shiftKey) {
+          if (document.activeElement === content.focusable[0]) {
+            content.focusable[content.focusable.length - 1].focus();
+            e.preventDefault();
+          }
+        } else if (
+          document.activeElement ===
+          content.focusable[content.focusable.length - 1]
+        ) {
+          content.focusable[0].focus();
+          e.preventDefault();
         }
-        content.style.marginTop = String(top) + "px";
-        content.style.marginLeft = "auto";
-        content.style.marginRight = "auto";
-        content.style.marginBottom = "auto";
-      };
-      window.parentIFrame.getPageInfo(irr);
-    }
+      }
+    });
+    content.focusable = [];
 
     var mbody = document.createElement("div");
-    mbody.classList = ["modal-body"];
+    mbody.classList = ["catsoop-modal-body"];
 
-    var close_button = document.createElement("div");
-    close_button.classList = ["modal-close"];
+    var close_button = document.createElement("button");
+    close_button.classList = ["catsoop-modal-close"];
     close_button.innerHTML = "&times;";
-    close_button.addEventListener("click", function () {
-      document.body.removeChild(background);
-      reject(false);
-    });
+    close_button.setAttribute("aria-label", "Close");
+    close_button.onclick = function () {
+      content.close("");
+    };
+    content.focusable.push(close_button);
     mbody.append(close_button);
 
-    var title = document.createElement("h3");
+    var title = document.createElement("span");
+    title.id = "catsoop-dialog-header";
+    title.classList = ["catsoop-modal-header"];
     title.appendChild(document.createTextNode(header));
+    title.setAttribute("role", "heading");
     mbody.appendChild(title);
 
     var body = document.createElement("p");
+    body.id = "catsoop-dialog-body";
     body.innerHTML = text + "<br/>";
     mbody.appendChild(body);
 
     var buttons = document.createElement("span");
     var okay_button = document.createElement("button");
     okay_button.innerText = input ? "Submit" : "OK";
-    okay_button.classList = ["btn"];
+    okay_button.classList = ["btn btn-catsoop"];
     okay_button.addEventListener("click", function () {
-      document.body.removeChild(background);
-      resolve(input ? input_field.value : true);
+      content.close(input ? input_field.value : true);
     });
     if (input) {
       var input_field = document.createElement("input");
-      input_field.classList = ["modal-input"];
+      input_field.classList = ["catsoop-modal-input"];
       input_field.setAttribute("type", "text");
+      input_field.setAttribute("autofocus", true);
+      content.focusable.push(input);
       body.appendChild(input_field);
       input_field.addEventListener("keypress", function (e) {
         if (e.which == 13) {
           okay_button.click();
         }
       });
+    } else {
+      okay_button.setAttribute("autofocus", true);
     }
+    content.focusable.push(okay_button);
 
     if (cancel) {
       var cancel_button = document.createElement("button");
       cancel_button.innerText = "Cancel";
-      cancel_button.classList = ["btn"];
+      cancel_button.classList = ["btn btn-catsoop"];
       cancel_button.addEventListener("click", function () {
-        document.body.removeChild(background);
-        reject(false);
+        content.close("");
       });
+      content.focusable.push(cancel_button);
     }
     buttons.appendChild(okay_button);
     if (cancel) {
@@ -443,9 +451,14 @@ catsoop.modal = function (header, text, input, cancel) {
     }
     mbody.appendChild(buttons);
 
+    content.addEventListener("close", function () {
+      content.remove();
+      (content.returnValue === "" ? reject : resolve)(content.returnValue);
+    });
+
     content.appendChild(mbody);
-    background.appendChild(content);
-    document.body.appendChild(background);
+    document.body.appendChild(content);
+    content.showModal();
   });
 };
 
