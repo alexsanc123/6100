@@ -55,6 +55,8 @@ _Work toward next release. Currently under development._
 
 * Code blocks within responses to question submissions are now properly highlighted
 
+* Fixed a regression that caused the `'timeout'` option in `pythoncode` test cases to be ignored
+
 **SECURITY:**
 
 **ACCESSIBILITY:**

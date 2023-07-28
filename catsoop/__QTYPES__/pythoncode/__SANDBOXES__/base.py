@@ -144,6 +144,8 @@ def sandbox_run_test(context, code, test):
     options = dict(DEFAULT_OPTIONS)
     options.update(context.get("csq_sandbox_options", {}))
     options.update(test.get("sandbox_options", {}))
+    if (timeout := test.get("timeout", None)) is not None:
+        options["CLOCKTIME"] = timeout
     safe = safety_check(code, options["BADIMPORT"], options["BADVAR"])
     if isinstance(safe, tuple):
         return ("", ("On line %d: " % safe[0]) + safe[1], "")
