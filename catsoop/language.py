@@ -798,11 +798,8 @@ def handle_custom_tags(context, text):
     if "cs_course_handle_custom_tags" in context:
         text = context["cs_course_handle_custom_tags"](text)
 
-    section = r"((?:chapter)|(?:(?:sub){0,2}section))"
-    section_star = (
-        r"&lt;catsoop-(?P<tag>%s)\*&gt;(?P<body>.*?)&lt;/catsoop-(?P=tag)\*?&gt;"
-        % section
-    )
+    section = r"(catsoop-(?:chapter)|catsoop-(?:(?:sub){0,2}section))"
+    section_star = r"&lt;(?P<tag>%s)\*&gt;(?P<body>.*?)&lt;/(?P=tag)\*?&gt;" % section
     section_star = re.compile(section_star, re.MULTILINE | re.DOTALL | re.IGNORECASE)
 
     tag_map = {
