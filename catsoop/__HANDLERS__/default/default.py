@@ -1833,6 +1833,7 @@ def render_question(elt, context, wrap=True):
     else:
         out = ""
     if wrap and q.get("indiv", True) and args.get("csq_indiv", True):
+        out += '<section aria-label="Question">'
         out += (
             '\n<div class="question question-%s" id="cs_qdiv_%s" style="position: static">'
             % (q["qtype"], name)
@@ -1971,6 +1972,7 @@ def render_question(elt, context, wrap=True):
     out += message + "</div>"
     if wrap and q.get("indiv", True) and args.get("csq_indiv", True):
         out += "\n</div>"
+        out += "\n</section>"
     if wrap:
         out += "\n<!--END question %s -->\n" % args["csq_name"]
     return out
