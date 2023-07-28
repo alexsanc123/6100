@@ -119,6 +119,10 @@
     catsoop.syntax_highlighting = function (elt) {{
         elt.querySelectorAll('pre > code').forEach((block) => {{
             hljs.highlightBlock(block);
+            var wrap = document.createElement("section");
+            wrap.setAttribute("aria-label", "Code block");
+            block.parentNode.replaceWith(wrap);
+            wrap.append(block.parentNode);
         }});
         elt.querySelectorAll('code.highlight-lines').forEach(function(b){{
             hljs.lineNumbersBlock(b);
