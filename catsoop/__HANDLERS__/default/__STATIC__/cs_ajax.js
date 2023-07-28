@@ -189,6 +189,7 @@ catsoop.ajaxDoneCallback = function (data, path, count) {
             "buttons",
           ]) {
             if (typeof thisone[i] !== "undefined") {
+              document.getElementById(name + "_" + i).innerHTML = "";
               document.getElementById(name + "_" + i).innerHTML = thisone[i];
             }
           }

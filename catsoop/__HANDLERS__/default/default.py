@@ -1853,12 +1853,12 @@ def render_question(elt, context, wrap=True):
     out += "<div>"
     out += ('\n<span id="%s_buttons">' % name) + make_buttons(context, name) + "</span>"
     out += (
-        '\n<span id="%s_loading_wrapper">'
-        '\n<span id="%s_loading" style="display:none;"><img src="%s" class="catsoop-darkmode-invert"/>'
+        '\n<span id="%s_loading_wrapper" role="status">'
+        '\n<span id="%s_loading" style="display:none;"><img src="%s" class="catsoop-darkmode-invert"/><span class="screenreader-only-clip">Loading...</span>'
         "</span>\n</span>"
     ) % (name, name, context["cs_loading_image"])
     out += (
-        ('\n<span id="%s_score_display">' % args["csq_name"])
+        ('\n<span id="%s_score_display" role="status">' % args["csq_name"])
         + context["csm_tutor"].make_score_display(
             context,
             args,
@@ -1871,7 +1871,7 @@ def render_question(elt, context, wrap=True):
         + "</span>"
     )
     out += (
-        ('\n<div id="%s_nsubmits_left" class="nsubmits_left">' % name)
+        ('\n<div id="%s_nsubmits_left" class="nsubmits_left" role="status">' % name)
         + nsubmits_left(context, name)[1]
         + "</div>"
     )
@@ -1903,7 +1903,7 @@ def render_question(elt, context, wrap=True):
     out += "\n</div>"
     out += "\n</div>"
 
-    out += '\n<div id="%s_message">' % args["csq_name"]
+    out += '\n<div id="%s_message" role="status" aria-atomic="true">' % args["csq_name"]
 
     gmode = _get(args, "csq_grading_mode", "auto", str)
 
@@ -2664,7 +2664,7 @@ def handle_whdw(context):
 WEBSOCKET_RESPONSE = """
 <div class="callout callout-default" id="cs_partialresults_%(name)s">
   <div id="cs_partialresults_%(name)s_body">
-    <span id="cs_partialresults_%(name)s_message">Looking up your submission (id <code>%(magic)s</code>).  Watch here for updates.</span><br/>
+    <span id="cs_partialresults_%(name)s_message">Looking up your submission<span aria-hidden="true"> (id <code>%(magic)s</code>)</span>.  Watch here for updates.</span><br/>
     <center><img src="%(loading)s" class="catsoop-darkmode-invert" /></center>
   </div>
 </div>
@@ -2680,7 +2680,7 @@ if (typeof ws_%(name)s !== 'undefined'){
     delete(ws_%(name)s);
 }
 
-document.getElementById('%(name)s_score_display').innerHTML =  '<img src="%(loading)s" class="catsoop-darkmode-invert" style="vertical-align: -6px; margin-left: 5px;"/>';
+document.getElementById('%(name)s_score_display').innerHTML =  '<img src="%(loading)s" class="catsoop-darkmode-invert" style="vertical-align: -6px; margin-left: 5px;" aria-hidden="true" /><span class="screenreader-only-clip">Loading...</span>';
 
 document.querySelectorAll('#%(name)s_buttons button').forEach(function(b){b.disabled = true});
 
@@ -2717,13 +2717,13 @@ ws_%(name)s.onmessage = function(event){
         ws_%(name)s_state = 0;
         try{clearInterval(ws_%(name)s_interval);}catch(err){}
         thediv.classList = 'callout callout-warning';
-        themessage.innerHTML = 'Your submission (id <code>%(magic)s</code>) is queued to be checked (position ' + j.position + ').';
+        themessage.innerHTML = 'Your submission<span aria-hidden="true"> (id <code>%(magic)s</code>)</span> is queued to be checked (position ' + j.position + ').';
         document.querySelectorAll('#%(name)s_buttons button').forEach(function(b){b.disabled = false;});
     }else if (j.type == 'running'){
         ws_%(name)s_state = 1;
         try{clearInterval(ws_%(name)s_interval);}catch(err){}
         thediv.classList = 'callout callout-note';
-        themessage.innerHTML = 'Your submission is currently being checked<span id="%(name)s_ws_running_time"></span>.';
+        themessage.innerHTML = 'Your submission is currently being checked<span id="%(name)s_ws_running_time" aria-hidden="true"></span>.';
         document.querySelectorAll('#%(name)s_buttons button').forEach(function(b){b.disabled = false;});
         var sync = ((new Date()).valueOf()/1000 - j.now);
         ws_%(name)s_interval = setInterval(function(){catsoop.setTimeSince("%(name)s",
