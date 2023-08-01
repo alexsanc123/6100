@@ -102,7 +102,7 @@ if ENCRYPT_PASS is not None:
 
 
 def log_lock(path):
-    lock_h = hashlib.blake2b(pickle.dumps(path, -1)).hexdigest()
+    lock_h = hashlib.sha3_512(pickle.dumps(path, 5)).hexdigest()
     log_lock_location = getattr(
         base_context, "cs_log_lock_location", None
     ) or os.path.join(base_context.cs_data_root, "_locks")
@@ -125,7 +125,7 @@ def prep(x):
     """
     Helper function to serialize a Python object.
     """
-    return compress_encrypt(pickle.dumps(x, -1))
+    return compress_encrypt(pickle.dumps(x, 5))
 
 
 def decompress_decrypt(x):
