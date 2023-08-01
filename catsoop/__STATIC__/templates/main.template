@@ -60,6 +60,7 @@
             catsoop.dark_mode_settings = {cs_dark_mode_default_settings!r};
         }}
     }}
+    localStorage.setItem('catsoop_dark_mode_settings', JSON.stringify(catsoop.dark_mode_settings));
     catsoop.dark_mode = catsoop.dark_mode_settings.mode;
     delete catsoop.dark_mode_settings.mode;
     if (catsoop.dark_mode === 'enabled' || catsoop.dark_mode === 'auto'){{
