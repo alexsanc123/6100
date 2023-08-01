@@ -163,7 +163,12 @@ def main(options=[]):
                 + uwsgi_opts
             )
 
-            procs.append((base_dir, ["uwsgi"] + uwsgi_opts, 0.1, "uWSGI server"))
+            uwsgi = os.path.join(
+                os.path.dirname(os.path.abspath(sys.executable)), "uwsgi"
+            )
+            if not (os.path.isfile(uwsgi) and os.access(uwsgi, os.X_OK)):
+                uwsgi = "uwsgi"
+            procs.append((base_dir, [uwsgi, *uwsgi_opts], 0.1, "uWSGI server"))
         else:
             _log(f"unknown wsgi server {base_context.cs_wsgi_server!r}.  exiting.")
             sys.exit(1)
@@ -176,7 +181,7 @@ def main(options=[]):
                 cmd, cwd=wd, preexec_fn=set_pdeathsig(signal.SIGTERM), env=os.environ
             )
         )
-        _log(f"started {name!r} with pid {running[-1].pid}")
+        _log(f"started {name!r} with pid {running[-1].pid}: {cmd}")
         time.sleep(slp)
 
     def _kill_children():
