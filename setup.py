@@ -117,9 +117,6 @@ def dirty_version():
 
 
 def main():
-    if sys.version_info[:2] < (3, 7):
-        sys.exit("catsoop currently requires Python 3.7+")
-
     if "--name" not in sys.argv:
         print(logo)
 
@@ -156,11 +153,11 @@ def main():
             extras_require={"server": ["uwsgi"], "test": ["pytest"]},
             package_dir={"catsoop": "catsoop"},
             package_data={"catsoop": ["scripts/*"]},
+            python_require=">=3.8",
             classifiers=[
                 "Development Status :: 4 - Beta",
                 "Intended Audience :: Education",
                 "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
-                "Programming Language :: Python :: 3.7",
                 "Programming Language :: Python :: 3.8",
                 "Programming Language :: Python :: 3.9",
                 "Programming Language :: Python :: 3.10",
