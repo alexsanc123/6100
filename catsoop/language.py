@@ -803,6 +803,9 @@ def handle_custom_tags(context, text):
     section_star = re.compile(section_star, re.MULTILINE | re.DOTALL | re.IGNORECASE)
 
     tag_map = {
+        "catsoop-section": ("h2", 1),
+        "catsoop-subsection": ("h3", 2),
+        "catsoop-subsubsection": ("h4", 3),
         "section": ("h2", 1),
         "subsection": ("h3", 2),
         "subsubsection": ("h4", 3),
