@@ -28,6 +28,8 @@ _Work toward next release. Currently under development._
 
 * `<chapter>`, `<section>`, `<subsection>`, and `<subsubsection>` tags have been replaced with `<catsoop-chapter>`, `<catsoop-section>`, etc; and a conversion script has been provided
 
+* Moved the default `'remote'` Python sandbox and improved the error message when the sandbox is offline.
+
 **DEPRECATED:**
 
 **REMOVED:**

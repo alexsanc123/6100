@@ -17,7 +17,7 @@
 import json
 import urllib.request, urllib.parse, urllib.error
 
-SANDBOX_URL = "https://catsoop.org/python_sandbox/"
+SANDBOX_URL = "https://sandbox.catsoop.org"
 
 
 def run_code(
@@ -37,7 +37,11 @@ def run_code(
         resp = urllib.request.urlopen(request, data).read()
         return json.loads(resp.decode())
     except:
-        err = "CAT-SOOP: Could not connect to %s" % context.get(
-            "csq_sandbox_url", SANDBOX_URL
-        )
-        return {"fname": "", "out": "", "err": err, "info": {}}
+        err = "CAT-SOOP ERROR: Could not connect to remote sandbox"
+        return {
+            "fname": "",
+            "out": "",
+            "err": err,
+            "info": {},
+            "remote_unavailable": True,
+        }

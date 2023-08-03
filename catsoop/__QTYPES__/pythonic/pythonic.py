@@ -86,6 +86,7 @@ def handle_submission(submissions, **info):
     if inp is not None:
         return {"score": 0.0, "msg": '<font color="red">%s</font>' % inp}
 
+    test_result = None
     pythoncode["get_sandbox"](info)
     if info["csq_mode"] == "raw":
         soln = info["csq_soln"]
@@ -94,9 +95,15 @@ def handle_submission(submissions, **info):
         s = info["csq_soln"]
         code += "\n_catsoop_answer = %s" % s
         opts = info.get("csq_options", {})
-        soln = info["sandbox_run_code"](info, code, opts, result_as_string=True)[
-            "info"
-        ]["result"]
+        test_result_soln = info["sandbox_run_code"](
+            info, code, opts, result_as_string=True
+        )
+        if test_result_soln.get("remote_unavailable", False):
+            return {
+                "score": 0.0,
+                "msg": '<font color="red">%s</font>' % test_result_soln["err"],
+            }
+        soln = test_result_soln["info"]["result"]
         soln = eval(soln, info)
     try:
         if sub == "":
@@ -105,9 +112,15 @@ def handle_submission(submissions, **info):
         code = info["csq_code_pre"]
         code += "\n_catsoop_answer = %s" % sub
         opts = info.get("csq_options", {})
-        sub = info["sandbox_run_code"](
+        test_result_sub = info["sandbox_run_code"](
             info, code, opts, result_as_string=info["csq_mode"] != "raw"
-        )["info"]["result"]
+        )
+        if test_result_sub.get("remote_unavailable", False):
+            return {
+                "score": 0.0,
+                "msg": '<font color="red">%s</font>' % test_result_sub["err"],
+            }
+        sub = test_result_sub["info"]["result"]
         if info["csq_mode"] != "raw":
             sub = eval(sub, info)
     except Exception as err:
